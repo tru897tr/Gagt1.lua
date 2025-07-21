@@ -1,5 +1,3 @@
--- Script Auto Buy Seeds/Gear với nút bật/tắt UI bằng icon trên điện thoại
--- Lưu ý: Sử dụng script này có thể vi phạm điều khoản của Roblox. Hãy sử dụng cẩn thận!
 
 local RS = game:GetService("ReplicatedStorage")
 local PLS = game:GetService("Players")
