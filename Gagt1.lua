@@ -1,16 +1,16 @@
 -- LocalScript under StarterPlayerScripts
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
 -- GUI Setup
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui", 5) -- Wait for PlayerGui
+local playerGui = player:WaitForChild("PlayerGui", 5)
 if not playerGui then
     warn("PlayerGui not found!")
     return
 end
 
--- Ensure character is loaded
 if not player.Character then
     player.CharacterAdded:Wait()
 end
@@ -19,29 +19,35 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "GrowGardenMenu"
 screenGui.Parent = playerGui
 screenGui.ResetOnSpawn = false
-screenGui.Enabled = true -- Ensure GUI is enabled
-screenGui.IgnoreGuiInset = true -- Respect Roblox GUI inset
+screenGui.Enabled = true
+screenGui.IgnoreGuiInset = true
 
 -- Menu Frame (Larger Rectangle)
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 400, 0, 300)
 frame.Position = UDim2.new(0.5, -200, 0.5, -150)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Default: Dark theme
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark theme
 frame.BorderSizePixel = 0
-frame.BackgroundTransparency = 0.4 -- Increased transparency
-frame.Visible = true -- Ensure frame is visible
+frame.BackgroundTransparency = 0.4
+frame.Visible = true
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 10)
 frameCorner.Parent = frame
+
+-- Drag Handle (Top of Frame)
+local dragHandle = Instance.new("Frame")
+dragHandle.Size = UDim2.new(1, 0, 0, 30)
+dragHandle.Position = UDim2.new(0, 0, 0, 0)
+dragHandle.BackgroundTransparency = 1
+dragHandle.Parent = frame
 
 -- Sidebar Frame
 local sidebar = Instance.new("Frame")
 sidebar.Size = UDim2.new(0, 100, 1, -40)
 sidebar.Position = UDim2.new(0, 10, 0, 30)
 sidebar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-sidebar.BorderSizePixel = 0
-sidebar.BackgroundTransparency = 0.5 -- Increased transparency
+sidebar.BackgroundTransparency = 0.5
 sidebar.Parent = frame
 local sidebarCorner = Instance.new("UICorner")
 sidebarCorner.CornerRadius = UDim.new(0, 8)
@@ -58,7 +64,7 @@ title.TextScaled = true
 title.Font = Enum.Font.GothamBold
 title.Parent = frame
 
--- Content Frame (Main Area)
+-- Content Frame
 local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(0, 270, 1, -70)
 contentFrame.Position = UDim2.new(0, 120, 0, 40)
@@ -71,7 +77,7 @@ homeButton.Size = UDim2.new(1, -10, 0, 40)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Trang chủ"
 homeButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-homeButton.BackgroundTransparency = 0.3 -- Increased transparency
+homeButton.BackgroundTransparency = 0.3
 homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 homeButton.Font = Enum.Font.Gotham
 homeButton.TextSize = 14
@@ -85,7 +91,7 @@ settingsButton.Size = UDim2.new(1, -10, 0, 40)
 settingsButton.Position = UDim2.new(0, 5, 0, 50)
 settingsButton.Text = "Cài đặt"
 settingsButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-settingsButton.BackgroundTransparency = 0.3 -- Increased transparency
+settingsButton.BackgroundTransparency = 0.3
 settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 settingsButton.Font = Enum.Font.Gotham
 settingsButton.TextSize = 14
@@ -94,7 +100,7 @@ local settingsCorner = Instance.new("UICorner")
 settingsCorner.CornerRadius = UDim.new(0, 6)
 settingsCorner.Parent = settingsButton
 
--- Content: Home (Main Page)
+-- Content: Home
 local homeContent = Instance.new("Frame")
 homeContent.Size = UDim2.new(1, 0, 1, 0)
 homeContent.BackgroundTransparency = 1
@@ -106,7 +112,7 @@ speedButton.Size = UDim2.new(0, 220, 0, 40)
 speedButton.Position = UDim2.new(0, 10, 0, 10)
 speedButton.Text = "Speed Up"
 speedButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-speedButton.BackgroundTransparency = 0.3 -- Increased transparency
+speedButton.BackgroundTransparency = 0.3
 speedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 speedButton.Font = Enum.Font.Gotham
 speedButton.TextSize = 16
@@ -117,10 +123,10 @@ speedCorner.Parent = speedButton
 
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0, 220, 0, 40)
-closeButton.Position = UDim2.new(0, 10, 0, 60) -- Fixed typo
+closeButton.Position = UDim2.new(0, 10, 0, 60)
 closeButton.Text = "Close Menu"
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
-closeButton.BackgroundTransparency = 0.3 -- Increased transparency
+closeButton.BackgroundTransparency = 0.3
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.Font = Enum.Font.Gotham
 closeButton.TextSize = 16
@@ -137,7 +143,7 @@ settingsContent.Parent = contentFrame
 settingsContent.Visible = false
 
 -- Theme Selection
-local currentTheme = "Tối" -- Default theme
+local currentTheme = "Tối"
 local themeButton = Instance.new("TextButton")
 themeButton.Size = UDim2.new(0, 220, 0, 30)
 themeButton.Position = UDim2.new(0, 10, 0, 10)
@@ -155,7 +161,7 @@ themeButtonCorner.Parent = themeButton
 -- Theme Dropdown
 local themeDropdown = Instance.new("Frame")
 themeDropdown.Size = UDim2.new(0, 100, 0, 120)
-themeDropdown.Position = UDim2.new(0, 235, 0, 10) -- Right of themeButton
+themeDropdown.Position = UDim2.new(0, 235, 0, 10)
 themeDropdown.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 themeDropdown.BackgroundTransparency = 0.4
 themeDropdown.Visible = false
@@ -189,17 +195,33 @@ for i, theme in ipairs(themes) do
     optionButton.MouseButton1Click:Connect(function()
         currentTheme = theme.Name
         themeButton.Text = "Chọn chủ đề: " .. currentTheme .. " >"
-        themeDropdown.Visible = false
+        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2), {Size = UDim2.new(0, 100, 0, 0)})
+        tween:Play()
+        tween.Completed:Connect(function()
+            themeDropdown.Visible = false
+            themeDropdown.Size = UDim2.new(0, 100, 0, 120)
+        end)
         frame.BackgroundColor3 = theme.Color
         sidebar.BackgroundColor3 = Color3.new(theme.Color.R * 1.2, theme.Color.G * 1.2, theme.Color.B * 1.2)
         title.TextColor3 = theme.TextColor
         themeButton.TextColor3 = theme.TextColor
-        credit.TextColor3 = theme.TextColor -- Update credit text color
+        credit.TextColor3 = theme.TextColor
     end)
 end
 
 themeButton.MouseButton1Click:Connect(function()
-    themeDropdown.Visible = not themeDropdown.Visible
+    if themeDropdown.Visible then
+        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2), {Size = UDim2.new(0, 100, 0, 0)})
+        tween:Play()
+        tween.Completed:Connect(function()
+            themeDropdown.Visible = false
+            themeDropdown.Size = UDim2.new(0, 100, 0, 120)
+        end)
+    else
+        themeDropdown.Visible = true
+        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2), {Size = UDim2.new(0, 100, 0, 120)})
+        tween:Play()
+    end
 end)
 
 -- Credit Label
@@ -214,40 +236,83 @@ credit.Font = Enum.Font.Gotham
 credit.TextSize = 14
 credit.Parent = frame
 
--- Toggle Button (Checkbox) outside Frame
+-- Toggle Button (Circular, Top-Right)
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 30, 0, 30)
-toggleButton.Position = UDim2.new(0, 10, 0, 10)
+toggleButton.Position = UDim2.new(1, -40, 0, 10) -- Top-right corner
 toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 toggleButton.BackgroundTransparency = 0.3
 toggleButton.Text = ""
 toggleButton.Parent = screenGui
 local toggleCorner = Instance.new("UICorner")
-toggleCorner.CornerRadius = UDim.new(0, 5)
+toggleCorner.CornerRadius = UDim.new(0, 15) -- Circular
 toggleCorner.Parent = toggleButton
 
--- Menu Visibility
+-- Menu Visibility with Zoom Effect
 local menuVisible = true
 local function toggleMenu()
     menuVisible = not menuVisible
-    frame.Visible = menuVisible
+    local scaleGoal = menuVisible and 1 or 0
+    local transparencyGoal = menuVisible and 0.4 or 1
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+    local tween = TweenService:Create(frame, tweenInfo, {
+        Size = UDim2.new(0, 400 * scaleGoal, 0, 300 * scaleGoal),
+        BackgroundTransparency = transparencyGoal
+    })
+    tween:Play()
+    tween.Completed:Connect(function()
+        if not menuVisible then
+            frame.Visible = false
+            frame.Size = UDim2.new(0, 400, 0, 300) -- Reset size
+        else
+            frame.Visible = true
+        end
+    end)
     toggleButton.BackgroundColor3 = menuVisible and Color3.fromRGB(0, 255, 127) or Color3.fromRGB(255, 255, 255)
 end
+
+-- Drag Functionality
+local dragging = false
+local dragStartPos, startPos
+dragHandle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStartPos = input.Position
+        startPos = frame.Position
+    end
+end)
+
+dragHandle.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStartPos
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
 
 -- Sidebar Navigation
 local function showHome()
     homeContent.Visible = true
     settingsContent.Visible = false
-    homeButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-    settingsButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    local tween = TweenService:Create(homeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 170, 255)})
+    tween:Play()
+    tween = TweenService:Create(settingsButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)})
+    tween:Play()
     themeDropdown.Visible = false
 end
 
 local function showSettings()
     homeContent.Visible = false
     settingsContent.Visible = true
-    homeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    settingsButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    local tween = TweenService:Create(homeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(100, 100, 100)})
+    tween:Play()
+    tween = TweenService:Create(settingsButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 170, 255)})
+    tween:Play()
     themeDropdown.Visible = false
 end
 
@@ -294,14 +359,14 @@ end)
 local function addHoverEffect(button)
     local originalColor = button.BackgroundColor3
     button.MouseEnter:Connect(function()
-        button.BackgroundColor3 = Color3.new(
-            originalColor.R * 0.8,
-            originalColor.G * 0.8,
-            originalColor.B * 0.8
-        )
+        local tween = TweenService:Create(button, TweenInfo.new(0.2), {
+            BackgroundColor3 = Color3.new(originalColor.R * 0.8, originalColor.G * 0.8, originalColor.B * 0.8)
+        })
+        tween:Play()
     end)
     button.MouseLeave:Connect(function()
-        button.BackgroundColor3 = originalColor
+        local tween = TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = originalColor})
+        tween:Play()
     end)
 end
 
