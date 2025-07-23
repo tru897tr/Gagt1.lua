@@ -1,6 +1,7 @@
 -- Script chạy phía client, đặt trong StarterPlayerScripts
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui", 10) -- Chờ PlayerGui tải
 
@@ -22,29 +23,45 @@ toggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Tạo Frame chính (menu)
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 200, 0, 150) -- Kích thước nhỏ gọn
-frame.Position = UDim2.new(0.5, -100, 0.5, -75) -- Căn giữa màn hình
-frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-frame.BorderSizePixel = 2
+frame.Size = UDim2.new(0, 220, 0, 160) -- Kích thước lớn hơn một chút cho giao diện hiện đại
+frame.Position = UDim2.new(0.5, -110, 0.5, -80) -- Căn giữa
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Màu nền tối
+frame.BorderSizePixel = 0
 frame.ZIndex = 10
 frame.Parent = menuGui
-frame.Active = true -- Cho phép tương tác kéo thả
-frame.Draggable = false -- Sử dụng logic kéo thả tùy chỉnh
+frame.Active = true
+frame.Visible = true -- Hiển thị ban đầu
 
 -- Bo góc cho Frame
 local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 10)
+corner.CornerRadius = UDim.new(0, 12)
 corner.Parent = frame
+
+-- Gradient cho Frame
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 50, 50)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
+})
+gradient.Rotation = 45
+gradient.Parent = frame
+
+-- Bóng đổ cho Frame
+local shadow = Instance.new("UIStroke")
+shadow.Thickness = 2
+shadow.Color = Color3.fromRGB(0, 255, 0) -- Viền xanh neon cho vibe hiện đại
+shadow.Transparency = 0.5
+shadow.Parent = frame
 
 -- Tạo tiêu đề "Grow A Garden"
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(0, 180, 0, 40)
-title.Position = UDim2.new(0.5, -90, 0, 10)
+title.Size = UDim2.new(0, 200, 0, 40)
+title.Position = UDim2.new(0.5, -100, 0, 10)
 title.BackgroundTransparency = 1
 title.Text = "Grow A Garden"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 20
-title.Font = Enum.Font.SourceSansBold
+title.TextColor3 = Color3.fromRGB(0, 255, 0) -- Màu xanh neon
+title.TextSize = 22
+title.Font = Enum.Font.FredokaOne -- Font hiện đại
 title.ZIndex = 11
 title.Parent = frame
 
@@ -63,25 +80,49 @@ local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 5)
 closeCorner.Parent = closeButton
 closeButton.MouseButton1Click:Connect(function()
-    frame.Visible = false -- Chỉ ẩn frame
+    -- Hiệu ứng trượt ra khi đóng
+    local tween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Position = UDim2.new(0.5, -110, 0.6, -80),
+        Transparency = 1
+    })
+    tween:Play()
+    tween.Completed:Connect(function()
+        frame.Visible = false
+        frame.Transparency = 0
+    end)
 end)
 
--- Hàm tạo nút
+-- Hàm tạo nút với hiệu ứng hover
 local function createButton(name, positionY, text, callback)
     local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 150, 0, 40)
-    button.Position = UDim2.new(0.5, -75, 0, positionY)
-    button.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
+    button.Size = UDim2.new(0, 160, 0, 40)
+    button.Position = UDim2.new(0.5, -80, 0, positionY)
+    button.BackgroundColor3 = Color3.fromRGB(0, 120, 255) -- Màu xanh hiện đại
     button.Text = text
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.TextSize = 16
-    button.Font = Enum.Font.SourceSansBold
+    button.Font = Enum.Font.FredokaOne
     button.ZIndex = 11
     button.Parent = frame
 
     local btnCorner = Instance.new("UICorner")
     btnCorner.CornerRadius = UDim.new(0, 8)
     btnCorner.Parent = button
+
+    local btnGradient = Instance.new("UIGradient")
+    btnGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 255)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 80, 200))
+    })
+    btnGradient.Parent = button
+
+    -- Hiệu ứng hover
+    button.MouseEnter:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundTransparency = 0.2}):Play()
+    end)
+    button.MouseLeave:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+    end)
 
     button.MouseButton1Click:Connect(callback)
 end
@@ -101,22 +142,52 @@ end)
 
 -- Tạo nút bật/tắt giao diện (hình vuông nhỏ)
 local toggleButton = Instance.new("ImageButton")
-toggleButton.Size = UDim2.new(0, 50, 0, 50) -- Hình vuông nhỏ
-toggleButton.Position = UDim2.new(0, 10, 0, 10) -- Góc trên bên trái
-toggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+toggleButton.Size = UDim2.new(0, 50, 0, 50)
+toggleButton.Position = UDim2.new(0, 10, 0, 10)
+toggleButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 toggleButton.Image = "rbxassetid://10723433819" -- Asset ID mẫu
 toggleButton.ZIndex = 10
 toggleButton.Parent = toggleGui
-toggleButton.Active = true -- Cho phép tương tác kéo thả
+toggleButton.Active = true
 local toggleCorner = Instance.new("UICorner")
-toggleCorner.CornerRadius = UDim.new(0, 5)
+toggleCorner.CornerRadius = UDim.new(0, 10)
 toggleCorner.Parent = toggleButton
-toggleButton.MouseButton1Click:Connect(function()
-    frame.Visible = not frame.Visible -- Chỉ bật/tắt frame
-end)
+local toggleGradient = Instance.new("UIGradient")
+toggleGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 120, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 80, 200))
+})
+toggleGradient.Parent = toggleButton
+
+-- Hiệu ứng bật/tắt menu
+local function toggleMenu()
+    if frame.Visible then
+        -- Hiệu ứng trượt ra
+        local tween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Position = UDim2.new(0.5, -110, 0.6, -80),
+            Transparency = 1
+        })
+        tween:Play()
+        tween.Completed:Connect(function()
+            frame.Visible = false
+            frame.Transparency = 0
+        end)
+    else
+        -- Hiệu ứng trượt vào
+        frame.Visible = true
+        frame.Position = UDim2.new(0.5, -110, 0.6, -80)
+        frame.Transparency = 1
+        local tween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            Position = UDim2.new(0.5, -110, 0.5, -80),
+            Transparency = 0
+        })
+        tween:Play()
+    end
+end
+toggleButton.MouseButton1Click:Connect(toggleMenu)
 
 -- Kéo thả cho Frame (menu)
-local draggingFrame, dragInput, dragStart, startPos
+local draggingFrame, dragStart, startPos
 local function updateFrame(input)
     local delta = input.Position - dragStart
     frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
@@ -139,11 +210,17 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Kéo thả cho nút bật/tắt
+-- Kéo thả cải tiến cho nút bật/tắt
 local draggingToggle, toggleDragStart, toggleStartPos
 local function updateToggle(input)
     local delta = input.Position - toggleDragStart
-    toggleButton.Position = UDim2.new(toggleStartPos.X.Scale, toggleStartPos.X.Offset + delta.X, toggleStartPos.Y.Scale, toggleStartPos.Y.Offset + delta.Y)
+    local newX = toggleStartPos.X.Offset + delta.X
+    local newY = toggleStartPos.Y.Offset + delta.Y
+    -- Giới hạn để nút không vượt ra ngoài màn hình
+    local screenSize = playerGui:GetService("GuiService"):GetScreenResolution()
+    newX = math.clamp(newX, 0, screenSize.X - toggleButton.Size.X.Offset)
+    newY = math.clamp(newY, 0, screenSize.Y - toggleButton.Size.Y.Offset)
+    toggleButton.Position = UDim2.new(0, newX, 0, newY)
 end
 toggleButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -166,6 +243,6 @@ end)
 -- Bật/tắt menu bằng phím Right Shift
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and input.KeyCode == Enum.KeyCode.RightShift then
-        frame.Visible = not frame.Visible -- Chỉ bật/tắt frame
+        toggleMenu()
     end
 end)
