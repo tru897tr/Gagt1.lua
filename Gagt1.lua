@@ -40,11 +40,6 @@ local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 10)
 frameCorner.Parent = frame
 
--- UI Scale for Zoom
-local uiScale = Instance.new("UIScale")
-uiScale.Scale = 1
-uiScale.Parent = frame
-
 -- Drag Handle (Top of Frame)
 local dragHandle = Instance.new("Frame")
 dragHandle.Size = UDim2.new(1, 0, 0, 30)
@@ -258,26 +253,11 @@ local toggleCorner = Instance.new("UICorner")
 toggleCorner.CornerRadius = UDim.new(0, 15)
 toggleCorner.Parent = toggleButton
 
--- Menu Visibility with Zoom Effect
+-- Menu Visibility (No Zoom, Only Show/Hide)
 local menuVisible = true
 local function toggleMenu()
     menuVisible = not menuVisible
-    local scaleGoal = menuVisible and 1 or 0.2
-    local transparencyGoal = menuVisible and 0.4 or 1
-    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
-    local scaleTween = TweenService:Create(uiScale, tweenInfo, {Scale = scaleGoal})
-    local transparencyTween = TweenService:Create(frame, tweenInfo, {BackgroundTransparency = transparencyGoal})
-    scaleTween:Play()
-    transparencyTween:Play()
-    scaleTween.Completed:Connect(function()
-        if not menuVisible then
-            frame.Visible = false
-            uiScale.Scale = 1
-            frame.BackgroundTransparency = 0.4
-        else
-            frame.Visible = true
-        end
-    end)
+    frame.Visible = menuVisible
     toggleButton.BackgroundColor3 = menuVisible and Color3.fromRGB(0, 255, 127) or Color3.fromRGB(255, 255, 255)
 end
 
@@ -289,7 +269,7 @@ dragHandle.InputBegan:Connect(function(input)
         dragging = true
         dragStartPos = UserInputService:GetMouseLocation()
         startPos = frame.Position
-        print("Drag started at: " .. tostring(dragStartPos))
+        print("Drag started at: " .. tostring(dragStartPos) .. ", Frame at: " .. tostring(startPos))
     end
 end)
 
@@ -298,8 +278,8 @@ dragHandle.InputChanged:Connect(function(input)
         local currentPos = UserInputService:GetMouseLocation()
         local delta = currentPos - dragStartPos
         local screenSize = GuiService:GetScreenResolution()
-        local newX = math.clamp(startPos.X.Offset + delta.X, -200, screenSize.X - 200) -- Adjusted bounds
-        local newY = math.clamp(startPos.Y.Offset + delta.Y, -150, screenSize.Y - 150)
+        local newX = math.clamp(startPos.X.Offset + delta.X, 0, screenSize.X - 400) -- Adjusted bounds
+        local newY = math.clamp(startPos.Y.Offset + delta.Y, 0, screenSize.Y - 300)
         frame.Position = UDim2.new(0, newX, 0, newY)
         savedPosition = frame.Position
         print("Dragging to: " .. tostring(frame.Position))
