@@ -29,12 +29,12 @@ local savedPosition = UDim2.new(0.5, 0, 0.5, 0) -- Default center
 -- Menu Frame (Larger Rectangle)
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 400, 0, 300)
-frame.Position = savedPosition -- Start at center
+frame.Position = savedPosition
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.4
 frame.Visible = true
-frame.AnchorPoint = Vector2.new(0.5, 0.5) -- Center for zoom and position
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 10)
@@ -262,7 +262,7 @@ toggleCorner.Parent = toggleButton
 local menuVisible = true
 local function toggleMenu()
     menuVisible = not menuVisible
-    local scaleGoal = menuVisible and 1 or 0.2 -- Zoom to 20% when hiding
+    local scaleGoal = menuVisible and 1 or 0.2
     local transparencyGoal = menuVisible and 0.4 or 1
     local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
     local scaleTween = TweenService:Create(uiScale, tweenInfo, {Scale = scaleGoal})
@@ -272,7 +272,7 @@ local function toggleMenu()
     scaleTween.Completed:Connect(function()
         if not menuVisible then
             frame.Visible = false
-            uiScale.Scale = 1 -- Reset scale
+            uiScale.Scale = 1
             frame.BackgroundTransparency = 0.4
         else
             frame.Visible = true
@@ -287,25 +287,29 @@ local dragStartPos, startPos
 dragHandle.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
-        dragStartPos = input.Position
+        dragStartPos = UserInputService:GetMouseLocation()
         startPos = frame.Position
+        print("Drag started at: " .. tostring(dragStartPos))
     end
 end)
 
 dragHandle.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStartPos
+        local currentPos = UserInputService:GetMouseLocation()
+        local delta = currentPos - dragStartPos
         local screenSize = GuiService:GetScreenResolution()
-        local newX = math.clamp(startPos.X.Offset + delta.X, -350, screenSize.X - 50)
-        local newY = math.clamp(startPos.Y.Offset + delta.Y, -250, screenSize.Y - 50)
+        local newX = math.clamp(startPos.X.Offset + delta.X, -200, screenSize.X - 200) -- Adjusted bounds
+        local newY = math.clamp(startPos.Y.Offset + delta.Y, -150, screenSize.Y - 150)
         frame.Position = UDim2.new(0, newX, 0, newY)
-        savedPosition = frame.Position -- Save new position
+        savedPosition = frame.Position
+        print("Dragging to: " .. tostring(frame.Position))
     end
 end)
 
 UserInputService.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = false
+        print("Drag ended at: " .. tostring(frame.Position))
     end
 end)
 
