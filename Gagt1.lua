@@ -9,14 +9,16 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "GrowAGardenMenu"
 screenGui.Parent = playerGui
 screenGui.ResetOnSpawn = false
-screenGui.Enabled = false -- Tắt menu ban đầu, bật bằng Right Shift
+screenGui.Enabled = true -- Menu hiển thị ngay khi bắt đầu
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Tạo Frame chính
+-- Tạo Frame chính (menu)
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 200, 0, 150) -- Kích thước nhỏ gọn
 frame.Position = UDim2.new(0.5, -100, 0.5, -75) -- Căn giữa màn hình
 frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 frame.BorderSizePixel = 2
+frame.ZIndex = 10
 frame.Parent = screenGui
 
 -- Bo góc cho Frame
@@ -33,17 +35,19 @@ title.Text = "Grow A Garden"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextSize = 20
 title.Font = Enum.Font.SourceSansBold
+title.ZIndex = 11
 title.Parent = frame
 
--- Tạo nút đóng (dấu X) ở góc trên bên phải
+-- Tạo nút đóng (dấu X)
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0, 30, 0, 30)
 closeButton.Position = UDim2.new(1, -35, 0, 5)
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50) -- Màu đỏ
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
 closeButton.Text = "X"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.TextSize = 16
 closeButton.Font = Enum.Font.SourceSansBold
+closeButton.ZIndex = 11
 closeButton.Parent = frame
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 5)
@@ -62,6 +66,7 @@ local function createButton(name, positionY, text, callback)
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.TextSize = 16
     button.Font = Enum.Font.SourceSansBold
+    button.ZIndex = 11
     button.Parent = frame
 
     local btnCorner = Instance.new("UICorner")
@@ -84,18 +89,61 @@ createButton("SpeedUpButton", 60, "Speed Up X", function()
     end
 end)
 
--- Tạo nút bật/tắt giao diện (hình vuông nhỏ với hình ảnh)
+-- Tạo nút bật/tắt giao diện (hình vuông nhỏ)
 local toggleButton = Instance.new("ImageButton")
 toggleButton.Size = UDim2.new(0, 50, 0, 50) -- Hình vuông nhỏ
-toggleButton.Position = UDim2.new(0, 10, 0, 10) -- Góc trên bên trái màn hình
+toggleButton.Position = UDim2.new(0, 10, 0, 10) -- Góc trên bên trái
 toggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-toggleButton.Image = "rbxassetid://YOUR_ASSET_ID" -- Thay YOUR_ASSET_ID bằng Asset ID hình ảnh
+toggleButton.Image = "rbxassetid://10723433819" -- Asset ID mẫu
+toggleButton.ZIndex = 10
 toggleButton.Parent = screenGui
 local toggleCorner = Instance.new("UICorner")
 toggleCorner.CornerRadius = UDim.new(0, 5)
 toggleCorner.Parent = toggleButton
 toggleButton.MouseButton1Click:Connect(function()
     screenGui.Enabled = not screenGui.Enabled
+end)
+
+-- Kéo thả cho Frame (menu)
+local draggingFrame, dragStart, startPos
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingFrame = true
+        dragStart = input.Position
+        startPos = frame.Position
+    end
+end)
+frame.InputChanged:Connect(function(input)
+    if draggingFrame and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+frame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingFrame = false
+    end
+end)
+
+-- Kéo thả cho nút bật/tắt
+local draggingToggle, toggleStart, togglePos
+toggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingToggle = true
+        toggleStart = input.Position
+        togglePos = toggleButton.Position
+    end
+end)
+toggleButton.InputChanged:Connect(function(input)
+    if draggingToggle and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - toggleStart
+        toggleButton.Position = UDim2.new(togglePos.X.Scale, togglePos.X.Offset + delta.X, togglePos.Y.Scale, togglePos.Y.Offset + delta.Y)
+    end
+end)
+toggleButton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        draggingToggle = false
+    end
 end)
 
 -- Bật/tắt menu bằng phím Right Shift
