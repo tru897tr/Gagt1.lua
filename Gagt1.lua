@@ -37,11 +37,22 @@ closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.Parent = frame
 
+-- Checkbox Button
+local checkbox = Instance.new("TextButton")
+checkbox.Size = UDim2.new(0, 20, 0, 20)
+checkbox.Position = UDim2.new(0, 10, 0, 120)
+checkbox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+checkbox.Text = "" -- Empty text for a simple square
+checkbox.Parent = frame
+local checkboxState = false -- Tracks checkbox state (checked/unchecked)
+
 -- Toggle Visibility
 local menuVisible = true
 local function toggleMenu()
     menuVisible = not menuVisible
     frame.Visible = menuVisible
+    -- Update checkbox appearance
+    checkbox.BackgroundColor3 = menuVisible and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 255, 255)
 end
 
 -- Toggle with RightShift
@@ -63,5 +74,11 @@ end)
 
 -- Close Button Logic
 closeButton.MouseButton1Click:Connect(function()
+    toggleMenu()
+end)
+
+-- Checkbox Logic
+checkbox.MouseButton1Click:Connect(function()
+    checkboxState = not checkboxState
     toggleMenu()
 end)
