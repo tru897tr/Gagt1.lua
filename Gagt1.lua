@@ -4,13 +4,21 @@ local UserInputService = game:GetService("UserInputService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui", 10) -- Chờ PlayerGui tải
 
--- Tạo ScreenGui
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "GrowAGardenMenu"
-screenGui.Parent = playerGui
-screenGui.ResetOnSpawn = false
-screenGui.Enabled = true -- Menu hiển thị ngay khi bắt đầu
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+-- Tạo ScreenGui cho menu
+local menuGui = Instance.new("ScreenGui")
+menuGui.Name = "GrowAGardenMenu"
+menuGui.Parent = playerGui
+menuGui.ResetOnSpawn = false
+menuGui.Enabled = true -- Menu hiển thị ngay khi bắt đầu
+menuGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Tạo ScreenGui riêng cho nút bật/tắt
+local toggleGui = Instance.new("ScreenGui")
+toggleGui.Name = "ToggleButtonGui"
+toggleGui.Parent = playerGui
+toggleGui.ResetOnSpawn = false
+toggleGui.Enabled = true -- Nút bật/tắt luôn hiển thị
+toggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Tạo Frame chính (menu)
 local frame = Instance.new("Frame")
@@ -19,7 +27,9 @@ frame.Position = UDim2.new(0.5, -100, 0.5, -75) -- Căn giữa màn hình
 frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 frame.BorderSizePixel = 2
 frame.ZIndex = 10
-frame.Parent = screenGui
+frame.Parent = menuGui
+frame.Active = true -- Cho phép tương tác kéo thả
+frame.Draggable = false -- Sử dụng logic kéo thả tùy chỉnh
 
 -- Bo góc cho Frame
 local corner = Instance.new("UICorner")
@@ -53,7 +63,7 @@ local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 5)
 closeCorner.Parent = closeButton
 closeButton.MouseButton1Click:Connect(function()
-    screenGui.Enabled = false
+    frame.Visible = false -- Chỉ ẩn frame
 end)
 
 -- Hàm tạo nút
@@ -96,59 +106,66 @@ toggleButton.Position = UDim2.new(0, 10, 0, 10) -- Góc trên bên trái
 toggleButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 toggleButton.Image = "rbxassetid://10723433819" -- Asset ID mẫu
 toggleButton.ZIndex = 10
-toggleButton.Parent = screenGui
+toggleButton.Parent = toggleGui
+toggleButton.Active = true -- Cho phép tương tác kéo thả
 local toggleCorner = Instance.new("UICorner")
 toggleCorner.CornerRadius = UDim.new(0, 5)
 toggleCorner.Parent = toggleButton
 toggleButton.MouseButton1Click:Connect(function()
-    screenGui.Enabled = not screenGui.Enabled
+    frame.Visible = not frame.Visible -- Chỉ bật/tắt frame
 end)
 
 -- Kéo thả cho Frame (menu)
-local draggingFrame, dragStart, startPos
+local draggingFrame, dragInput, dragStart, startPos
+local function updateFrame(input)
+    local delta = input.Position - dragStart
+    frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
 frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         draggingFrame = true
         dragStart = input.Position
         startPos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                draggingFrame = false
+            end
+        end)
     end
 end)
-frame.InputChanged:Connect(function(input)
-    if draggingFrame and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-frame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        draggingFrame = false
+UserInputService.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and draggingFrame then
+        updateFrame(input)
     end
 end)
 
 -- Kéo thả cho nút bật/tắt
-local draggingToggle, toggleStart, togglePos
+local draggingToggle, toggleDragStart, toggleStartPos
+local function updateToggle(input)
+    local delta = input.Position - toggleDragStart
+    toggleButton.Position = UDim2.new(toggleStartPos.X.Scale, toggleStartPos.X.Offset + delta.X, toggleStartPos.Y.Scale, toggleStartPos.Y.Offset + delta.Y)
+end
 toggleButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
         draggingToggle = true
-        toggleStart = input.Position
-        togglePos = toggleButton.Position
+        toggleDragStart = input.Position
+        toggleStartPos = toggleButton.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                draggingToggle = false
+            end
+        end)
     end
 end)
-toggleButton.InputChanged:Connect(function(input)
-    if draggingToggle and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - toggleStart
-        toggleButton.Position = UDim2.new(togglePos.X.Scale, togglePos.X.Offset + delta.X, togglePos.Y.Scale, togglePos.Y.Offset + delta.Y)
-    end
-end)
-toggleButton.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        draggingToggle = false
+UserInputService.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and draggingToggle then
+        updateToggle(input)
     end
 end)
 
 -- Bật/tắt menu bằng phím Right Shift
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and input.KeyCode == Enum.KeyCode.RightShift then
-        screenGui.Enabled = not screenGui.Enabled
+        frame.Visible = not frame.Visible -- Chỉ bật/tắt frame
     end
 end)
