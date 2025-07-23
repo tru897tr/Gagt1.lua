@@ -4,6 +4,7 @@ local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui", 10) -- Chờ PlayerGui tải
+print("PlayerGui loaded") -- Debug
 
 -- Tạo ScreenGui cho menu
 local menuGui = Instance.new("ScreenGui")
@@ -12,7 +13,7 @@ menuGui.ResetOnSpawn = false
 menuGui.Enabled = true
 menuGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 menuGui.Parent = playerGui
-print("MenuGui created and parented to PlayerGui") -- Debug
+print("menuGui created and parented") -- Debug
 
 -- Tạo ScreenGui cho nút bật/tắt
 local toggleGui = Instance.new("ScreenGui")
@@ -21,7 +22,7 @@ toggleGui.ResetOnSpawn = false
 toggleGui.Enabled = true
 toggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 toggleGui.Parent = playerGui
-print("ToggleGui created and parented to PlayerGui") -- Debug
+print("toggleGui created and parented") -- Debug
 
 -- Tạo Frame chính (menu)
 local frame = Instance.new("Frame")
@@ -34,7 +35,7 @@ frame.ZIndex = 10
 frame.Active = true
 frame.Visible = true
 frame.Parent = menuGui
-print("Menu Frame created") -- Debug
+print("Frame created") -- Debug
 
 -- Bo góc cho Frame
 local corner = Instance.new("UICorner")
@@ -50,7 +51,7 @@ gradient.Color = ColorSequence.new({
 gradient.Rotation = 90
 gradient.Parent = frame
 
--- Viền mỏng nhẹ nhàng
+-- Viền mỏng
 local stroke = Instance.new("UIStroke")
 stroke.Thickness = 1
 stroke.Color = Color3.fromRGB(150, 180, 200)
@@ -60,13 +61,14 @@ stroke.Parent = frame
 
 -- Tạo tiêu đề "Grow A Garden"
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(0, 200, 0, 40)
-title.Position = UDim2.new(0.5, -100, 0, 10)
+title.Size = UDim2.new(1, -20, 0, 40)
+title.Position = UDim2.new(0, 10, 0, 10)
 title.BackgroundTransparency = 1
 title.Text = "Grow A Garden"
 title.TextColor3 = Color3.fromRGB(50, 70, 100)
 title.TextSize = 22
 title.Font = Enum.Font.SourceSansPro
+title.TextXAlignment = Enum.TextXAlignment.Center
 title.ZIndex = 11
 title.Parent = frame
 print("Title created") -- Debug
@@ -116,71 +118,56 @@ closeButton.MouseButton1Click:Connect(function()
 end)
 print("Close Button created") -- Debug
 
--- Hàm tạo nút với hiệu ứng tap/hover
-local function createButton(name, positionY, text, callback)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 160, 0, 40)
-    button.Position = UDim2.new(0.5, -80, 0, positionY)
-    button.BackgroundColor3 = Color3.fromRGB(100, 150, 200)
-    button.BackgroundTransparency = 0.3
-    button.Text = text
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.TextSize = 16
-    button.Font = Enum.Font.SourceSansPro
-    button.ZIndex = 11
-    button.Parent = frame
-
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 8)
-    btnCorner.Parent = button
-
-    local btnGradient = Instance.new("UIGradient")
-    btnGradient.Color = ColorSequence.new({
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 150, 200)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(80, 120, 180))
-    })
-    btnGradient.Rotation = 90
-    btnGradient.Parent = button
-
-    local btnStroke = Instance.new("UIStroke")
-    btnStroke.Thickness = 1
-    btnStroke.Color = Color3.fromRGB(150, 180, 200)
-    btnStroke.Transparency = 0.5
-    btnStroke.Parent = button
-
-    button.MouseEnter:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0, TextSize = 17}):Play()
-        TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
-    end)
-    button.MouseLeave:Connect(function()
-        TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.3, TextSize = 16}):Play()
-        TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
-    end)
-    button.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch then
-            TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0, TextSize = 17}):Play()
-            TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
-        end
-    end)
-    button.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch then
-            TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.3, TextSize = 16}):Play()
-            TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
-        end
-    end)
-
-    button.MouseButton1Click:Connect(callback)
-    button.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.Touch then
-            callback()
-        end
-    end)
-    print("Button " .. name .. " created") -- Debug
-end
-
 -- Tạo nút "Speed Up X"
-createButton("SpeedUpButton", 60, "Speed Up X", function()
-    print("Speed Up X clicked")
+local speedUpButton = Instance.new("TextButton")
+speedUpButton.Name = "SpeedUpButton"
+speedUpButton.Size = UDim2.new(0, 160, 0, 40)
+speedUpButton.Position = UDim2.new(0.5, -80, 0, 60)
+speedUpButton.BackgroundColor3 = Color3.fromRGB(100, 150, 200)
+speedUpButton.BackgroundTransparency = 0.3
+speedUpButton.Text = "Speed Up X"
+speedUpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedUpButton.TextSize = 16
+speedUpButton.Font = Enum.Font.SourceSansPro
+speedUpButton.ZIndex = 11
+speedUpButton.Parent = frame
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 8)
+btnCorner.Parent = speedUpButton
+local btnGradient = Instance.new("UIGradient")
+btnGradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(100, 150, 200)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(80, 120, 180))
+})
+btnGradient.Rotation = 90
+btnGradient.Parent = speedUpButton
+local btnStroke = Instance.new("UIStroke")
+btnStroke.Thickness = 1
+btnStroke.Color = Color3.fromRGB(150, 180, 200)
+btnStroke.Transparency = 0.5
+btnStroke.Parent = speedUpButton
+speedUpButton.MouseEnter:Connect(function()
+    TweenService:Create(speedUpButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0, TextSize = 17}):Play()
+    TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
+end)
+speedUpButton.MouseLeave:Connect(function()
+    TweenService:Create(speedUpButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.3, TextSize = 16}):Play()
+    TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
+end)
+speedUpButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch then
+        TweenService:Create(speedUpButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0, TextSize = 17}):Play()
+        TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
+    end
+end)
+speedUpButton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch then
+        TweenService:Create(speedUpButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.3, TextSize = 16}):Play()
+        TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
+    end
+end)
+speedUpButton.MouseButton1Click:Connect(function()
+    print("Speed Up X clicked") -- Debug
     local success, errorMsg = pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
     end)
@@ -190,6 +177,20 @@ createButton("SpeedUpButton", 60, "Speed Up X", function()
         warn("Error executing script: " .. tostring(errorMsg))
     end
 end)
+speedUpButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch then
+        print("Speed Up X touched") -- Debug
+        local success, errorMsg = pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+        end)
+        if success then
+            print("Script executed successfully!")
+        else
+            warn("Error executing script: " .. tostring(errorMsg))
+        end
+    end
+end)
+print("SpeedUpButton created") -- Debug
 
 -- Tạo nút bật/tắt (hình vuông nhỏ, không dùng hình ảnh)
 local toggleButton = Instance.new("TextButton")
@@ -201,8 +202,9 @@ toggleButton.Text = ""
 toggleButton.ZIndex = 20
 toggleButton.Active = true
 toggleButton.Selectable = true
+toggleButton.Visible = true
 toggleButton.Parent = toggleGui
-print("Toggle Button created") -- Debug
+print("ToggleButton created") -- Debug
 local toggleCorner = Instance.new("UICorner")
 toggleCorner.CornerRadius = UDim.new(0, 10)
 toggleCorner.Parent = toggleButton
@@ -268,6 +270,7 @@ toggleButton.MouseButton1Click:Connect(toggleMenu)
 toggleButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.Touch then
         toggleMenu()
+        print("ToggleButton touched") -- Debug
     end
 end)
 
@@ -342,6 +345,7 @@ end)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and input.KeyCode == Enum.KeyCode.RightShift then
         toggleMenu()
+        print("Right Shift pressed") -- Debug
     end
 end)
 
