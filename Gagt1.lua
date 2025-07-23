@@ -2,8 +2,6 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-local GuiService = game:GetService("GuiService")
-local RunService = game:GetService("RunService")
 
 -- GUI Setup
 local player = Players.LocalPlayer
@@ -24,13 +22,10 @@ screenGui.ResetOnSpawn = false
 screenGui.Enabled = true
 screenGui.IgnoreGuiInset = true
 
--- Store frame position (reset on script run)
-local savedPosition = UDim2.new(0.5, 0, 0.5, 0) -- Default center
-
--- Menu Frame (Larger Rectangle)
+-- Menu Frame (Larger Rectangle, Fixed in Center)
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 400, 0, 300)
-frame.Position = savedPosition
+frame.Position = UDim2.new(0.5, 0, 0.5, 0) -- Fixed at center
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.4
@@ -41,12 +36,16 @@ local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 10)
 frameCorner.Parent = frame
 
--- Drag Handle (Top of Frame)
-local dragHandle = Instance.new("Frame")
-dragHandle.Size = UDim2.new(1, 0, 0, 30)
-dragHandle.Position = UDim2.new(0, 0, 0, 0)
-dragHandle.BackgroundTransparency = 1
-dragHandle.Parent = frame
+-- Title Label (Replaces dragHandle, non-draggable)
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -20, 0, 30)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Grow a Garden"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.Parent = frame
 
 -- Sidebar Frame
 local sidebar = Instance.new("Frame")
@@ -58,17 +57,6 @@ sidebar.Parent = frame
 local sidebarCorner = Instance.new("UICorner")
 sidebarCorner.CornerRadius = UDim.new(0, 8)
 sidebarCorner.Parent = sidebar
-
--- Title Label
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -20, 0, 30)
-title.Position = UDim2.new(0, 10, 0, 0)
-title.BackgroundTransparency = 1
-title.Text = "Grow a Garden"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextScaled = true
-title.Font = Enum.Font.GothamBold
-title.Parent = frame
 
 -- Content Frame
 local contentFrame = Instance.new("Frame")
@@ -254,46 +242,13 @@ local toggleCorner = Instance.new("UICorner")
 toggleCorner.CornerRadius = UDim.new(0, 15)
 toggleCorner.Parent = toggleButton
 
--- Menu Visibility (No Zoom, Only Show/Hide)
+-- Menu Visibility (Show/Hide)
 local menuVisible = true
 local function toggleMenu()
     menuVisible = not menuVisible
     frame.Visible = menuVisible
     toggleButton.BackgroundColor3 = menuVisible and Color3.fromRGB(0, 255, 127) or Color3.fromRGB(255, 255, 255)
 end
-
--- Improved Drag Functionality with RunService
-local dragging = false
-local dragStartPos, startPos
-dragHandle.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStartPos = UserInputService:GetMouseLocation()
-        startPos = frame.Position
-        print("Drag started at mouse: " .. tostring(dragStartPos) .. ", Frame at: " .. tostring(startPos))
-        RunService:BindToRenderStep("Drag", Enum.RenderPriority.Input.Value, function()
-            if not dragging then return end
-            local currentPos = UserInputService:GetMouseLocation()
-            local delta = currentPos - dragStartPos
-            local screenSize = GuiService:GetScreenResolution()
-            local newX = math.clamp(startPos.X.Offset + delta.X, 0, screenSize.X - 400)
-            local newY = math.clamp(startPos.Y.Offset + delta.Y, 0, screenSize.Y - 300)
-            frame.Position = UDim2.new(0, newX, 0, newY)
-            savedPosition = frame.Position
-            print("Dragging to: " .. tostring(frame.Position))
-        end)
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        if dragging then
-            dragging = false
-            RunService:UnbindFromRenderStep("Drag")
-            print("Drag ended at: " .. tostring(frame.Position))
-        end
-    end
-end)
 
 -- Sidebar Navigation
 local function showHome()
@@ -383,4 +338,4 @@ for _, button in ipairs(themeDropdown:GetChildren()) do
 end
 
 -- Debug: Confirm GUI creation
-print("GrowGardenMenu created and should be visible at position: " .. tostring(savedPosition))
+print("GrowGardenMenu created and fixed at center: " .. tostring(frame.Position))
