@@ -12,8 +12,8 @@ screenGui.ResetOnSpawn = false
 
 -- Menu Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 220, 0, 180)
-frame.Position = UDim2.new(0.5, -110, 0.5, -90)
+frame.Size = UDim2.new(0, 220, 0, 210) -- Increased height to accommodate credit
+frame.Position = UDim2.new(0.5, -110, 0.5, -105)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.1
@@ -62,6 +62,18 @@ local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 8)
 closeCorner.Parent = closeButton
 
+-- Credit Label
+local credit = Instance.new("TextLabel")
+credit.Size = UDim2.new(1, -20, 0, 20)
+credit.Position = UDim2.new(0, 10, 0, 180) -- At bottom of frame
+credit.BackgroundTransparency = 1
+credit.Text = "Credit: Nguyễn Thanh Trứ"
+credit.TextColor3 = Color3.fromRGB(200, 200, 200)
+credit.TextScaled = true
+credit.Font = Enum.Font.Gotham
+credit.TextSize = 14
+credit.Parent = frame
+
 -- Toggle Button (Checkbox) outside Frame
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 30, 0, 30)
@@ -95,7 +107,7 @@ speedButton.MouseButton1Click:Connect(function()
     end)
     if not success then
         warn("Error executing Speed Hub X: ", err)
-        -- Optional: Add in-game feedback
+        -- In-game feedback
         local errorLabel = Instance.new("TextLabel")
         errorLabel.Size = UDim2.new(0, 180, 0, 30)
         errorLabel.Position = UDim2.new(0, 20, 0, 150)
