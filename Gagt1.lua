@@ -23,15 +23,15 @@ toggleGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Tạo Frame chính (menu)
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 250, 0, 180) -- Kích thước lớn hơn cho giao diện hiện đại
-frame.Position = UDim2.new(0.5, -125, 0.5, -90) -- Căn giữa
-frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Màu nền tối
+frame.Size = UDim2.new(0, 250, 0, 180)
+frame.Position = UDim2.new(0.5, -125, 0.5, -90)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 frame.BackgroundTransparency = 0.1
 frame.BorderSizePixel = 0
 frame.ZIndex = 10
 frame.Parent = menuGui
 frame.Active = true
-frame.Visible = true -- Hiển thị ban đầu
+frame.Visible = true
 
 -- Bo góc cho Frame
 local corner = Instance.new("UICorner")
@@ -44,13 +44,13 @@ gradient.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 40, 60)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 30))
 })
-gradient.Rotation = 135 -- Góc gradient đẹp hơn
+gradient.Rotation = 135
 gradient.Parent = frame
 
 -- Viền neon cho Frame
 local stroke = Instance.new("UIStroke")
 stroke.Thickness = 3
-stroke.Color = Color3.fromRGB(0, 255, 255) -- Cyan neon
+stroke.Color = Color3.fromRGB(0, 255, 255)
 stroke.Transparency = 0.3
 stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 stroke.Parent = frame
@@ -61,9 +61,9 @@ title.Size = UDim2.new(0, 220, 0, 40)
 title.Position = UDim2.new(0.5, -110, 0, 10)
 title.BackgroundTransparency = 1
 title.Text = "Grow A Garden"
-title.TextColor3 = Color3.fromRGB(0, 255, 255) -- Cyan neon
+title.TextColor3 = Color3.fromRGB(0, 255, 255)
 title.TextSize = 24
-title.Font = Enum.Font.GothamBlack -- Font hiện đại, đậm
+title.Font = Enum.Font.GothamBlack
 title.ZIndex = 11
 title.Parent = frame
 
@@ -71,7 +71,7 @@ title.Parent = frame
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0, 35, 0, 35)
 closeButton.Position = UDim2.new(1, -40, 0, 5)
-closeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0) -- Đỏ neon
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 closeButton.BackgroundTransparency = 0.2
 closeButton.Text = "X"
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -89,7 +89,6 @@ closeButton.MouseLeave:Connect(function()
     TweenService:Create(closeButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.2}):Play()
 end)
 closeButton.MouseButton1Click:Connect(function()
-    -- Hiệu ứng trượt ra
     local tween = TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
         Position = UDim2.new(0.5, -125, 0.7, -90),
         BackgroundTransparency = 0.8
@@ -106,7 +105,7 @@ local function createButton(name, positionY, text, callback)
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(0, 180, 0, 45)
     button.Position = UDim2.new(0.5, -90, 0, positionY)
-    button.BackgroundColor3 = Color3.fromRGB(0, 100, 255) -- Xanh neon
+    button.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
     button.BackgroundTransparency = 0.2
     button.Text = text
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -133,7 +132,6 @@ local function createButton(name, positionY, text, callback)
     btnStroke.Transparency = 0.5
     btnStroke.Parent = button
 
-    -- Hiệu ứng hover
     button.MouseEnter:Connect(function()
         TweenService:Create(button, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0, TextSize = 19}):Play()
         TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
@@ -166,9 +164,10 @@ toggleButton.Position = UDim2.new(0, 10, 0, 10)
 toggleButton.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
 toggleButton.BackgroundTransparency = 0.2
 toggleButton.Image = "rbxassetid://10723433819" -- Asset ID mẫu
-toggleButton.ZIndex = 10
+toggleButton.ZIndex = 15 -- ZIndex cao để đảm bảo tương tác
 toggleButton.Parent = toggleGui
 toggleButton.Active = true
+toggleButton.Selectable = true
 local toggleCorner = Instance.new("UICorner")
 toggleCorner.CornerRadius = UDim.new(0, 12)
 toggleCorner.Parent = toggleButton
@@ -184,7 +183,6 @@ toggleStroke.Thickness = 2
 toggleStroke.Color = Color3.fromRGB(0, 255, 255)
 toggleStroke.Transparency = 0.5
 toggleStroke.Parent = toggleButton
--- Hiệu ứng hover cho nút bật/tắt
 toggleButton.MouseEnter:Connect(function()
     TweenService:Create(toggleButton, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
     TweenService:Create(toggleStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
@@ -197,7 +195,6 @@ end)
 -- Hiệu ứng bật/tắt menu
 local function toggleMenu()
     if frame.Visible then
-        -- Hiệu ứng trượt ra
         local tween = TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
             Position = UDim2.new(0.5, -125, 0.7, -90),
             BackgroundTransparency = 0.8
@@ -208,7 +205,6 @@ local function toggleMenu()
             frame.BackgroundTransparency = 0.1
         end)
     else
-        -- Hiệu ứng trượt vào
         frame.Visible = true
         frame.Position = UDim2.new(0.5, -125, 0.7, -90)
         frame.BackgroundTransparency = 0.8
@@ -232,9 +228,11 @@ frame.InputBegan:Connect(function(input)
         draggingFrame = true
         dragStart = input.Position
         startPos = frame.Position
-        input.Changed:Connect(function()
+        local connection
+        connection = input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then
                 draggingFrame = false
+                connection:Disconnect()
             end
         end)
     end
@@ -251,7 +249,6 @@ local function updateToggle(input)
     local delta = input.Position - toggleDragStart
     local newX = toggleStartPos.X.Offset + delta.X
     local newY = toggleStartPos.Y.Offset + delta.Y
-    -- Giới hạn để nút không vượt ra ngoài màn hình
     local screenSize = playerGui:GetService("GuiService"):GetScreenResolution()
     newX = math.clamp(newX, 0, screenSize.X - toggleButton.Size.X.Offset)
     newY = math.clamp(newY, 0, screenSize.Y - toggleButton.Size.Y.Offset)
@@ -263,8 +260,8 @@ toggleButton.InputBegan:Connect(function(input)
         toggleDragStart = input.Position
         toggleStartPos = toggleButton.Position
         local connection
-        connection = input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
+        connection = UserInputService.InputEnded:Connect(function(endInput)
+            if endInput.UserInputType == Enum.UserInputType.MouseButton1 then
                 draggingToggle = false
                 connection:Disconnect()
             end
