@@ -2,6 +2,7 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local GuiService = game:GetService("GuiService")
 
 -- GUI Setup
 local player = Players.LocalPlayer
@@ -22,15 +23,18 @@ screenGui.ResetOnSpawn = false
 screenGui.Enabled = true
 screenGui.IgnoreGuiInset = true
 
+-- Store frame position (reset on script run)
+local savedPosition = UDim2.new(0.5, 0, 0.5, 0) -- Default center
+
 -- Menu Frame (Larger Rectangle)
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 400, 0, 300)
-frame.Position = UDim2.new(0.5, -200, 0.5, -150)
+frame.Position = savedPosition -- Start at center
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.4
 frame.Visible = true
-frame.AnchorPoint = Vector2.new(0.5, 0.5) -- Center for zoom
+frame.AnchorPoint = Vector2.new(0.5, 0.5) -- Center for zoom and position
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 10)
@@ -38,8 +42,8 @@ frameCorner.Parent = frame
 
 -- UI Scale for Zoom
 local uiScale = Instance.new("UIScale")
-uiScale.Parent = frame
 uiScale.Scale = 1
+uiScale.Parent = frame
 
 -- Drag Handle (Top of Frame)
 local dragHandle = Instance.new("Frame")
@@ -258,14 +262,14 @@ toggleCorner.Parent = toggleButton
 local menuVisible = true
 local function toggleMenu()
     menuVisible = not menuVisible
-    local scaleGoal = menuVisible and 1 or 0
+    local scaleGoal = menuVisible and 1 or 0.2 -- Zoom to 20% when hiding
     local transparencyGoal = menuVisible and 0.4 or 1
     local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
-    local tween = TweenService:Create(uiScale, tweenInfo, {Scale = scaleGoal})
+    local scaleTween = TweenService:Create(uiScale, tweenInfo, {Scale = scaleGoal})
     local transparencyTween = TweenService:Create(frame, tweenInfo, {BackgroundTransparency = transparencyGoal})
-    tween:Play()
+    scaleTween:Play()
     transparencyTween:Play()
-    tween.Completed:Connect(function()
+    scaleTween.Completed:Connect(function()
         if not menuVisible then
             frame.Visible = false
             uiScale.Scale = 1 -- Reset scale
@@ -277,7 +281,7 @@ local function toggleMenu()
     toggleButton.BackgroundColor3 = menuVisible and Color3.fromRGB(0, 255, 127) or Color3.fromRGB(255, 255, 255)
 end
 
--- Improved Drag Functionality
+-- Improved Drag Functionality with Position Saving
 local dragging = false
 local dragStartPos, startPos
 dragHandle.InputBegan:Connect(function(input)
@@ -291,10 +295,11 @@ end)
 dragHandle.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragStartPos
-        local screenSize = game:GetService("GuiService"):GetScreenResolution()
-        local newX = math.clamp(startPos.X.Offset + delta.X, -350, screenSize.X - 50) -- Keep frame in bounds
+        local screenSize = GuiService:GetScreenResolution()
+        local newX = math.clamp(startPos.X.Offset + delta.X, -350, screenSize.X - 50)
         local newY = math.clamp(startPos.Y.Offset + delta.Y, -250, screenSize.Y - 50)
         frame.Position = UDim2.new(0, newX, 0, newY)
+        savedPosition = frame.Position -- Save new position
     end
 end)
 
@@ -392,4 +397,4 @@ for _, button in ipairs(themeDropdown:GetChildren()) do
 end
 
 -- Debug: Confirm GUI creation
-print("GrowGardenMenu created and should be visible")
+print("GrowGardenMenu created and should be visible at position: " .. tostring(savedPosition))
