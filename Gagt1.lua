@@ -12,11 +12,11 @@ screenGui.ResetOnSpawn = false
 
 -- Menu Frame (Larger Rectangle)
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 400, 0, 300) -- Larger rectangle
+frame.Size = UDim2.new(0, 400, 0, 300)
 frame.Position = UDim2.new(0.5, -200, 0.5, -150)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Default: Dark theme
 frame.BorderSizePixel = 0
-frame.BackgroundTransparency = 0.1
+frame.BackgroundTransparency = 0.3 -- Increased transparency
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 10)
@@ -28,6 +28,7 @@ sidebar.Size = UDim2.new(0, 100, 1, -40)
 sidebar.Position = UDim2.new(0, 10, 0, 30)
 sidebar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 sidebar.BorderSizePixel = 0
+sidebar.BackgroundTransparency = 0.4 -- Increased transparency
 sidebar.Parent = frame
 local sidebarCorner = Instance.new("UICorner")
 sidebarCorner.CornerRadius = UDim.new(0, 8)
@@ -57,6 +58,7 @@ homeButton.Size = UDim2.new(1, -10, 0, 40)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Trang chủ"
 homeButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+homeButton.BackgroundTransparency = 0.2 -- Increased transparency
 homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 homeButton.Font = Enum.Font.Gotham
 homeButton.TextSize = 14
@@ -70,6 +72,7 @@ settingsButton.Size = UDim2.new(1, -10, 0, 40)
 settingsButton.Position = UDim2.new(0, 5, 0, 50)
 settingsButton.Text = "Cài đặt"
 settingsButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+settingsButton.BackgroundTransparency = 0.2 -- Increased transparency
 settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 settingsButton.Font = Enum.Font.Gotham
 settingsButton.TextSize = 14
@@ -90,6 +93,7 @@ speedButton.Size = UDim2.new(0, 220, 0, 40)
 speedButton.Position = UDim2.new(0, 10, 0, 10)
 speedButton.Text = "Speed Up"
 speedButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+speedButton.BackgroundTransparency = 0.2 -- Increased transparency
 speedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 speedButton.Font = Enum.Font.Gotham
 speedButton.TextSize = 16
@@ -100,9 +104,10 @@ speedCorner.Parent = speedButton
 
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0, 220, 0, 40)
-closeButton.Position = UDim2.new(0, 10, 0, 60)
+closeButton.Position = UDim2.new(0, 10 юб, 0, 60)
 closeButton.Text = "Close Menu"
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+closeButton.BackgroundTransparency = 0.2 -- Increased transparency
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.Font = Enum.Font.Gotham
 closeButton.TextSize = 16
@@ -118,15 +123,33 @@ settingsContent.BackgroundTransparency = 1
 settingsContent.Parent = contentFrame
 settingsContent.Visible = false
 
-local themeLabel = Instance.new("TextLabel")
-themeLabel.Size = UDim2.new(0, 220, 0, 30)
-themeLabel.Position = UDim2.new(0, 10, 0, 10)
-themeLabel.BackgroundTransparency = 1
-themeLabel.Text = "Chọn chủ đề:"
-themeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-themeLabel.TextScaled = true
-themeLabel.Font = Enum.Font.Gotham
-themeLabel.Parent = settingsContent
+-- Theme Selection
+local currentTheme = "Tối" -- Default theme
+local themeButton = Instance.new("TextButton")
+themeButton.Size = UDim2.new(0, 220, 0, 30)
+themeButton.Position = UDim2.new(0, 10, 0, 10)
+themeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+themeButton.BackgroundTransparency = 0.2
+themeButton.Text = "Chọn chủ đề: " .. currentTheme .. " >"
+themeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+themeButton.Font = Enum.Font.Gotham
+themeButton.TextSize = 14
+themeButton.Parent = settingsContent
+local themeButtonCorner = Instance.new("UICorner")
+themeButtonCorner.CornerRadius = UDim.new(0, 6)
+themeButtonCorner.Parent = themeButton
+
+-- Theme Dropdown
+local themeDropdown = Instance.new("Frame")
+themeDropdown.Size = UDim2.new(0, 100, 0, 120)
+themeDropdown.Position = UDim2.new(0, 235, 0, 10) -- Right of themeButton
+themeDropdown.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+themeDropdown.BackgroundTransparency = 0.3
+themeDropdown.Visible = false
+themeDropdown.Parent = settingsContent
+local dropdownCorner = Instance.new("UICorner")
+dropdownCorner.CornerRadius = UDim.new(0, 6)
+dropdownCorner.Parent = themeDropdown
 
 local themes = {
     {Name = "Sáng", Color = Color3.fromRGB(200, 200, 200), TextColor = Color3.fromRGB(0, 0, 0)},
@@ -136,26 +159,34 @@ local themes = {
 }
 
 for i, theme in ipairs(themes) do
-    local themeButton = Instance.new("TextButton")
-    themeButton.Size = UDim2.new(0, 220, 0, 30)
-    themeButton.Position = UDim2.new(0, 10, 0, 40 + (i-1)*35)
-    themeButton.Text = theme.Name
-    themeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    themeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    themeButton.Font = Enum.Font.Gotham
-    themeButton.TextSize = 14
-    themeButton.Parent = settingsContent
-    local themeCorner = Instance.new("UICorner")
-    themeCorner.CornerRadius = UDim.new(0, 6)
-    themeCorner.Parent = themeButton
+    local optionButton = Instance.new("TextButton")
+    optionButton.Size = UDim2.new(1, -10, 0, 25)
+    optionButton.Position = UDim2.new(0, 5, 0, 5 + (i-1)*30)
+    optionButton.Text = theme.Name
+    optionButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    optionButton.BackgroundTransparency = 0.2
+    optionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    optionButton.Font = Enum.Font.Gotham
+    optionButton.TextSize = 14
+    optionButton.Parent = themeDropdown
+    local optionCorner = Instance.new("UICorner")
+    optionCorner.CornerRadius = UDim.new(0, 4)
+    optionCorner.Parent = optionButton
 
-    themeButton.MouseButton1Click:Connect(function()
+    optionButton.MouseButton1Click:Connect(function()
+        currentTheme = theme.Name
+        themeButton.Text = "Chọn chủ đề: " .. currentTheme .. " >"
+        themeDropdown.Visible = false
         frame.BackgroundColor3 = theme.Color
         sidebar.BackgroundColor3 = Color3.new(theme.Color.R * 1.2, theme.Color.G * 1.2, theme.Color.B * 1.2)
         title.TextColor3 = theme.TextColor
-        themeLabel.TextColor3 = theme.TextColor
+        themeButton.TextColor3 = theme.TextColor
     end)
 end
+
+themeButton.MouseButton1Click:Connect(function()
+    themeDropdown.Visible = not themeDropdown.Visible
+end)
 
 -- Credit Label
 local credit = Instance.new("TextLabel")
@@ -174,6 +205,7 @@ local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 30, 0, 30)
 toggleButton.Position = UDim2.new(0, 10, 0, 10)
 toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.BackgroundTransparency = 0.2
 toggleButton.Text = ""
 toggleButton.Parent = screenGui
 local toggleCorner = Instance.new("UICorner")
@@ -201,12 +233,13 @@ local function showSettings()
     settingsContent.Visible = true
     homeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     settingsButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+    themeDropdown.Visible = false -- Hide dropdown when switching to settings
 end
 
 homeButton.MouseButton1Click:Connect(showHome)
 settingsButton.MouseButton1Click:Connect(showSettings)
 
--- Input Handling (RightShift)
+--iferative Handling (RightShift)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and input.KeyCode == Enum.KeyCode.RightShift then
         toggleMenu()
@@ -262,7 +295,8 @@ addHoverEffect(closeButton)
 addHoverEffect(toggleButton)
 addHoverEffect(homeButton)
 addHoverEffect(settingsButton)
-for _, button in ipairs(settingsContent:GetChildren()) do
+addHoverEffect(themeButton)
+for _, button in ipairs(themeDropdown:GetChildren()) do
     if button:IsA("TextButton") then
         addHoverEffect(button)
     end
