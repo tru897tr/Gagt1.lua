@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local GuiService = game:GetService("GuiService")
+local RunService = game:GetService("RunService")
 
 -- GUI Setup
 local player = Players.LocalPlayer
@@ -261,7 +262,7 @@ local function toggleMenu()
     toggleButton.BackgroundColor3 = menuVisible and Color3.fromRGB(0, 255, 127) or Color3.fromRGB(255, 255, 255)
 end
 
--- Improved Drag Functionality with Position Saving
+-- Improved Drag Functionality with RunService
 local dragging = false
 local dragStartPos, startPos
 dragHandle.InputBegan:Connect(function(input)
@@ -269,27 +270,28 @@ dragHandle.InputBegan:Connect(function(input)
         dragging = true
         dragStartPos = UserInputService:GetMouseLocation()
         startPos = frame.Position
-        print("Drag started at: " .. tostring(dragStartPos) .. ", Frame at: " .. tostring(startPos))
-    end
-end)
-
-dragHandle.InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local currentPos = UserInputService:GetMouseLocation()
-        local delta = currentPos - dragStartPos
-        local screenSize = GuiService:GetScreenResolution()
-        local newX = math.clamp(startPos.X.Offset + delta.X, 0, screenSize.X - 400) -- Adjusted bounds
-        local newY = math.clamp(startPos.Y.Offset + delta.Y, 0, screenSize.Y - 300)
-        frame.Position = UDim2.new(0, newX, 0, newY)
-        savedPosition = frame.Position
-        print("Dragging to: " .. tostring(frame.Position))
+        print("Drag started at mouse: " .. tostring(dragStartPos) .. ", Frame at: " .. tostring(startPos))
+        RunService:BindToRenderStep("Drag", Enum.RenderPriority.Input.Value, function()
+            if not dragging then return end
+            local currentPos = UserInputService:GetMouseLocation()
+            local delta = currentPos - dragStartPos
+            local screenSize = GuiService:GetScreenResolution()
+            local newX = math.clamp(startPos.X.Offset + delta.X, 0, screenSize.X - 400)
+            local newY = math.clamp(startPos.Y.Offset + delta.Y, 0, screenSize.Y - 300)
+            frame.Position = UDim2.new(0, newX, 0, newY)
+            savedPosition = frame.Position
+            print("Dragging to: " .. tostring(frame.Position))
+        end)
     end
 end)
 
 UserInputService.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-        print("Drag ended at: " .. tostring(frame.Position))
+        if dragging then
+            dragging = false
+            RunService:UnbindFromRenderStep("Drag")
+            print("Drag ended at: " .. tostring(frame.Position))
+        end
     end
 end)
 
