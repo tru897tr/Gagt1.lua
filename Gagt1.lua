@@ -1,7 +1,6 @@
 -- Script chạy phía client, đặt trong StarterPlayerScripts
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui", 10) -- Chờ PlayerGui tải
 print("PlayerGui loaded") -- Debug
@@ -88,33 +87,15 @@ closeButton.Parent = frame
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 8)
 closeCorner.Parent = closeButton
-closeButton.MouseEnter:Connect(function()
-    TweenService:Create(closeButton, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
-end)
-closeButton.MouseLeave:Connect(function()
-    TweenService:Create(closeButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.3}):Play()
+closeButton.MouseButton1Click:Connect(function()
+    frame.Visible = false
+    print("Menu hidden via Close Button") -- Debug
 end)
 closeButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.Touch then
-        TweenService:Create(closeButton, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
-    end
-end)
-closeButton.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch then
-        TweenService:Create(closeButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.3}):Play()
-    end
-end)
-closeButton.MouseButton1Click:Connect(function()
-    local tween = TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
-        Position = UDim2.new(0.5, -110, 0.6, -80),
-        BackgroundTransparency = 0.7
-    })
-    tween:Play()
-    tween.Completed:Connect(function()
         frame.Visible = false
-        frame.BackgroundTransparency = 0.1
-        print("Menu hidden") -- Debug
-    end)
+        print("Menu hidden via Close Button (touch)") -- Debug
+    end
 end)
 print("Close Button created") -- Debug
 
@@ -146,26 +127,6 @@ btnStroke.Thickness = 1
 btnStroke.Color = Color3.fromRGB(150, 180, 200)
 btnStroke.Transparency = 0.5
 btnStroke.Parent = speedUpButton
-speedUpButton.MouseEnter:Connect(function()
-    TweenService:Create(speedUpButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0, TextSize = 17}):Play()
-    TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
-end)
-speedUpButton.MouseLeave:Connect(function()
-    TweenService:Create(speedUpButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.3, TextSize = 16}):Play()
-    TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
-end)
-speedUpButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch then
-        TweenService:Create(speedUpButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0, TextSize = 17}):Play()
-        TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
-    end
-end)
-speedUpButton.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch then
-        TweenService:Create(speedUpButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.3, TextSize = 16}):Play()
-        TweenService:Create(btnStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
-    end
-end)
 speedUpButton.MouseButton1Click:Connect(function()
     print("Speed Up X clicked") -- Debug
     local success, errorMsg = pcall(function()
@@ -220,57 +181,14 @@ toggleStroke.Thickness = 1
 toggleStroke.Color = Color3.fromRGB(150, 180, 200)
 toggleStroke.Transparency = 0.5
 toggleStroke.Parent = toggleButton
-toggleButton.MouseEnter:Connect(function()
-    TweenService:Create(toggleButton, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
-    TweenService:Create(toggleStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
-end)
-toggleButton.MouseLeave:Connect(function()
-    TweenService:Create(toggleButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.3}):Play()
-    TweenService:Create(toggleStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
+toggleButton.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible
+    print("Menu toggled via ToggleButton: Visible = " .. tostring(frame.Visible)) -- Debug
 end)
 toggleButton.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.Touch then
-        TweenService:Create(toggleButton, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
-        TweenService:Create(toggleStroke, TweenInfo.new(0.2), {Transparency = 0.2}):Play()
-    end
-end)
-toggleButton.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch then
-        TweenService:Create(toggleButton, TweenInfo.new(0.2), {BackgroundTransparency = 0.3}):Play()
-        TweenService:Create(toggleStroke, TweenInfo.new(0.2), {Transparency = 0.5}):Play()
-    end
-end)
-
--- Hiệu ứng bật/tắt menu
-local function toggleMenu()
-    if frame.Visible then
-        local tween = TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {
-            Position = UDim2.new(0.5, -110, 0.6, -80),
-            BackgroundTransparency = 0.7
-        })
-        tween:Play()
-        tween.Completed:Connect(function()
-            frame.Visible = false
-            frame.BackgroundTransparency = 0.1
-            print("Menu hidden") -- Debug
-        end)
-    else
-        frame.Visible = true
-        frame.Position = UDim2.new(0.5, -110, 0.6, -80)
-        frame.BackgroundTransparency = 0.7
-        local tween = TweenService:Create(frame, TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {
-            Position = UDim2.new(0.5, -110, 0.5, -80),
-            BackgroundTransparency = 0.1
-        })
-        tween:Play()
-        print("Menu shown") -- Debug
-    end
-end
-toggleButton.MouseButton1Click:Connect(toggleMenu)
-toggleButton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.Touch then
-        toggleMenu()
-        print("ToggleButton touched") -- Debug
+        frame.Visible = not frame.Visible
+        print("Menu toggled via ToggleButton (touch): Visible = " .. tostring(frame.Visible)) -- Debug
     end
 end)
 
@@ -344,8 +262,8 @@ end)
 -- Bật/tắt menu bằng phím Right Shift (cho PC)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and input.KeyCode == Enum.KeyCode.RightShift then
-        toggleMenu()
-        print("Right Shift pressed") -- Debug
+        frame.Visible = not frame.Visible
+        print("Menu toggled via Right Shift: Visible = " .. tostring(frame.Visible)) -- Debug
     end
 end)
 
