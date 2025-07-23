@@ -26,14 +26,20 @@ screenGui.IgnoreGuiInset = true
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 400, 0, 300)
 frame.Position = UDim2.new(0.5, -200, 0.5, -150)
-frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Dark theme
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.4
 frame.Visible = true
+frame.AnchorPoint = Vector2.new(0.5, 0.5) -- Center for zoom
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 10)
 frameCorner.Parent = frame
+
+-- UI Scale for Zoom
+local uiScale = Instance.new("UIScale")
+uiScale.Parent = frame
+uiScale.Scale = 1
 
 -- Drag Handle (Top of Frame)
 local dragHandle = Instance.new("Frame")
@@ -239,13 +245,13 @@ credit.Parent = frame
 -- Toggle Button (Circular, Top-Right)
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 30, 0, 30)
-toggleButton.Position = UDim2.new(1, -40, 0, 10) -- Top-right corner
+toggleButton.Position = UDim2.new(1, -40, 0, 10)
 toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 toggleButton.BackgroundTransparency = 0.3
 toggleButton.Text = ""
 toggleButton.Parent = screenGui
 local toggleCorner = Instance.new("UICorner")
-toggleCorner.CornerRadius = UDim.new(0, 15) -- Circular
+toggleCorner.CornerRadius = UDim.new(0, 15)
 toggleCorner.Parent = toggleButton
 
 -- Menu Visibility with Zoom Effect
@@ -255,15 +261,15 @@ local function toggleMenu()
     local scaleGoal = menuVisible and 1 or 0
     local transparencyGoal = menuVisible and 0.4 or 1
     local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
-    local tween = TweenService:Create(frame, tweenInfo, {
-        Size = UDim2.new(0, 400 * scaleGoal, 0, 300 * scaleGoal),
-        BackgroundTransparency = transparencyGoal
-    })
+    local tween = TweenService:Create(uiScale, tweenInfo, {Scale = scaleGoal})
+    local transparencyTween = TweenService:Create(frame, tweenInfo, {BackgroundTransparency = transparencyGoal})
     tween:Play()
+    transparencyTween:Play()
     tween.Completed:Connect(function()
         if not menuVisible then
             frame.Visible = false
-            frame.Size = UDim2.new(0, 400, 0, 300) -- Reset size
+            uiScale.Scale = 1 -- Reset scale
+            frame.BackgroundTransparency = 0.4
         else
             frame.Visible = true
         end
@@ -271,7 +277,7 @@ local function toggleMenu()
     toggleButton.BackgroundColor3 = menuVisible and Color3.fromRGB(0, 255, 127) or Color3.fromRGB(255, 255, 255)
 end
 
--- Drag Functionality
+-- Improved Drag Functionality
 local dragging = false
 local dragStartPos, startPos
 dragHandle.InputBegan:Connect(function(input)
@@ -285,7 +291,10 @@ end)
 dragHandle.InputChanged:Connect(function(input)
     if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         local delta = input.Position - dragStartPos
-        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        local screenSize = game:GetService("GuiService"):GetScreenResolution()
+        local newX = math.clamp(startPos.X.Offset + delta.X, -350, screenSize.X - 50) -- Keep frame in bounds
+        local newY = math.clamp(startPos.Y.Offset + delta.Y, -250, screenSize.Y - 50)
+        frame.Position = UDim2.new(0, newX, 0, newY)
     end
 end)
 
