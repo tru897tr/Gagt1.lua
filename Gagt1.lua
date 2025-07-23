@@ -4,11 +4,23 @@ local UserInputService = game:GetService("UserInputService")
 
 -- GUI Setup
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local playerGui = player:WaitForChild("PlayerGui", 5) -- Wait for PlayerGui
+if not playerGui then
+    warn("PlayerGui not found!")
+    return
+end
+
+-- Ensure character is loaded
+if not player.Character then
+    player.CharacterAdded:Wait()
+end
+
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "GrowGardenMenu"
 screenGui.Parent = playerGui
 screenGui.ResetOnSpawn = false
+screenGui.Enabled = true -- Ensure GUI is enabled
+screenGui.IgnoreGuiInset = true -- Respect Roblox GUI inset
 
 -- Menu Frame (Larger Rectangle)
 local frame = Instance.new("Frame")
@@ -16,7 +28,8 @@ frame.Size = UDim2.new(0, 400, 0, 300)
 frame.Position = UDim2.new(0.5, -200, 0.5, -150)
 frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Default: Dark theme
 frame.BorderSizePixel = 0
-frame.BackgroundTransparency = 0.3 -- Increased transparency
+frame.BackgroundTransparency = 0.4 -- Increased transparency
+frame.Visible = true -- Ensure frame is visible
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 10)
@@ -28,7 +41,7 @@ sidebar.Size = UDim2.new(0, 100, 1, -40)
 sidebar.Position = UDim2.new(0, 10, 0, 30)
 sidebar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 sidebar.BorderSizePixel = 0
-sidebar.BackgroundTransparency = 0.4 -- Increased transparency
+sidebar.BackgroundTransparency = 0.5 -- Increased transparency
 sidebar.Parent = frame
 local sidebarCorner = Instance.new("UICorner")
 sidebarCorner.CornerRadius = UDim.new(0, 8)
@@ -58,7 +71,7 @@ homeButton.Size = UDim2.new(1, -10, 0, 40)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Trang chủ"
 homeButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-homeButton.BackgroundTransparency = 0.2 -- Increased transparency
+homeButton.BackgroundTransparency = 0.3 -- Increased transparency
 homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 homeButton.Font = Enum.Font.Gotham
 homeButton.TextSize = 14
@@ -72,7 +85,7 @@ settingsButton.Size = UDim2.new(1, -10, 0, 40)
 settingsButton.Position = UDim2.new(0, 5, 0, 50)
 settingsButton.Text = "Cài đặt"
 settingsButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-settingsButton.BackgroundTransparency = 0.2 -- Increased transparency
+settingsButton.BackgroundTransparency = 0.3 -- Increased transparency
 settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 settingsButton.Font = Enum.Font.Gotham
 settingsButton.TextSize = 14
@@ -93,7 +106,7 @@ speedButton.Size = UDim2.new(0, 220, 0, 40)
 speedButton.Position = UDim2.new(0, 10, 0, 10)
 speedButton.Text = "Speed Up"
 speedButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-speedButton.BackgroundTransparency = 0.2 -- Increased transparency
+speedButton.BackgroundTransparency = 0.3 -- Increased transparency
 speedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 speedButton.Font = Enum.Font.Gotham
 speedButton.TextSize = 16
@@ -104,10 +117,10 @@ speedCorner.Parent = speedButton
 
 local closeButton = Instance.new("TextButton")
 closeButton.Size = UDim2.new(0, 220, 0, 40)
-closeButton.Position = UDim2.new(0, 10 юб, 0, 60)
+closeButton.Position = UDim2.new(0, 10, 0, 60) -- Fixed typo
 closeButton.Text = "Close Menu"
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
-closeButton.BackgroundTransparency = 0.2 -- Increased transparency
+closeButton.BackgroundTransparency = 0.3 -- Increased transparency
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.Font = Enum.Font.Gotham
 closeButton.TextSize = 16
@@ -129,7 +142,7 @@ local themeButton = Instance.new("TextButton")
 themeButton.Size = UDim2.new(0, 220, 0, 30)
 themeButton.Position = UDim2.new(0, 10, 0, 10)
 themeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-themeButton.BackgroundTransparency = 0.2
+themeButton.BackgroundTransparency = 0.3
 themeButton.Text = "Chọn chủ đề: " .. currentTheme .. " >"
 themeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 themeButton.Font = Enum.Font.Gotham
@@ -144,7 +157,7 @@ local themeDropdown = Instance.new("Frame")
 themeDropdown.Size = UDim2.new(0, 100, 0, 120)
 themeDropdown.Position = UDim2.new(0, 235, 0, 10) -- Right of themeButton
 themeDropdown.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-themeDropdown.BackgroundTransparency = 0.3
+themeDropdown.BackgroundTransparency = 0.4
 themeDropdown.Visible = false
 themeDropdown.Parent = settingsContent
 local dropdownCorner = Instance.new("UICorner")
@@ -164,7 +177,7 @@ for i, theme in ipairs(themes) do
     optionButton.Position = UDim2.new(0, 5, 0, 5 + (i-1)*30)
     optionButton.Text = theme.Name
     optionButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    optionButton.BackgroundTransparency = 0.2
+    optionButton.BackgroundTransparency = 0.3
     optionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     optionButton.Font = Enum.Font.Gotham
     optionButton.TextSize = 14
@@ -181,6 +194,7 @@ for i, theme in ipairs(themes) do
         sidebar.BackgroundColor3 = Color3.new(theme.Color.R * 1.2, theme.Color.G * 1.2, theme.Color.B * 1.2)
         title.TextColor3 = theme.TextColor
         themeButton.TextColor3 = theme.TextColor
+        credit.TextColor3 = theme.TextColor -- Update credit text color
     end)
 end
 
@@ -205,7 +219,7 @@ local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 30, 0, 30)
 toggleButton.Position = UDim2.new(0, 10, 0, 10)
 toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-toggleButton.BackgroundTransparency = 0.2
+toggleButton.BackgroundTransparency = 0.3
 toggleButton.Text = ""
 toggleButton.Parent = screenGui
 local toggleCorner = Instance.new("UICorner")
@@ -226,6 +240,7 @@ local function showHome()
     settingsContent.Visible = false
     homeButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
     settingsButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    themeDropdown.Visible = false
 end
 
 local function showSettings()
@@ -233,13 +248,13 @@ local function showSettings()
     settingsContent.Visible = true
     homeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     settingsButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-    themeDropdown.Visible = false -- Hide dropdown when switching to settings
+    themeDropdown.Visible = false
 end
 
 homeButton.MouseButton1Click:Connect(showHome)
 settingsButton.MouseButton1Click:Connect(showSettings)
 
---iferative Handling (RightShift)
+-- Input Handling (RightShift)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and input.KeyCode == Enum.KeyCode.RightShift then
         toggleMenu()
@@ -301,3 +316,6 @@ for _, button in ipairs(themeDropdown:GetChildren()) do
         addHoverEffect(button)
     end
 end
+
+-- Debug: Confirm GUI creation
+print("GrowGardenMenu created and should be visible")
