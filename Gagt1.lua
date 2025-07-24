@@ -94,7 +94,7 @@ homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Home"
 homeButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200) -- Selected: Highlight
 homeButton.BackgroundTransparency = 0.3
-homeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Fixed text color
+homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 homeButton.Font = Enum.Font.Gotham
 homeButton.TextSize = 14
 homeButton.Parent = sidebar
@@ -113,7 +113,7 @@ settingsButton.Position = UDim2.new(0, 5, 0, 42)
 settingsButton.Text = "Settings"
 settingsButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Unselected
 settingsButton.BackgroundTransparency = 0.4
-settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Fixed text color
+settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 settingsButton.Font = Enum.Font.Gotham
 settingsButton.TextSize = 14
 settingsButton.Parent = sidebar
@@ -317,6 +317,8 @@ local function showHome()
     tween2:Play()
     strokeTween1:Play()
     strokeTween2:Play()
+    homeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Ensure text stays white
+    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Ensure text stays white
     themeDropdown.Visible = false
     print("Home selected, Home: (200, 200, 200, 0.3), Settings: (50, 50, 50, 0.4)")
 end
@@ -338,6 +340,8 @@ local function showSettings()
     tween2:Play()
     strokeTween1:Play()
     strokeTween2:Play()
+    homeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Ensure text stays white
+    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Ensure text stays white
     themeDropdown.Visible = false
     print("Settings selected, Home: (50, 50, 50, 0.4), Settings: (200, 200, 200, 0.3)")
 end
