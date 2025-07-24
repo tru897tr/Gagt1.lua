@@ -2,7 +2,6 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
-local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
 -- Translations
@@ -11,7 +10,7 @@ local translations = {
         title = "Grow a Garden",
         home = "Home",
         settings = "Settings",
-        music = "Misic",
+        music = "Features",
         speed_title = "Walk Speed",
         speed_desc = "Set custom walking speed",
         jump_title = "Infinite Jump",
@@ -32,11 +31,6 @@ local translations = {
         jump_error = "Infinite Jump Error!",
         theme_notification = "Theme changed: %s",
         lang_notification = "Language changed to %s",
-        speedx_notification = "Speed Up X Successful!",
-        speedx_error = "Speed Up X Error: Check console",
-        nolag_notification = "No Lag Successful!",
-        nolag_error = "No Lag Error: Check console",
-        client_error = "Client not supported!",
         loading_error = "Loading failed: Check console",
         init_error = "Initialization failed: Check console"
     },
@@ -65,11 +59,6 @@ local translations = {
         jump_error = "Lỗi nhảy vô hạn!",
         theme_notification = "Giao diện đã đổi: %s",
         lang_notification = "Ngôn ngữ thay đổi thành %s",
-        speedx_notification = "Speed Up X thành công!",
-        speedx_error = "Lỗi Speed Up X: Xem console",
-        nolag_notification = "No Lag thành công!",
-        nolag_error = "Lỗi No Lag: Xem console",
-        client_error = "Client không được hỗ trợ!",
         loading_error = "Tải thất bại: Xem console",
         init_error = "Khởi tạo thất bại: Xem console"
     }
@@ -354,116 +343,6 @@ homeContent.ZIndex = 10
 homeContent.Parent = contentFrame
 homeContent.Visible = true
 
-local speedXFrame = Instance.new("Frame")
-speedXFrame.Size = UDim2.new(0, 190, 0, 80)
-speedXFrame.Position = UDim2.new(0, 25, 0, 20)
-speedXFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-speedXFrame.BackgroundTransparency = 0.4
-speedXFrame.ZIndex = 11
-speedXFrame.Parent = homeContent
-local speedXCorner = Instance.new("UICorner")
-speedXCorner.CornerRadius = UDim.new(0, 8)
-speedXCorner.Parent = speedXFrame
-local speedXStroke = Instance.new("UIStroke")
-speedXStroke.Thickness = 1
-speedXStroke.Color = Color3.fromRGB(255, 255, 255)
-speedXStroke.Transparency = 0.5
-speedXStroke.Parent = speedXFrame
-
-local speedXTitle = Instance.new("TextLabel")
-speedXTitle.Size = UDim2.new(0, 180, 0, 20)
-speedXTitle.Position = UDim2.new(0, 5, 0, 5)
-speedXTitle.BackgroundTransparency = 1
-speedXTitle.Text = "Speed Up X"
-speedXTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedXTitle.TextSize = 14
-speedXTitle.Font = Enum.Font.GothamBold
-speedXTitle.TextXAlignment = Enum.TextXAlignment.Left
-speedXTitle.ZIndex = 12
-speedXTitle.Parent = speedXFrame
-
-local speedXDesc = Instance.new("TextLabel")
-speedXDesc.Size = UDim2.new(0, 180, 0, 20)
-speedXDesc.Position = UDim2.new(0, 5, 0, 25)
-speedXDesc.BackgroundTransparency = 1
-speedXDesc.Text = "Boost game performance"
-speedXDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
-speedXDesc.TextSize = 12
-speedXDesc.Font = Enum.Font.Gotham
-speedXDesc.TextXAlignment = Enum.TextXAlignment.Left
-speedXDesc.ZIndex = 12
-speedXDesc.Parent = speedXFrame
-
-local speedButton = Instance.new("TextButton")
-speedButton.Size = UDim2.new(0, 180, 0, 25)
-speedButton.Position = UDim2.new(0, 5, 0, 50)
-speedButton.Text = "Execute"
-speedButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-speedButton.BackgroundTransparency = 0.4
-speedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-speedButton.Font = Enum.Font.Gotham
-speedButton.TextSize = 14
-speedButton.ZIndex = 12
-speedButton.Parent = speedXFrame
-local speedCorner = Instance.new("UICorner")
-speedCorner.CornerRadius = UDim.new(0, 6)
-speedCorner.Parent = speedButton
-
-local noLagFrame = Instance.new("Frame")
-noLagFrame.Size = UDim2.new(0, 190, 0, 80)
-noLagFrame.Position = UDim2.new(0, 25, 0, 110)
-noLagFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-noLagFrame.BackgroundTransparency = 0.4
-noLagFrame.ZIndex = 11
-noLagFrame.Parent = homeContent
-local noLagCorner = Instance.new("UICorner")
-noLagCorner.CornerRadius = UDim.new(0, 8)
-noLagCorner.Parent = noLagFrame
-local noLagStroke = Instance.new("UIStroke")
-noLagStroke.Thickness = 1
-noLagStroke.Color = Color3.fromRGB(255, 255, 255)
-noLagStroke.Transparency = 0.5
-noLagStroke.Parent = noLagFrame
-
-local noLagTitle = Instance.new("TextLabel")
-noLagTitle.Size = UDim2.new(0, 180, 0, 20)
-noLagTitle.Position = UDim2.new(0, 5, 0, 5)
-noLagTitle.BackgroundTransparency = 1
-noLagTitle.Text = "No Lag"
-noLagTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-noLagTitle.TextSize = 14
-noLagTitle.Font = Enum.Font.GothamBold
-noLagTitle.TextXAlignment = Enum.TextXAlignment.Left
-noLagTitle.ZIndex = 12
-noLagTitle.Parent = noLagFrame
-
-local noLagDesc = Instance.new("TextLabel")
-noLagDesc.Size = UDim2.new(0, 180, 0, 20)
-noLagDesc.Position = UDim2.new(0, 5, 0, 25)
-noLagDesc.BackgroundTransparency = 1
-noLagDesc.Text = "Reduce game lag"
-noLagDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
-noLagDesc.TextSize = 12
-noLagDesc.Font = Enum.Font.Gotham
-noLagDesc.TextXAlignment = Enum.TextXAlignment.Left
-noLagDesc.ZIndex = 12
-noLagDesc.Parent = noLagFrame
-
-local noLagButton = Instance.new("TextButton")
-noLagButton.Size = UDim2.new(0, 180, 0, 25)
-noLagButton.Position = UDim2.new(0, 5, 0, 50)
-noLagButton.Text = "Execute"
-noLagButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-noLagButton.BackgroundTransparency = 0.4
-noLagButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-noLagButton.Font = Enum.Font.Gotham
-noLagButton.TextSize = 14
-noLagButton.ZIndex = 12
-noLagButton.Parent = noLagFrame
-local noLagCorner = Instance.new("UICorner")
-noLagCorner.CornerRadius = UDim.new(0, 6)
-noLagCorner.Parent = noLagButton
-
 -- Content: Settings
 local settingsContent = Instance.new("Frame")
 settingsContent.Size = UDim2.new(1, 0, 1, 0)
@@ -580,7 +459,7 @@ local languageButtonCorner = Instance.new("UICorner")
 languageButtonCorner.CornerRadius = UDim.new(0, 6)
 languageButtonCorner.Parent = languageButton
 
--- Content: Misic
+-- Content: Features
 local musicContent = Instance.new("Frame")
 musicContent.Size = UDim2.new(1, 0, 1, 0)
 musicContent.BackgroundTransparency = 1
@@ -1092,7 +971,7 @@ local function showMusic()
             musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
             themeDropdown.Visible = false
             languageDropdown.Visible = false
-            print("Misic selected")
+            print("Features selected")
         else
             error("Content frames missing")
         end
@@ -1256,88 +1135,6 @@ table.insert(connections, UserInputService.InputBegan:Connect(function(input, ga
     end
 end))
 
--- Speed Up X Logic
-speedButton.MouseButton1Click:Connect(function()
-    local success, err
-    local clientName = "Unknown"
-    local loadstringSupported = false
-
-    local successDetect, detectErr = pcall(function()
-        if typeof(getgenv) == "function" then
-            clientName = "KRNL/Fluxus/Synapse"
-            loadstringSupported = true
-        end
-    end)
-    if not successDetect then
-        warn("Client detection failed: " .. tostring(detectErr))
-    end
-    print("Detected client: " .. clientName .. ", loadstring supported: " .. tostring(loadstringSupported))
-
-    if not loadstringSupported then
-        warn("Client does not support loadstring!")
-        showNotification(translations[currentLanguage].client_error, Color3.fromRGB(255, 80, 80))
-        return
-    end
-
-    success, err = pcall(function()
-        local response = game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true)
-        if response and response ~= "" then
-            loadstring(response)()
-            print("Executed Speed Up X script")
-        else
-            error("Failed to fetch Speed Up X script")
-        end
-    end)
-
-    if success then
-        showNotification(translations[currentLanguage].speedx_notification, Color3.fromRGB(0, 200, 100))
-    else
-        warn("Error executing Speed Up X: " .. tostring(err))
-        showNotification(translations[currentLanguage].speedx_error, Color3.fromRGB(255, 80, 80))
-    end
-end)
-
--- No Lag Logic
-noLagButton.MouseButton1Click:Connect(function()
-    local success, err
-    local clientName = "Unknown"
-    local loadstringSupported = false
-
-    local successDetect, detectErr = pcall(function()
-        if typeof(getgenv) == "function" then
-            clientName = "KRNL/Fluxus/Synapse"
-            loadstringSupported = true
-        end
-    end)
-    if not successDetect then
-        warn("Client detection failed: " .. tostring(detectErr))
-    end
-    print("Detected client: " .. clientName .. ", loadstring supported: " .. tostring(loadstringSupported))
-
-    if not loadstringSupported then
-        warn("Client does not support loadstring!")
-        showNotification(translations[currentLanguage].client_error, Color3.fromRGB(255, 80, 80))
-        return
-    end
-
-    success, err = pcall(function()
-        local response = game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua")
-        if response and response ~= "" then
-            loadstring(response)()
-            print("Executed No Lag script")
-        else
-            error("Failed to fetch No Lag script")
-        end
-    end)
-
-    if success then
-        showNotification(translations[currentLanguage].nolag_notification, Color3.fromRGB(0, 200, 100))
-    else
-        warn("Error executing No Lag: " .. tostring(err))
-        showNotification(translations[currentLanguage].nolag_error, Color3.fromRGB(255, 80, 80))
-    end
-end)
-
 -- Close X Button Logic
 closeXButton.MouseButton1Click:Connect(toggleMenu)
 
@@ -1373,8 +1170,6 @@ local function addHoverEffect(button)
     end
 end
 
-addHoverEffect(speedButton)
-addHoverEffect(noLagButton)
 addHoverEffect(applySpeedButton)
 addHoverEffect(infiniteJumpButton)
 addHoverEffect(closeXButton)
@@ -1395,7 +1190,7 @@ for _, button in ipairs(languageDropdown:GetChildren()) do
     end
 end
 
--- Loading Animation (Sử dụng RunService thay vì TweenService)
+-- Loading Animation (Sử dụng RunService)
 local function startLoading()
     local success, err = pcall(function()
         -- Kiểm tra instance
@@ -1412,7 +1207,7 @@ local function startLoading()
             error("ToggleButton missing or destroyed")
         end
 
-        -- Đặt lại ProgressBar
+        -- Đặt lại ProgressBar và đảm bảo LoadingFrame hiển thị
         ProgressBar.Size = UDim2.new(0, 0, 1, 0)
         LoadingFrame.Visible = true
         LoadingFrame.BackgroundTransparency = 0.2
