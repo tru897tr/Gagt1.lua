@@ -23,7 +23,7 @@ screenGui.ResetOnSpawn = false
 screenGui.Enabled = true
 screenGui.IgnoreGuiInset = true
 
--- Menu Frame (Compact, Centered)
+-- Menu Frame
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 340, 0, 240)
 frame.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -54,7 +54,7 @@ title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = frame
 
--- Close Button (X, Top-Right)
+-- Close Button (X)
 local closeXButton = Instance.new("TextButton")
 closeXButton.Size = UDim2.new(0, 20, 0, 20)
 closeXButton.Position = UDim2.new(1, -28, 0, 8)
@@ -92,8 +92,8 @@ local homeButton = Instance.new("TextButton")
 homeButton.Size = UDim2.new(1, -10, 0, 32)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Home"
-homeButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255) -- Selected
-homeButton.BackgroundTransparency = 0.4
+homeButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200) -- Selected: Highlight
+homeButton.BackgroundTransparency = 0.3
 homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 homeButton.Font = Enum.Font.Gotham
 homeButton.TextSize = 14
@@ -101,12 +101,17 @@ homeButton.Parent = sidebar
 local homeCorner = Instance.new("UICorner")
 homeCorner.CornerRadius = UDim.new(0, 6)
 homeCorner.Parent = homeButton
+local homeStroke = Instance.new("UIStroke")
+homeStroke.Thickness = 1
+homeStroke.Color = Color3.fromRGB(255, 255, 255)
+homeStroke.Transparency = 0.5
+homeStroke.Parent = homeButton
 
 local settingsButton = Instance.new("TextButton")
 settingsButton.Size = UDim2.new(1, -10, 0, 32)
 settingsButton.Position = UDim2.new(0, 5, 0, 42)
 settingsButton.Text = "Settings"
-settingsButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Unselected
+settingsButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Unselected
 settingsButton.BackgroundTransparency = 0.4
 settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 settingsButton.Font = Enum.Font.Gotham
@@ -115,6 +120,11 @@ settingsButton.Parent = sidebar
 local settingsCorner = Instance.new("UICorner")
 settingsCorner.CornerRadius = UDim.new(0, 6)
 settingsCorner.Parent = settingsButton
+local settingsStroke = Instance.new("UIStroke")
+settingsStroke.Thickness = 1
+settingsStroke.Color = Color3.fromRGB(255, 255, 255)
+settingsStroke.Transparency = 1 -- Hidden for unselected
+settingsStroke.Parent = settingsButton
 
 -- Content: Home
 local homeContent = Instance.new("Frame")
@@ -126,7 +136,7 @@ homeContent.Visible = true
 local speedButton = Instance.new("TextButton")
 speedButton.Size = UDim2.new(0, 190, 0, 32)
 speedButton.Position = UDim2.new(0, 25, 0, 20)
-speedButton.Text = "Speed Up X" -- Updated name
+speedButton.Text = "Speed Up X"
 speedButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 speedButton.BackgroundTransparency = 0.4
 speedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -207,8 +217,8 @@ for i, theme in ipairs(themes) do
         sidebar.BackgroundColor3 = Color3.new(theme.Color.R * 1.1, theme.Color.G * 1.1, theme.Color.B * 1.1)
         title.TextColor3 = theme.TextColor
         themeButton.TextColor3 = theme.TextColor
-        credit.TextColor3 = theme.TextColor
         closeXButton.TextColor3 = theme.TextColor
+        credit.TextColor3 = theme.TextColor
         print("Theme changed to: " .. theme.Name)
     end)
 end
@@ -273,31 +283,47 @@ local function toggleMenu()
     print("Menu toggled: " .. tostring(menuVisible))
 end
 
--- Sidebar Navigation
+-- Sidebar Navigation (Highlight Effect)
 local function showHome()
     homeContent.Visible = true
     settingsContent.Visible = false
-    local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
-    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)})
+    local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        BackgroundColor3 = Color3.fromRGB(200, 200, 200),
+        BackgroundTransparency = 0.3
+    })
+    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+        BackgroundTransparency = 0.4
+    })
+    local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
+    local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
     tween1:Play()
     tween2:Play()
-    homeButton.BackgroundTransparency = 0.4
-    settingsButton.BackgroundTransparency = 0.4
+    strokeTween1:Play()
+    strokeTween2:Play()
     themeDropdown.Visible = false
-    print("Home selected, Home color: (0, 120, 255), Settings color: (0, 0, 0)")
+    print("Home selected, Home: (200, 200, 200, 0.3), Settings: (50, 50, 50, 0.4)")
 end
 
 local function showSettings()
     homeContent.Visible = false
     settingsContent.Visible = true
-    local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)})
-    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
+    local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+        BackgroundTransparency = 0.4
+    })
+    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        BackgroundColor3 = Color3.fromRGB(200, 200, 200),
+        BackgroundTransparency = 0.3
+    })
+    local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
+    local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
     tween1:Play()
     tween2:Play()
-    homeButton.BackgroundTransparency = 0.4
-    settingsButton.BackgroundTransparency = 0.4
+    strokeTween1:Play()
+    strokeTween2:Play()
     themeDropdown.Visible = false
-    print("Settings selected, Home color: (0, 0, 0), Settings color: (0, 120, 255)")
+    print("Settings selected, Home: (50, 50, 50, 0.4), Settings: (200, 200, 200, 0.3)")
 end
 
 homeButton.MouseButton1Click:Connect(showHome)
@@ -366,14 +392,19 @@ end)
 -- Hover Effects for Buttons
 local function addHoverEffect(button)
     local originalColor = button.BackgroundColor3
+    local originalTransparency = button.BackgroundTransparency
     button.MouseEnter:Connect(function()
         local tween = TweenService:Create(button, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
-            BackgroundColor3 = Color3.new(originalColor.R * 0.85, originalColor.G * 0.85, originalColor.B * 0.85)
+            BackgroundColor3 = Color3.new(originalColor.R * 0.85, originalColor.G * 0.85, originalColor.B * 0.85),
+            BackgroundTransparency = math.max(0, originalTransparency - 0.1)
         })
         tween:Play()
     end)
     button.MouseLeave:Connect(function()
-        local tween = TweenService:Create(button, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundColor3 = originalColor})
+        local tween = TweenService:Create(button, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = originalColor,
+            BackgroundTransparency = originalTransparency
+        })
         tween:Play()
     end)
 end
