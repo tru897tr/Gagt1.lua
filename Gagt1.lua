@@ -71,6 +71,7 @@ frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.5
 frame.Visible = true
 frame.ZIndex = 10
+frame.Active = true -- Enable dragging on entire frame
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 14)
@@ -81,16 +82,6 @@ frameStroke.Color = Color3.fromRGB(255, 255, 255)
 frameStroke.Transparency = 0.7
 frameStroke.Parent = frame
 print("Frame created at: " .. tostring(frame.Position))
-
--- Drag Frame
-local dragFrame = Instance.new("Frame")
-dragFrame.Size = UDim2.new(1, 0, 0, 32)
-dragFrame.Position = UDim2.new(0, 0, 0, 0)
-dragFrame.BackgroundTransparency = 1
-dragFrame.ZIndex = 12
-dragFrame.Active = true
-dragFrame.Parent = frame
-print("DragFrame created")
 
 -- Title Label
 local title = Instance.new("TextLabel")
@@ -396,7 +387,7 @@ for i, theme in ipairs(themes) do
         settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         print("Theme changed to: " .. theme.Name)
-        saveTheme() -- Save theme to gag.js
+        saveTheme()
         showNotification("Theme saved: " .. theme.Name, Color3.fromRGB(0, 200, 100))
     end)
 end
@@ -564,25 +555,43 @@ homeButton.MouseButton1Click:Connect(showHome)
 settingsButton.MouseButton1Click:Connect(showSettings)
 musicButton.MouseButton1Click:Connect(showMusic)
 
--- New Dragging Logic
+-- New Dragging Logic (Applied to entire frame)
 local isDragging = false
 local offset = Vector2.new(0, 0)
 
-dragFrame.InputBegan:Connect(function(input)
+frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         if frame.Visible and frame.Parent then
-            isDragging = true
-            local mousePos = Vector2.new(input.Position.X, input.Position.Y)
-            local framePos = frame.AbsolutePosition
-            offset = mousePos - framePos
-            print("Drag started at mouse: " .. tostring(mousePos) .. ", frame: " .. tostring(framePos) .. ", offset: " .. tostring(offset))
+            -- Check if input is not on interactive elements (buttons, dropdown)
+            local target = input.UserInputType == Enum.UserInputType.MouseButton1 and input.UserInputState == Enum.UserInputState.Begin
+            local isOnButton = false
+            local descendants = frame:GetDescendants()
+            for _, descendant in ipairs(descendants) do
+                if descendant:IsA("GuiButton") and descendant.Active then
+                    local absPos = descendant.AbsolutePosition
+                    local absSize = descendant.AbsoluteSize
+                    local mousePos = Vector2.new(input.Position.X, input.Position.Y)
+                    if mousePos.X >= absPos.X and mousePos.X <= absPos.X + absSize.X and
+                       mousePos.Y >= absPos.Y and mousePos.Y <= absPos.Y + absSize.Y then
+                        isOnButton = true
+                        break
+                    end
+                end
+            end
+            if not isOnButton then
+                isDragging = true
+                local mousePos = Vector2.new(input.Position.X, input.Position.Y)
+                local framePos = frame.AbsolutePosition
+                offset = mousePos - framePos
+                print("Drag started at mouse: " .. tostring(mousePos) .. ", frame: " .. tostring(framePos) .. ", offset: " .. tostring(offset))
+            end
         else
             warn("Drag failed: Frame not visible or missing")
         end
     end
 end)
 
-dragFrame.InputEnded:Connect(function(input)
+frame.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         isDragging = false
         print("Drag ended")
@@ -595,10 +604,10 @@ UserInputService.InputChanged:Connect(function(input)
             local mousePos = Vector2.new(input.Position.X, input.Position.Y)
             local viewportSize = workspace.CurrentCamera.ViewportSize
             local frameSize = frame.AbsoluteSize
-            local newPosX = math.clamp(mousePos.X - offset.X, 0, viewportSize.X - frameSize.X)
-            local newPosY = math.clamp(mousePos.Y - offset.Y, 0, viewportSize.Y - frameSize.Y)
+            local newPosX = math.clamp(mousePos.X - offset.X, 0, math.max(0, viewportSize.X - frameSize.X))
+            local newPosY = math.clamp(mousePos.Y - offset.Y, 0, math.max(0, viewportSize.Y - frameSize.Y))
             frame.Position = UDim2.new(0, newPosX, 0, newPosY)
-            print("Frame moved to: " .. tostring(frame.Position) .. ", mouse: " .. tostring(mousePos))
+            print("Frame moved to: " .. tostring(frame.Position) .. ", mouse: " .. tostring(mousePos) .. ", viewport: " .. tostring(viewportSize) .. ", frameSize: " .. tostring(frameSize))
         else
             isDragging = false
             warn("Drag stopped: Frame missing")
