@@ -44,7 +44,7 @@ local LoadingFrame = Instance.new("Frame")
 LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
 LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
 LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-LoadingFrame.BackgroundTransparency = 0.2 -- Slightly transparent
+LoadingFrame.BackgroundTransparency = 0.2
 LoadingFrame.ZIndex = 20
 LoadingFrame.Parent = screenGui
 local loadingCorner = Instance.new("UICorner")
@@ -73,7 +73,7 @@ ProgressBarFrameStroke.Transparency = 0.5
 ProgressBarFrameStroke.Parent = ProgressBarFrame
 
 local ProgressBar = Instance.new("Frame")
-ProgressBar.Size = UDim2.new(0, 0, 1, 0) -- Start at 0 width
+ProgressBar.Size = UDim2.new(0, 0, 1, 0)
 ProgressBar.Position = UDim2.new(0, 0, 0, 0)
 ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 ProgressBar.ZIndex = 22
@@ -122,8 +122,8 @@ frame.Size = UDim2.new(0, 340, 0, 240)
 frame.Position = UDim2.new(0.5, -170, 0.5, -120)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 frame.BorderSizePixel = 0
-frame.BackgroundTransparency = 1 -- Start hidden
-frame.Visible = false -- Start hidden
+frame.BackgroundTransparency = 1
+frame.Visible = false
 frame.ZIndex = 10
 frame.Active = true
 frame.Parent = screenGui
@@ -136,6 +136,13 @@ frameStroke.Color = Color3.fromRGB(255, 255, 255)
 frameStroke.Transparency = 0.7
 frameStroke.Parent = frame
 print("Frame created at: " .. tostring(frame.Position))
+
+-- Drag Area
+local DragArea = Instance.new("Frame")
+DragArea.Size = UDim2.new(1, 0, 1, 0)
+DragArea.BackgroundTransparency = 1
+DragArea.ZIndex = 9 -- Below other elements
+DragArea.Parent = frame
 
 -- Title Label
 local title = Instance.new("TextLabel")
@@ -293,7 +300,7 @@ settingsContent.ZIndex = 10
 settingsContent.Parent = contentFrame
 settingsContent.Visible = false
 
--- Content: Misic
+-- Content: Misic (Speed Control)
 local musicContent = Instance.new("Frame")
 musicContent.Size = UDim2.new(1, 0, 1, 0)
 musicContent.BackgroundTransparency = 1
@@ -301,20 +308,36 @@ musicContent.ZIndex = 10
 musicContent.Parent = contentFrame
 musicContent.Visible = false
 
-local swimButton = Instance.new("TextButton")
-swimButton.Size = UDim2.new(0, 190, 0, 32)
-swimButton.Position = UDim2.new(0, 25, 0, 20)
-swimButton.Text = "Swim"
-swimButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-swimButton.BackgroundTransparency = 0.4
-swimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-swimButton.Font = Enum.Font.Gotham
-swimButton.TextSize = 14
-swimButton.ZIndex = 11
-swimButton.Parent = musicContent
-local swimCorner = Instance.new("UICorner")
-swimCorner.CornerRadius = UDim.new(0, 8)
-swimCorner.Parent = swimButton
+local speedInput = Instance.new("TextBox")
+speedInput.Size = UDim2.new(0, 100, 0, 30)
+speedInput.Position = UDim2.new(0, 25, 0, 20)
+speedInput.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+speedInput.BackgroundTransparency = 0.4
+speedInput.Text = "16"
+speedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedInput.Font = Enum.Font.Gotham
+speedInput.TextSize = 14
+speedInput.PlaceholderText = "Enter speed (16-100)"
+speedInput.ZIndex = 11
+speedInput.Parent = musicContent
+local speedInputCorner = Instance.new("UICorner")
+speedInputCorner.CornerRadius = UDim.new(0, 6)
+speedInputCorner.Parent = speedInput
+
+local applySpeedButton = Instance.new("TextButton")
+applySpeedButton.Size = UDim2.new(0, 80, 0, 30)
+applySpeedButton.Position = UDim2.new(0, 135, 0, 20)
+applySpeedButton.Text = "Apply"
+applySpeedButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+applySpeedButton.BackgroundTransparency = 0.4
+applySpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+applySpeedButton.Font = Enum.Font.Gotham
+applySpeedButton.TextSize = 14
+applySpeedButton.ZIndex = 11
+applySpeedButton.Parent = musicContent
+local applySpeedCorner = Instance.new("UICorner")
+applySpeedCorner.CornerRadius = UDim.new(0, 6)
+applySpeedCorner.Parent = applySpeedButton
 
 -- Theme Selection
 local currentTheme = "Tối"
@@ -609,42 +632,25 @@ homeButton.MouseButton1Click:Connect(showHome)
 settingsButton.MouseButton1Click:Connect(showSettings)
 musicButton.MouseButton1Click:Connect(showMusic)
 
--- Dragging Logic
+-- Dragging Logic (Only on DragArea)
 local isDragging = false
 local offset = Vector2.new(0, 0)
 
-frame.InputBegan:Connect(function(input)
+DragArea.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         if frame.Visible and frame.Parent then
-            local target = input.UserInputType == Enum.UserInputType.MouseButton1 and input.UserInputState == Enum.UserInputState.Begin
-            local isOnButton = false
-            local descendants = frame:GetDescendants()
-            for _, descendant in ipairs(descendants) do
-                if descendant:IsA("GuiButton") and descendant.Active then
-                    local absPos = descendant.AbsolutePosition
-                    local absSize = descendant.AbsoluteSize
-                    local mousePos = Vector2.new(input.Position.X, input.Position.Y)
-                    if mousePos.X >= absPos.X and mousePos.X <= absPos.X + absSize.X and
-                       mousePos.Y >= absPos.Y and mousePos.Y <= absPos.Y + absSize.Y then
-                        isOnButton = true
-                        break
-                    end
-                end
-            end
-            if not isOnButton then
-                isDragging = true
-                local mousePos = Vector2.new(input.Position.X, input.Position.Y)
-                local framePos = frame.AbsolutePosition
-                offset = mousePos - framePos
-                print("Drag started at mouse: " .. tostring(mousePos) .. ", frame: " .. tostring(framePos) .. ", offset: " .. tostring(offset))
-            end
+            isDragging = true
+            local mousePos = Vector2.new(input.Position.X, input.Position.Y)
+            local framePos = frame.AbsolutePosition
+            offset = mousePos - framePos
+            print("Drag started at mouse: " .. tostring(mousePos) .. ", frame: " .. tostring(framePos) .. ", offset: " .. tostring(offset))
         else
             warn("Drag failed: Frame not visible or missing")
         end
     end
 end)
 
-frame.InputEnded:Connect(function(input)
+DragArea.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         isDragging = false
         print("Drag ended")
@@ -668,135 +674,28 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Swim Logic
-local isSwimming = false
-local bodyVelocity = nil
-local bodyGyro = nil
-local swimSpeed = 30
-local swimConnection = nil
-local initialY = 0
-local swayConnection = nil
-
-local function startSwim()
-    local character = player.Character
-    local rootPart = character and character:FindFirstChild("HumanoidRootPart")
-    if not rootPart then
-        warn("Swim error: HumanoidRootPart not found")
-        showNotification("Swim Failed: No HumanoidRootPart", Color3.fromRGB(255, 80, 80))
-        return false
-    end
-
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.PlatformStand = true
-    end
-
-    initialY = rootPart.Position.Y
-    bodyVelocity = Instance.new("BodyVelocity")
-    bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-    bodyVelocity.Parent = rootPart
-
-    bodyGyro = Instance.new("BodyGyro")
-    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-    bodyGyro.P = 5000
-    bodyGyro.D = 300
-    bodyGyro.Parent = rootPart
-
-    local camera = workspace.CurrentCamera
-    swimConnection = RunService.Heartbeat:Connect(function(dt)
-        if not isSwimming or not rootPart or not bodyVelocity or not bodyGyro then
-            swimConnection:Disconnect()
-            return
-        end
-        local direction = Vector3.new(0, 0, 0)
-        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-            direction = direction + camera.CFrame.LookVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-            direction = direction - camera.CFrame.LookVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-            direction = direction - camera.CFrame.RightVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-            direction = direction + camera.CFrame.RightVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-            direction = direction + Vector3.new(0, 1, 0)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
-            direction = direction - Vector3.new(0, 1, 0)
-        end
-        local currentY = rootPart.Position.Y
-        if currentY > initialY + 10 then
-            direction = direction - Vector3.new(0, currentY - (initialY + 10), 0)
-        elseif currentY < initialY - 10 then
-            direction = direction + Vector3.new(0, (initialY - 10) - currentY, 0)
-        end
-        bodyVelocity.Velocity = direction.Magnitude > 0 and direction.Unit * swimSpeed or Vector3.new(0, 0, 0)
-        bodyGyro.CFrame = camera.CFrame
-    end)
-
-    swayConnection = RunService.Heartbeat:Connect(function(dt)
-        if bodyGyro and isSwimming then
-            local sway = math.sin(tick() * 2) * 0.1
-            bodyGyro.CFrame = bodyGyro.CFrame * CFrame.Angles(0, sway, 0)
-        end
-    end)
-
-    return true
-end
-
-local function stopSwim()
-    if bodyVelocity then
-        bodyVelocity:Destroy()
-        bodyVelocity = nil
-    end
-    if bodyGyro then
-        bodyGyro:Destroy()
-        bodyGyro = nil
-    end
-    if swimConnection then
-        swimConnection:Disconnect()
-        swimConnection = nil
-    end
-    if swayConnection then
-        swayConnection:Disconnect()
-        swayConnection = nil
-    end
-    local character = player.Character
-    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid.PlatformStand = false
-    end
-end
-
-swimButton.MouseButton1Click:Connect(function()
+-- Speed Control Logic
+applySpeedButton.MouseButton1Click:Connect(function()
     local success, err = pcall(function()
-        if not isSwimming then
-            if startSwim() then
-                isSwimming = true
-                swimButton.Text = "Swim (On)"
-                showNotification("Swim Enabled!", Color3.fromRGB(0, 200, 100))
-                print("Swim enabled")
-            else
-                error("Swim failed to start")
-            end
-        else
-            isSwimming = false
-            swimButton.Text = "Swim"
-            stopSwim()
-            showNotification("Swim Disabled!", Color3.fromRGB(0, 200, 100))
-            print("Swim disabled")
+        local speed = tonumber(speedInput.Text)
+        if not speed then
+            error("Invalid speed input: " .. speedInput.Text)
         end
+        if speed < 16 or speed > 100 then
+            error("Speed must be between 16 and 100")
+        end
+        local character = player.Character
+        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+        if not humanoid then
+            error("Humanoid not found")
+        end
+        humanoid.WalkSpeed = speed
+        print("Speed set to: " .. speed)
+        showNotification("Speed set to " .. speed .. "!", Color3.fromRGB(0, 200, 100))
     end)
     if not success then
-        warn("Swim error: " .. tostring(err))
-        showNotification("Swim Error: Check console", Color3.fromRGB(255, 80, 80))
-        isSwimming = false
-        swimButton.Text = "Swim"
-        stopSwim()
+        warn("Speed error: " .. tostring(err))
+        showNotification("Invalid speed! (16-100)", Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -921,7 +820,7 @@ end
 
 addHoverEffect(speedButton)
 addHoverEffect(noLagButton)
-addHoverEffect(swimButton)
+addHoverEffect(applySpeedButton)
 addHoverEffect(closeXButton)
 addHoverEffect(toggleButton)
 addHoverEffect(homeButton)
