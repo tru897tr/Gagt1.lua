@@ -88,6 +88,7 @@ dragFrame.Size = UDim2.new(1, 0, 0, 32)
 dragFrame.Position = UDim2.new(0, 0, 0, 0)
 dragFrame.BackgroundTransparency = 1
 dragFrame.ZIndex = 12
+dragFrame.Active = true
 dragFrame.Parent = frame
 print("DragFrame created")
 
@@ -272,6 +273,66 @@ flyCorner.Parent = flyButton
 
 -- Theme Selection
 local currentTheme = "Tối"
+local themes = {
+    {Name = "Sáng", Color = Color3.fromRGB(220, 220, 220), TextColor = Color3.fromRGB(0, 0, 0)},
+    {Name = "Tối", Color = Color3.fromRGB(20, 20, 20), TextColor = Color3.fromRGB(255, 255, 255)},
+    {Name = "Xanh", Color = Color3.fromRGB(0, 80, 120), TextColor = Color3.fromRGB(255, 255, 255)},
+    {Name = "Tím", Color = Color3.fromRGB(80, 0, 120), TextColor = Color3.fromRGB(255, 255, 255)}
+}
+
+-- Load saved theme from gag.js
+local function loadTheme()
+    if isfile and isfile("gag.js") then
+        local success, result = pcall(function()
+            local loaded = loadfile("gag.js")
+            if loaded then
+                local data = loaded()
+                return data and data.theme
+            end
+        end)
+        if success and result then
+            for _, theme in ipairs(themes) do
+                if theme.Name == result then
+                    currentTheme = theme.Name
+                    frame.BackgroundColor3 = theme.Color
+                    sidebar.BackgroundColor3 = Color3.new(theme.Color.R * 1.1, theme.Color.G * 1.1, theme.Color.B * 1.1)
+                    title.TextColor3 = theme.TextColor
+                    closeXButton.TextColor3 = theme.TextColor
+                    credit.TextColor3 = theme.TextColor
+                    print("Loaded theme from gag.js: " .. result)
+                    return
+                end
+            end
+            warn("Invalid theme in gag.js: " .. tostring(result))
+        else
+            warn("Failed to load gag.js: " .. tostring(result))
+        end
+    else
+        print("No gag.js found, using default theme: Tối")
+    end
+end
+
+-- Save theme to gag.js
+local function saveTheme()
+    if writefile then
+        local success, err = pcall(function()
+            writefile("gag.js", "return { theme = \"" .. currentTheme .. "\" }")
+        end)
+        if success then
+            print("Saved theme to gag.js: " .. currentTheme)
+        else
+            warn("Failed to save gag.js: " .. tostring(err))
+            showNotification("Failed to save theme!", Color3.fromRGB(255, 80, 80))
+        end
+    else
+        warn("Executor does not support writefile")
+        showNotification("Theme saving not supported!", Color3.fromRGB(255, 80, 80))
+    end
+end
+
+-- Load theme on startup
+loadTheme()
+
 local themeButton = Instance.new("TextButton")
 themeButton.Size = UDim2.new(0, 190, 0, 30)
 themeButton.Position = UDim2.new(0, 25, 0, 20)
@@ -299,13 +360,6 @@ themeDropdown.Parent = settingsContent
 local dropdownCorner = Instance.new("UICorner")
 dropdownCorner.CornerRadius = UDim.new(0, 6)
 dropdownCorner.Parent = themeDropdown
-
-local themes = {
-    {Name = "Sáng", Color = Color3.fromRGB(220, 220, 220), TextColor = Color3.fromRGB(0, 0, 0)},
-    {Name = "Tối", Color = Color3.fromRGB(20, 20, 20), TextColor = Color3.fromRGB(255, 255, 255)},
-    {Name = "Xanh", Color = Color3.fromRGB(0, 80, 120), TextColor = Color3.fromRGB(255, 255, 255)},
-    {Name = "Tím", Color = Color3.fromRGB(80, 0, 120), TextColor = Color3.fromRGB(255, 255, 255)}
-}
 
 for i, theme in ipairs(themes) do
     local optionButton = Instance.new("TextButton")
@@ -342,6 +396,8 @@ for i, theme in ipairs(themes) do
         settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         print("Theme changed to: " .. theme.Name)
+        saveTheme() -- Save theme to gag.js
+        showNotification("Theme saved: " .. theme.Name, Color3.fromRGB(0, 200, 100))
     end)
 end
 
@@ -514,10 +570,15 @@ local offset = Vector2.new(0, 0)
 
 dragFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        isDragging = true
-        local framePos = frame.AbsolutePosition
-        offset = input.Position - framePos
-        print("Drag started at: " .. tostring(input.Position) .. ", offset: " .. tostring(offset))
+        if frame.Visible and frame.Parent then
+            isDragging = true
+            local mousePos = Vector2.new(input.Position.X, input.Position.Y)
+            local framePos = frame.AbsolutePosition
+            offset = mousePos - framePos
+            print("Drag started at mouse: " .. tostring(mousePos) .. ", frame: " .. tostring(framePos) .. ", offset: " .. tostring(offset))
+        else
+            warn("Drag failed: Frame not visible or missing")
+        end
     end
 end)
 
@@ -530,12 +591,18 @@ end)
 
 UserInputService.InputChanged:Connect(function(input)
     if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local viewportSize = workspace.CurrentCamera.ViewportSize
-        local frameSize = frame.AbsoluteSize
-        local newPosX = math.clamp(input.Position.X - offset.X, 0, viewportSize.X - frameSize.X)
-        local newPosY = math.clamp(input.Position.Y - offset.Y, 0, viewportSize.Y - frameSize.Y)
-        frame.Position = UDim2.new(0, newPosX, 0, newPosY)
-        print("Frame moved to: " .. tostring(frame.Position))
+        if frame and frame.Parent then
+            local mousePos = Vector2.new(input.Position.X, input.Position.Y)
+            local viewportSize = workspace.CurrentCamera.ViewportSize
+            local frameSize = frame.AbsoluteSize
+            local newPosX = math.clamp(mousePos.X - offset.X, 0, viewportSize.X - frameSize.X)
+            local newPosY = math.clamp(mousePos.Y - offset.Y, 0, viewportSize.Y - frameSize.Y)
+            frame.Position = UDim2.new(0, newPosX, 0, newPosY)
+            print("Frame moved to: " .. tostring(frame.Position) .. ", mouse: " .. tostring(mousePos))
+        else
+            isDragging = false
+            warn("Drag stopped: Frame missing")
+        end
     end
 end)
 
