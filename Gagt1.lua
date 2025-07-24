@@ -46,6 +46,7 @@ local dragFrame = Instance.new("Frame")
 dragFrame.Size = UDim2.new(1, 0, 0, 32)
 dragFrame.Position = UDim2.new(0, 0, 0, 0)
 dragFrame.BackgroundTransparency = 1
+dragFrame.ZIndex = 2 -- Ensure it receives input
 dragFrame.Parent = frame
 
 -- Title Label
@@ -70,6 +71,7 @@ closeXButton.Text = "X"
 closeXButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeXButton.Font = Enum.Font.GothamBold
 closeXButton.TextSize = 12
+closeXButton.ZIndex = 3 -- Above dragFrame
 closeXButton.Parent = frame
 local closeXCorner = Instance.new("UICorner")
 closeXCorner.CornerRadius = UDim.new(0, 6)
@@ -98,7 +100,7 @@ local homeButton = Instance.new("TextButton")
 homeButton.Size = UDim2.new(1, -10, 0, 32)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Home"
-homeButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200) -- Selected: Highlight
+homeButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200) -- Selected
 homeButton.BackgroundTransparency = 0.3
 homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 homeButton.Font = Enum.Font.Gotham
@@ -129,8 +131,27 @@ settingsCorner.Parent = settingsButton
 local settingsStroke = Instance.new("UIStroke")
 settingsStroke.Thickness = 1
 settingsStroke.Color = Color3.fromRGB(255, 255, 255)
-settingsStroke.Transparency = 1 -- Hidden for unselected
+settingsStroke.Transparency = 1
 settingsStroke.Parent = settingsButton
+
+local musicButton = Instance.new("TextButton")
+musicButton.Size = UDim2.new(1, -10, 0, 32)
+musicButton.Position = UDim2.new(0, 5, 0, 79)
+musicButton.Text = "Music"
+musicButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Unselected
+musicButton.BackgroundTransparency = 0.4
+musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+musicButton.Font = Enum.Font.Gotham
+musicButton.TextSize = 14
+musicButton.Parent = sidebar
+local musicCorner = Instance.new("UICorner")
+musicCorner.CornerRadius = UDim.new(0, 6)
+musicCorner.Parent = musicButton
+local musicStroke = Instance.new("UIStroke")
+musicStroke.Thickness = 1
+musicStroke.Color = Color3.fromRGB(255, 255, 255)
+musicStroke.Transparency = 1
+musicStroke.Parent = musicButton
 
 -- Content: Home
 local homeContent = Instance.new("Frame")
@@ -173,6 +194,27 @@ settingsContent.Size = UDim2.new(1, 0, 1, 0)
 settingsContent.BackgroundTransparency = 1
 settingsContent.Parent = contentFrame
 settingsContent.Visible = false
+
+-- Content: Music
+local musicContent = Instance.new("Frame")
+musicContent.Size = UDim2.new(1, 0, 1, 0)
+musicContent.BackgroundTransparency = 1
+musicContent.Parent = contentFrame
+musicContent.Visible = false
+
+local flyButton = Instance.new("TextButton")
+flyButton.Size = UDim2.new(0, 190, 0, 32)
+flyButton.Position = UDim2.new(0, 25, 0, 20)
+flyButton.Text = "Fly"
+flyButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+flyButton.BackgroundTransparency = 0.4
+flyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+flyButton.Font = Enum.Font.Gotham
+flyButton.TextSize = 14
+flyButton.Parent = musicContent
+local flyCorner = Instance.new("UICorner")
+flyCorner.CornerRadius = UDim.new(0, 8)
+flyCorner.Parent = flyButton
 
 -- Theme Selection
 local currentTheme = "Tối"
@@ -239,8 +281,9 @@ for i, theme in ipairs(themes) do
         themeButton.TextColor3 = theme.TextColor
         closeXButton.TextColor3 = theme.TextColor
         credit.TextColor3 = theme.TextColor
-        homeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Keep text white
-        settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Keep text white
+        homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         print("Theme changed to: " .. theme.Name)
     end)
 end
@@ -309,6 +352,7 @@ end
 local function showHome()
     homeContent.Visible = true
     settingsContent.Visible = false
+    musicContent.Visible = false
     local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
         BackgroundColor3 = Color3.fromRGB(200, 200, 200),
         BackgroundTransparency = 0.3
@@ -317,22 +361,31 @@ local function showHome()
         BackgroundColor3 = Color3.fromRGB(50, 50, 50),
         BackgroundTransparency = 0.4
     })
+    local tween3 = TweenService:Create(musicButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+        BackgroundTransparency = 0.4
+    })
     local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
     local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
+    local strokeTween3 = TweenService:Create(musicStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
     tween1:Play()
     tween2:Play()
+    tween3:Play()
     strokeTween1:Play()
     strokeTween2:Play()
-    homeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Ensure text stays white
-    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Ensure text stays white
+    strokeTween3:Play()
+    homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     themeDropdown.Visible = false
-    print("Home selected, Home: (200, 200, 200, 0.3), Settings: (50, 50, 50, 0.4)")
+    print("Home selected, Home: (200, 200, 200, 0.3), Settings: (50, 50, 50, 0.4), Music: (50, 50, 50, 0.4)")
     print("SettingsButton Background: " .. tostring(settingsButton.BackgroundColor3) .. ", Transparency: " .. tostring(settingsButton.BackgroundTransparency) .. ", Stroke Transparency: " .. tostring(settingsStroke.Transparency))
 end
 
 local function showSettings()
     homeContent.Visible = false
     settingsContent.Visible = true
+    musicContent.Visible = false
     local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
         BackgroundColor3 = Color3.fromRGB(50, 50, 50),
         BackgroundTransparency = 0.4
@@ -341,21 +394,62 @@ local function showSettings()
         BackgroundColor3 = Color3.fromRGB(200, 200, 200),
         BackgroundTransparency = 0.3
     })
+    local tween3 = TweenService:Create(musicButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+        BackgroundTransparency = 0.4
+    })
     local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
     local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
+    local strokeTween3 = TweenService:Create(musicStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
     tween1:Play()
     tween2:Play()
+    tween3:Play()
     strokeTween1:Play()
     strokeTween2:Play()
-    homeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Ensure text stays white
-    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Ensure text stays white
+    strokeTween3:Play()
+    homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     themeDropdown.Visible = false
-    print("Settings selected, Home: (50, 50, 50, 0.4), Settings: (200, 200, 200, 0.3)")
+    print("Settings selected, Home: (50, 50, 50, 0.4), Settings: (200, 200, 200, 0.3), Music: (50, 50, 50, 0.4)")
     print("SettingsButton Background: " .. tostring(settingsButton.BackgroundColor3) .. ", Transparency: " .. tostring(settingsButton.BackgroundTransparency) .. ", Stroke Transparency: " .. tostring(settingsStroke.Transparency))
+end
+
+local function showMusic()
+    homeContent.Visible = false
+    settingsContent.Visible = false
+    musicContent.Visible = true
+    local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+        BackgroundTransparency = 0.4
+    })
+    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+        BackgroundTransparency = 0.4
+    })
+    local tween3 = TweenService:Create(musicButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+        BackgroundColor3 = Color3.fromRGB(200, 200, 200),
+        BackgroundTransparency = 0.3
+    })
+    local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
+    local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
+    local strokeTween3 = TweenService:Create(musicStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
+    tween1:Play()
+    tween2:Play()
+    tween3:Play()
+    strokeTween1:Play()
+    strokeTween2:Play()
+    strokeTween3:Play()
+    homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    themeDropdown.Visible = false
+    print("Music selected, Home: (50, 50, 50, 0.4), Settings: (50, 50, 50, 0.4), Music: (200, 200, 200, 0.3)")
 end
 
 homeButton.MouseButton1Click:Connect(showHome)
 settingsButton.MouseButton1Click:Connect(showSettings)
+musicButton.MouseButton1Click:Connect(showMusic)
 
 -- Dragging Logic
 local isDragging = false
@@ -367,11 +461,14 @@ dragFrame.InputBegan:Connect(function(input)
         isDragging = true
         dragStart = input.Position
         startPos = frame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                isDragging = false
-            end
-        end)
+        print("Drag started at: " .. tostring(dragStart))
+    end
+end)
+
+dragFrame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = false
+        print("Drag ended")
     end
 end)
 
@@ -379,10 +476,8 @@ UserInputService.InputChanged:Connect(function(input)
     if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
         local delta = input.Position - dragStart
         local newPos = UDim2.new(
-            startPos.X.Scale,
-            startPos.X.Offset + delta.X,
-            startPos.Y.Scale,
-            startPos.Y.Offset + delta.Y
+            0, startPos.X.Offset + delta.X,
+            0, startPos.Y.Offset + delta.Y
         )
         -- Clamp position within screen bounds
         local viewportSize = game:GetService("Workspace").CurrentCamera.ViewportSize
@@ -393,6 +488,110 @@ UserInputService.InputChanged:Connect(function(input)
         )
         frame.Position = newPos
         print("Frame moved to: " .. tostring(newPos))
+    end
+end)
+
+-- Fly Logic
+local isFlying = false
+local bodyVelocity = nil
+local bodyGyro = nil
+local flySpeed = 50
+
+flyButton.MouseButton1Click:Connect(function()
+    local success, err = pcall(function()
+        if not isFlying then
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                isFlying = true
+                flyButton.Text = "Fly (On)"
+                bodyVelocity = Instance.new("BodyVelocity")
+                bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+                bodyVelocity.Parent = player.Character.HumanoidRootPart
+
+                bodyGyro = Instance.new("BodyGyro")
+                bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+                bodyGyro.P = 10000
+                bodyGyro.D = 500
+                bodyGyro.Parent = player.Character.HumanoidRootPart
+
+                local camera = game:GetService("Workspace").CurrentCamera
+                UserInputService.InputChanged:Connect(function(input)
+                    if isFlying and input.UserInputType == Enum.UserInputType.MouseMovement then
+                        -- Optional: Add mouse-based rotation if desired
+                    end
+                end)
+
+                local function updateFly()
+                    if not isFlying then return end
+                    local direction = Vector3.new(0, 0, 0)
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                        direction = direction + camera.CFrame.LookVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                        direction = direction - camera.CFrame.LookVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                        direction = direction - camera.CFrame.RightVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                        direction = direction + camera.CFrame.RightVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                        direction = direction + Vector3.new(0, 1, 0)
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                        direction = direction - Vector3.new(0, 1, 0)
+                    end
+                    bodyVelocity.Velocity = direction * flySpeed
+                    bodyGyro.CFrame = camera.CFrame
+                end
+
+                game:GetService("RunService").RenderStepped:Connect(updateFly)
+                local successLabel = Instance.new("TextLabel")
+                successLabel.Size = UDim2.new(0, 190, 0, 20)
+                successLabel.Position = UDim2.new(0, 25, 0, 58)
+                successLabel.BackgroundTransparency = 1
+                successLabel.Text = "Fly Enabled!"
+                successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
+                successLabel.TextSize = 12
+                successLabel.Parent = musicContent
+                game:GetService("Debris"):AddItem(successLabel, 3)
+                print("Fly enabled")
+            end
+        else
+            isFlying = false
+            flyButton.Text = "Fly"
+            if bodyVelocity then
+                bodyVelocity:Destroy()
+                bodyVelocity = nil
+            end
+            if bodyGyro then
+                bodyGyro:Destroy()
+                bodyGyro = nil
+            end
+            local successLabel = Instance.new("TextLabel")
+            successLabel.Size = UDim2.new(0, 190, 0, 20)
+            successLabel.Position = UDim2.new(0, 25, 0, 58)
+            successLabel.BackgroundTransparency = 1
+            successLabel.Text = "Fly Disabled!"
+            successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
+            successLabel.TextSize = 12
+            successLabel.Parent = musicContent
+            game:GetService("Debris"):AddItem(successLabel, 3)
+            print("Fly disabled")
+        end
+    end)
+    if not success then
+        warn("Fly error: " .. tostring(err))
+        local errorLabel = Instance.new("TextLabel")
+        errorLabel.Size = UDim2.new(0, 190, 0, 20)
+        errorLabel.Position = UDim2.new(0, 25, 0, 58)
+        errorLabel.BackgroundTransparency = 1
+        errorLabel.Text = "Error: Check console"
+        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        errorLabel.TextSize = 12
+        errorLabel.Parent = musicContent
+        game:GetService("Debris"):AddItem(errorLabel, 3)
     end
 end)
 
@@ -521,10 +720,12 @@ end
 
 addHoverEffect(speedButton)
 addHoverEffect(noLagButton)
+addHoverEffect(flyButton)
 addHoverEffect(closeXButton)
 addHoverEffect(toggleButton)
 addHoverEffect(homeButton)
 addHoverEffect(settingsButton)
+addHoverEffect(musicButton)
 addHoverEffect(themeButton)
 for _, button in ipairs(themeDropdown:GetChildren()) do
     if button:IsA("TextButton") then
