@@ -141,7 +141,7 @@ print("Frame created at: " .. tostring(frame.Position))
 local DragArea = Instance.new("Frame")
 DragArea.Size = UDim2.new(1, 0, 1, 0)
 DragArea.BackgroundTransparency = 1
-DragArea.ZIndex = 9 -- Below other elements
+DragArea.ZIndex = 9
 DragArea.Parent = frame
 
 -- Title Label
@@ -300,7 +300,7 @@ settingsContent.ZIndex = 10
 settingsContent.Parent = contentFrame
 settingsContent.Visible = false
 
--- Content: Misic (Speed Control)
+-- Content: Misic (Speed and Infinite Jump)
 local musicContent = Instance.new("Frame")
 musicContent.Size = UDim2.new(1, 0, 1, 0)
 musicContent.BackgroundTransparency = 1
@@ -308,36 +308,133 @@ musicContent.ZIndex = 10
 musicContent.Parent = contentFrame
 musicContent.Visible = false
 
+-- Speed Control Frame
+local speedControlFrame = Instance.new("Frame")
+speedControlFrame.Size = UDim2.new(0, 190, 0, 80)
+speedControlFrame.Position = UDim2.new(0, 25, 0, 20)
+speedControlFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+speedControlFrame.BackgroundTransparency = 0.4
+speedControlFrame.ZIndex = 11
+speedControlFrame.Parent = musicContent
+local speedControlCorner = Instance.new("UICorner")
+speedControlCorner.CornerRadius = UDim.new(0, 8)
+speedControlCorner.Parent = speedControlFrame
+local speedControlStroke = Instance.new("UIStroke")
+speedControlStroke.Thickness = 1
+speedControlStroke.Color = Color3.fromRGB(255, 255, 255)
+speedControlStroke.Transparency = 0.5
+speedControlStroke.Parent = speedControlFrame
+
+local speedControlTitle = Instance.new("TextLabel")
+speedControlTitle.Size = UDim2.new(0, 180, 0, 20)
+speedControlTitle.Position = UDim2.new(0, 5, 0, 5)
+speedControlTitle.BackgroundTransparency = 1
+speedControlTitle.Text = "Walk Speed"
+speedControlTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedControlTitle.TextSize = 14
+speedControlTitle.Font = Enum.Font.GothamBold
+speedControlTitle.TextXAlignment = Enum.TextXAlignment.Left
+speedControlTitle.ZIndex = 12
+speedControlTitle.Parent = speedControlFrame
+
+local speedControlDesc = Instance.new("TextLabel")
+speedControlDesc.Size = UDim2.new(0, 180, 0, 20)
+speedControlDesc.Position = UDim2.new(0, 5, 0, 25)
+speedControlDesc.BackgroundTransparency = 1
+speedControlDesc.Text = "Set custom walking speed"
+speedControlDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
+speedControlDesc.TextSize = 12
+speedControlDesc.Font = Enum.Font.Gotham
+speedControlDesc.TextXAlignment = Enum.TextXAlignment.Left
+speedControlDesc.ZIndex = 12
+speedControlDesc.Parent = speedControlFrame
+
 local speedInput = Instance.new("TextBox")
-speedInput.Size = UDim2.new(0, 100, 0, 30)
-speedInput.Position = UDim2.new(0, 25, 0, 20)
-speedInput.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+speedInput.Size = UDim2.new(0, 100, 0, 25)
+speedInput.Position = UDim2.new(0, 5, 0, 50)
+speedInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 speedInput.BackgroundTransparency = 0.4
 speedInput.Text = "16"
 speedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 speedInput.Font = Enum.Font.Gotham
 speedInput.TextSize = 14
-speedInput.PlaceholderText = "Enter speed (16-100)"
-speedInput.ZIndex = 11
-speedInput.Parent = musicContent
+speedInput.PlaceholderText = "Enter speed"
+speedInput.ZIndex = 12
+speedInput.Parent = speedControlFrame
 local speedInputCorner = Instance.new("UICorner")
 speedInputCorner.CornerRadius = UDim.new(0, 6)
 speedInputCorner.Parent = speedInput
 
 local applySpeedButton = Instance.new("TextButton")
-applySpeedButton.Size = UDim2.new(0, 80, 0, 30)
-applySpeedButton.Position = UDim2.new(0, 135, 0, 20)
+applySpeedButton.Size = UDim2.new(0, 70, 0, 25)
+applySpeedButton.Position = UDim2.new(0, 110, 0, 50)
 applySpeedButton.Text = "Apply"
 applySpeedButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 applySpeedButton.BackgroundTransparency = 0.4
 applySpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 applySpeedButton.Font = Enum.Font.Gotham
 applySpeedButton.TextSize = 14
-applySpeedButton.ZIndex = 11
-applySpeedButton.Parent = musicContent
+applySpeedButton.ZIndex = 12
+applySpeedButton.Parent = speedControlFrame
 local applySpeedCorner = Instance.new("UICorner")
 applySpeedCorner.CornerRadius = UDim.new(0, 6)
 applySpeedCorner.Parent = applySpeedButton
+
+-- Infinite Jump Frame
+local infiniteJumpFrame = Instance.new("Frame")
+infiniteJumpFrame.Size = UDim2.new(0, 190, 0, 80)
+infiniteJumpFrame.Position = UDim2.new(0, 25, 0, 110)
+infiniteJumpFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+infiniteJumpFrame.BackgroundTransparency = 0.4
+infiniteJumpFrame.ZIndex = 11
+infiniteJumpFrame.Parent = musicContent
+local infiniteJumpCorner = Instance.new("UICorner")
+infiniteJumpCorner.CornerRadius = UDim.new(0, 8)
+infiniteJumpCorner.Parent = infiniteJumpFrame
+local infiniteJumpStroke = Instance.new("UIStroke")
+infiniteJumpStroke.Thickness = 1
+infiniteJumpStroke.Color = Color3.fromRGB(255, 255, 255)
+infiniteJumpStroke.Transparency = 0.5
+infiniteJumpStroke.Parent = infiniteJumpFrame
+
+local infiniteJumpTitle = Instance.new("TextLabel")
+infiniteJumpTitle.Size = UDim2.new(0, 180, 0, 20)
+infiniteJumpTitle.Position = UDim2.new(0, 5, 0, 5)
+infiniteJumpTitle.BackgroundTransparency = 1
+infiniteJumpTitle.Text = "Infinite Jump"
+infiniteJumpTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+infiniteJumpTitle.TextSize = 14
+infiniteJumpTitle.Font = Enum.Font.GothamBold
+infiniteJumpTitle.TextXAlignment = Enum.TextXAlignment.Left
+infiniteJumpTitle.ZIndex = 12
+infiniteJumpTitle.Parent = infiniteJumpFrame
+
+local infiniteJumpDesc = Instance.new("TextLabel")
+infiniteJumpDesc.Size = UDim2.new(0, 180, 0, 20)
+infiniteJumpDesc.Position = UDim2.new(0, 5, 0, 25)
+infiniteJumpDesc.BackgroundTransparency = 1
+infiniteJumpDesc.Text = "Jump without touching ground"
+infiniteJumpDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
+infiniteJumpDesc.TextSize = 12
+infiniteJumpDesc.Font = Enum.Font.Gotham
+infiniteJumpDesc.TextXAlignment = Enum.TextXAlignment.Left
+infiniteJumpDesc.ZIndex = 12
+infiniteJumpDesc.Parent = infiniteJumpFrame
+
+local infiniteJumpButton = Instance.new("TextButton")
+infiniteJumpButton.Size = UDim2.new(0, 180, 0, 25)
+infiniteJumpButton.Position = UDim2.new(0, 5, 0, 50)
+infiniteJumpButton.Text = "Infinite Jump (Off)"
+infiniteJumpButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+infiniteJumpButton.BackgroundTransparency = 0.4
+infiniteJumpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+infiniteJumpButton.Font = Enum.Font.Gotham
+infiniteJumpButton.TextSize = 14
+infiniteJumpButton.ZIndex = 12
+infiniteJumpButton.Parent = infiniteJumpFrame
+local infiniteJumpButtonCorner = Instance.new("UICorner")
+infiniteJumpButtonCorner.CornerRadius = UDim.new(0, 6)
+infiniteJumpButtonCorner.Parent = infiniteJumpButton
 
 -- Theme Selection
 local currentTheme = "Tối"
@@ -674,15 +771,12 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Speed Control Logic
+-- Speed Control Logic (No Limit)
 applySpeedButton.MouseButton1Click:Connect(function()
     local success, err = pcall(function()
         local speed = tonumber(speedInput.Text)
         if not speed then
             error("Invalid speed input: " .. speedInput.Text)
-        end
-        if speed < 16 or speed > 100 then
-            error("Speed must be between 16 and 100")
         end
         local character = player.Character
         local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -695,7 +789,47 @@ applySpeedButton.MouseButton1Click:Connect(function()
     end)
     if not success then
         warn("Speed error: " .. tostring(err))
-        showNotification("Invalid speed! (16-100)", Color3.fromRGB(255, 80, 80))
+        showNotification("Invalid speed!", Color3.fromRGB(255, 80, 80))
+    end
+end)
+
+-- Infinite Jump Logic
+local infiniteJumpEnabled = false
+local jumpConnection = nil
+
+infiniteJumpButton.MouseButton1Click:Connect(function()
+    local success, err = pcall(function()
+        infiniteJumpEnabled = not infiniteJumpEnabled
+        infiniteJumpButton.Text = "Infinite Jump (" .. (infiniteJumpEnabled and "On" or "Off") .. ")"
+        if infiniteJumpEnabled then
+            local character = player.Character
+            local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+            if not humanoid then
+                error("Humanoid not found")
+            end
+            jumpConnection = UserInputService.JumpRequest:Connect(function()
+                humanoid.Jump = true
+            end)
+            print("Infinite Jump enabled")
+            showNotification("Infinite Jump Enabled!", Color3.fromRGB(0, 200, 100))
+        else
+            if jumpConnection then
+                jumpConnection:Disconnect()
+                jumpConnection = nil
+            end
+            print("Infinite Jump disabled")
+            showNotification("Infinite Jump Disabled!", Color3.fromRGB(0, 200, 100))
+        end
+    end)
+    if not success then
+        warn("Infinite Jump error: " .. tostring(err))
+        showNotification("Infinite Jump Error!", Color3.fromRGB(255, 80, 80))
+        infiniteJumpEnabled = false
+        infiniteJumpButton.Text = "Infinite Jump (Off)"
+        if jumpConnection then
+            jumpConnection:Disconnect()
+            jumpConnection = nil
+        end
     end
 end)
 
@@ -821,6 +955,7 @@ end
 addHoverEffect(speedButton)
 addHoverEffect(noLagButton)
 addHoverEffect(applySpeedButton)
+addHoverEffect(infiniteJumpButton)
 addHoverEffect(closeXButton)
 addHoverEffect(toggleButton)
 addHoverEffect(homeButton)
