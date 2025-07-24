@@ -71,7 +71,7 @@ local homeButton = Instance.new("TextButton")
 homeButton.Size = UDim2.new(1, -10, 0, 35)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Home"
-homeButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255) -- Selected: Blue
+homeButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255) -- Initial: Selected
 homeButton.BackgroundTransparency = 0.4
 homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 homeButton.Font = Enum.Font.Gotham
@@ -85,7 +85,7 @@ local settingsButton = Instance.new("TextButton")
 settingsButton.Size = UDim2.new(1, -10, 0, 35)
 settingsButton.Position = UDim2.new(0, 5, 0, 45)
 settingsButton.Text = "Settings"
-settingsButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Unselected: Black
+settingsButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Initial: Unselected
 settingsButton.BackgroundTransparency = 0.4
 settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 settingsButton.Font = Enum.Font.Gotham
@@ -201,6 +201,7 @@ for i, theme in ipairs(themes) do
         title.TextColor3 = theme.TextColor
         themeButton.TextColor3 = theme.TextColor
         credit.TextColor3 = theme.TextColor
+        print("Theme changed to: " .. theme.Name)
     end)
 end
 
@@ -217,9 +218,10 @@ themeButton.MouseButton1Click:Connect(function()
         local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2), {Size = UDim2.new(0, 100, 0, 100)})
         tween:Play()
     end
+    print("Theme dropdown toggled: " .. tostring(themeDropdown.Visible))
 end)
 
--- Credit Label (Restored, Bottom-Right)
+-- Credit Label (Bottom-Right)
 local credit = Instance.new("TextLabel")
 credit.Size = UDim2.new(0, 120, 0, 15)
 credit.Position = UDim2.new(1, -130, 1, -20)
@@ -259,27 +261,30 @@ local function toggleMenu()
         end)
     end
     toggleButton.BackgroundColor3 = menuVisible and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(200, 200, 200)
+    print("Menu toggled: " .. tostring(menuVisible))
 end
 
 -- Sidebar Navigation
 local function showHome()
     homeContent.Visible = true
     settingsContent.Visible = false
-    local tween = TweenService:Create(homeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
-    tween:Play()
-    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)})
+    local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
+    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)})
+    tween1:Play()
     tween2:Play()
     themeDropdown.Visible = false
+    print("Home selected, Home color: (0, 120, 255), Settings color: (0, 0, 0)")
 end
 
 local function showSettings()
     homeContent.Visible = false
     settingsContent.Visible = true
-    local tween = TweenService:Create(homeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)})
-    tween:Play()
-    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
+    local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)})
+    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
+    tween1:Play()
     tween2:Play()
     themeDropdown.Visible = false
+    print("Settings selected, Home color: (0, 0, 0), Settings color: (0, 120, 255)")
 end
 
 homeButton.MouseButton1Click:Connect(showHome)
