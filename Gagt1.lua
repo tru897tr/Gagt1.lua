@@ -39,6 +39,25 @@ screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.DisplayOrder = 10
 print("ScreenGui created")
 
+-- Loading Frame (Black Screen with Progress Bar)
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
+LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
+LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+LoadingFrame.BackgroundTransparency = 0
+LoadingFrame.ZIndex = 20
+LoadingFrame.Parent = screenGui
+
+local ProgressBar = Instance.new("Frame")
+ProgressBar.Size = UDim2.new(0, 0, 0, 10)
+ProgressBar.Position = UDim2.new(0.5, -100, 0.5, -5)
+ProgressBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ProgressBar.ZIndex = 21
+ProgressBar.Parent = LoadingFrame
+local ProgressBarCorner = Instance.new("UICorner")
+ProgressBarCorner.CornerRadius = UDim.new(0, 5)
+ProgressBarCorner.Parent = ProgressBar
+
 -- Notification Frame (Bottom-Right)
 local notificationFrame = Instance.new("Frame")
 notificationFrame.Size = UDim2.new(0, 190, 0, 20)
@@ -68,10 +87,10 @@ frame.Size = UDim2.new(0, 340, 0, 240)
 frame.Position = UDim2.new(0.5, -170, 0.5, -120)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 frame.BorderSizePixel = 0
-frame.BackgroundTransparency = 0.5
-frame.Visible = true
+frame.BackgroundTransparency = 1 -- Start hidden
+frame.Visible = false -- Start hidden
 frame.ZIndex = 10
-frame.Active = true -- Enable dragging on entire frame
+frame.Active = true
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 14)
@@ -247,20 +266,20 @@ musicContent.ZIndex = 10
 musicContent.Parent = contentFrame
 musicContent.Visible = false
 
-local flyButton = Instance.new("TextButton")
-flyButton.Size = UDim2.new(0, 190, 0, 32)
-flyButton.Position = UDim2.new(0, 25, 0, 20)
-flyButton.Text = "Fly"
-flyButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-flyButton.BackgroundTransparency = 0.4
-flyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-flyButton.Font = Enum.Font.Gotham
-flyButton.TextSize = 14
-flyButton.ZIndex = 11
-flyButton.Parent = musicContent
-local flyCorner = Instance.new("UICorner")
-flyCorner.CornerRadius = UDim.new(0, 8)
-flyCorner.Parent = flyButton
+local swimButton = Instance.new("TextButton")
+swimButton.Size = UDim2.new(0, 190, 0, 32)
+swimButton.Position = UDim2.new(0, 25, 0, 20)
+swimButton.Text = "Swim"
+swimButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+swimButton.BackgroundTransparency = 0.4
+swimButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+swimButton.Font = Enum.Font.Gotham
+swimButton.TextSize = 14
+swimButton.ZIndex = 11
+swimButton.Parent = musicContent
+local swimCorner = Instance.new("UICorner")
+swimCorner.CornerRadius = UDim.new(0, 8)
+swimCorner.Parent = swimButton
 
 -- Theme Selection
 local currentTheme = "Tối"
@@ -555,14 +574,13 @@ homeButton.MouseButton1Click:Connect(showHome)
 settingsButton.MouseButton1Click:Connect(showSettings)
 musicButton.MouseButton1Click:Connect(showMusic)
 
--- New Dragging Logic (Applied to entire frame)
+-- Dragging Logic
 local isDragging = false
 local offset = Vector2.new(0, 0)
 
 frame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         if frame.Visible and frame.Parent then
-            -- Check if input is not on interactive elements (buttons, dropdown)
             local target = input.UserInputType == Enum.UserInputType.MouseButton1 and input.UserInputState == Enum.UserInputState.Begin
             local isOnButton = false
             local descendants = frame:GetDescendants()
@@ -615,19 +633,21 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Fly Logic
-local isFlying = false
+-- Swim Logic
+local isSwimming = false
 local bodyVelocity = nil
 local bodyGyro = nil
-local flySpeed = 50
-local flyConnection = nil
+local swimSpeed = 30 -- Slower for swimming effect
+local swimConnection = nil
+local initialY = 0
+local swayConnection = nil
 
-local function startFly()
+local function startSwim()
     local character = player.Character
     local rootPart = character and character:FindFirstChild("HumanoidRootPart")
     if not rootPart then
-        warn("Fly error: HumanoidRootPart not found")
-        showNotification("Fly Failed: No HumanoidRootPart", Color3.fromRGB(255, 80, 80))
+        warn("Swim error: HumanoidRootPart not found")
+        showNotification("Swim Failed: No HumanoidRootPart", Color3.fromRGB(255, 80, 80))
         return false
     end
 
@@ -636,6 +656,7 @@ local function startFly()
         humanoid.PlatformStand = true
     end
 
+    initialY = rootPart.Position.Y
     bodyVelocity = Instance.new("BodyVelocity")
     bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
     bodyVelocity.Velocity = Vector3.new(0, 0, 0)
@@ -643,14 +664,14 @@ local function startFly()
 
     bodyGyro = Instance.new("BodyGyro")
     bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-    bodyGyro.P = 10000
-    bodyGyro.D = 500
+    bodyGyro.P = 5000 -- Reduced for smoother swimming
+    bodyGyro.D = 300
     bodyGyro.Parent = rootPart
 
     local camera = workspace.CurrentCamera
-    flyConnection = RunService.Heartbeat:Connect(function()
-        if not isFlying or not rootPart or not bodyVelocity or not bodyGyro then
-            flyConnection:Disconnect()
+    swimConnection = RunService.Heartbeat:Connect(function(dt)
+        if not isSwimming or not rootPart or not bodyVelocity or not bodyGyro then
+            swimConnection:Disconnect()
             return
         end
         local direction = Vector3.new(0, 0, 0)
@@ -672,14 +693,29 @@ local function startFly()
         if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
             direction = direction - Vector3.new(0, 1, 0)
         end
-        bodyVelocity.Velocity = direction.Magnitude > 0 and direction.Unit * flySpeed or Vector3.new(0, 0, 0)
+        -- Limit Y position (swimming in water)
+        local currentY = rootPart.Position.Y
+        if currentY > initialY + 10 then
+            direction = direction - Vector3.new(0, currentY - (initialY + 10), 0)
+        elseif currentY < initialY - 10 then
+            direction = direction + Vector3.new(0, (initialY - 10) - currentY, 0)
+        end
+        bodyVelocity.Velocity = direction.Magnitude > 0 and direction.Unit * swimSpeed or Vector3.new(0, 0, 0)
         bodyGyro.CFrame = camera.CFrame
+    end)
+
+    -- Swaying effect for swimming
+    swayConnection = RunService.Heartbeat:Connect(function(dt)
+        if bodyGyro and isSwimming then
+            local sway = math.sin(tick() * 2) * 0.1 -- Gentle swaying
+            bodyGyro.CFrame = bodyGyro.CFrame * CFrame.Angles(0, sway, 0)
+        end
     end)
 
     return true
 end
 
-local function stopFly()
+local function stopSwim()
     if bodyVelocity then
         bodyVelocity:Destroy()
         bodyVelocity = nil
@@ -688,9 +724,13 @@ local function stopFly()
         bodyGyro:Destroy()
         bodyGyro = nil
     end
-    if flyConnection then
-        flyConnection:Disconnect()
-        flyConnection = nil
+    if swimConnection then
+        swimConnection:Disconnect()
+        swimConnection = nil
+    end
+    if swayConnection then
+        swayConnection:Disconnect()
+        swayConnection = nil
     end
     local character = player.Character
     local humanoid = character and character:FindFirstChildOfClass("Humanoid")
@@ -699,31 +739,31 @@ local function stopFly()
     end
 end
 
-flyButton.MouseButton1Click:Connect(function()
+swimButton.MouseButton1Click:Connect(function()
     local success, err = pcall(function()
-        if not isFlying then
-            if startFly() then
-                isFlying = true
-                flyButton.Text = "Fly (On)"
-                showNotification("Fly Enabled!", Color3.fromRGB(0, 200, 100))
-                print("Fly enabled")
+        if not isSwimming then
+            if startSwim() then
+                isSwimming = true
+                swimButton.Text = "Swim (On)"
+                showNotification("Swim Enabled!", Color3.fromRGB(0, 200, 100))
+                print("Swim enabled")
             else
-                error("Fly failed to start")
+                error("Swim failed to start")
             end
         else
-            isFlying = false
-            flyButton.Text = "Fly"
-            stopFly()
-            showNotification("Fly Disabled!", Color3.fromRGB(0, 200, 100))
-            print("Fly disabled")
+            isSwimming = false
+            swimButton.Text = "Swim"
+            stopSwim()
+            showNotification("Swim Disabled!", Color3.fromRGB(0, 200, 100))
+            print("Swim disabled")
         end
     end)
     if not success then
-        warn("Fly error: " .. tostring(err))
-        showNotification("Fly Error: Check console", Color3.fromRGB(255, 80, 80))
-        isFlying = false
-        flyButton.Text = "Fly"
-        stopFly()
+        warn("Swim error: " .. tostring(err))
+        showNotification("Swim Error: Check console", Color3.fromRGB(255, 80, 80))
+        isSwimming = false
+        swimButton.Text = "Swim"
+        stopSwim()
     end
 end)
 
@@ -848,7 +888,7 @@ end
 
 addHoverEffect(speedButton)
 addHoverEffect(noLagButton)
-addHoverEffect(flyButton)
+addHoverEffect(swimButton)
 addHoverEffect(closeXButton)
 addHoverEffect(toggleButton)
 addHoverEffect(homeButton)
@@ -860,6 +900,21 @@ for _, button in ipairs(themeDropdown:GetChildren()) do
         addHoverEffect(button)
     end
 end
+
+-- Loading Animation
+local function startLoading()
+    local tween = TweenService:Create(ProgressBar, TweenInfo.new(5, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 0, 10)})
+    tween:Play()
+    tween.Completed:Connect(function()
+        LoadingFrame.Visible = false
+        frame.Visible = true
+        local fadeIn = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5})
+        fadeIn:Play()
+        print("Loading completed, showing main frame")
+    end)
+end
+
+startLoading()
 
 -- Debug
 print("GrowGardenMenu fully initialized")
