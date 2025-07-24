@@ -182,7 +182,7 @@ end
 
 -- Menu Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 340, 0, 300) -- Tăng chiều cao để chứa nút mới
+frame.Size = UDim2.new(0, 340, 0, 300)
 frame.Position = UDim2.new(0.5, -170, 0.5, -150)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Theme: Tối
 frame.BackgroundTransparency = 0.5
@@ -250,6 +250,39 @@ contentFrame.BackgroundTransparency = 1
 contentFrame.ZIndex = 10
 contentFrame.Parent = frame
 
+-- Content: Home (ScrollingFrame)
+local homeContent = Instance.new("ScrollingFrame")
+homeContent.Size = UDim2.new(1, 0, 1, 0)
+homeContent.BackgroundTransparency = 1
+homeContent.ZIndex = 10
+homeContent.Parent = contentFrame
+homeContent.Visible = true
+homeContent.CanvasSize = UDim2.new(0, 0, 0, 380) -- Đủ để chứa các frame
+homeContent.ScrollBarThickness = 4
+homeContent.ScrollBarImageColor3 = Color3.fromRGB(200, 200, 200)
+
+-- Content: Features (ScrollingFrame)
+local featuresContent = Instance.new("ScrollingFrame")
+featuresContent.Size = UDim2.new(1, 0, 1, 0)
+featuresContent.BackgroundTransparency = 1
+featuresContent.ZIndex = 10
+featuresContent.Parent = contentFrame
+featuresContent.Visible = false
+featuresContent.CanvasSize = UDim2.new(0, 0, 0, 200) -- Đủ để chứa Walk Speed và Infinite Jump
+featuresContent.ScrollBarThickness = 4
+featuresContent.ScrollBarImageColor3 = Color3.fromRGB(200, 200, 200)
+
+-- Content: Settings (ScrollingFrame)
+local settingsContent = Instance.new("ScrollingFrame")
+settingsContent.Size = UDim2.new(1, 0, 1, 0)
+settingsContent.BackgroundTransparency = 1
+settingsContent.ZIndex = 10
+settingsContent.Parent = contentFrame
+settingsContent.Visible = false
+settingsContent.CanvasSize = UDim2.new(0, 0, 0, 200) -- Đủ để chứa Theme và Language
+settingsContent.ScrollBarThickness = 4
+settingsContent.ScrollBarImageColor3 = Color3.fromRGB(200, 200, 200)
+
 -- Sidebar Buttons
 local homeButton = Instance.new("TextButton")
 homeButton.Size = UDim2.new(1, -10, 0, 32)
@@ -296,29 +329,14 @@ local settingsCorner = Instance.new("UICorner")
 settingsCorner.CornerRadius = UDim.new(0, 6)
 settingsCorner.Parent = settingsButton
 
--- Content: Home
-local homeContent = Instance.new("Frame")
-homeContent.Size = UDim2.new(1, 0, 1, 0)
-homeContent.BackgroundTransparency = 1
-homeContent.ZIndex = 10
-homeContent.Parent = contentFrame
-homeContent.Visible = true
-
--- Content: Features
-local featuresContent = Instance.new("Frame")
-featuresContent.Size = UDim2.new(1, 0, 1, 0)
-featuresContent.BackgroundTransparency = 1
-featuresContent.ZIndex = 10
-featuresContent.Parent = contentFrame
-featuresContent.Visible = false
-
+-- Home Content Frames
 local speedFrame = Instance.new("Frame")
 speedFrame.Size = UDim2.new(0, 190, 0, 80)
 speedFrame.Position = UDim2.new(0, 25, 0, 20)
 speedFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 speedFrame.BackgroundTransparency = 0.4
 speedFrame.ZIndex = 11
-speedFrame.Parent = featuresContent
+speedFrame.Parent = homeContent
 local speedCorner = Instance.new("UICorner")
 speedCorner.CornerRadius = UDim.new(0, 8)
 speedCorner.Parent = speedFrame
@@ -384,7 +402,7 @@ jumpFrame.Position = UDim2.new(0, 25, 0, 110)
 jumpFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 jumpFrame.BackgroundTransparency = 0.4
 jumpFrame.ZIndex = 11
-jumpFrame.Parent = featuresContent
+jumpFrame.Parent = homeContent
 local jumpCorner = Instance.new("UICorner")
 jumpCorner.CornerRadius = UDim.new(0, 8)
 jumpCorner.Parent = jumpFrame
@@ -427,14 +445,13 @@ local jumpButtonCorner = Instance.new("UICorner")
 jumpButtonCorner.CornerRadius = UDim.new(0, 6)
 jumpButtonCorner.Parent = jumpButton
 
--- Speed Up X Frame
 local speedupFrame = Instance.new("Frame")
 speedupFrame.Size = UDim2.new(0, 190, 0, 80)
 speedupFrame.Position = UDim2.new(0, 25, 0, 200)
 speedupFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 speedupFrame.BackgroundTransparency = 0.4
 speedupFrame.ZIndex = 11
-speedupFrame.Parent = featuresContent
+speedupFrame.Parent = homeContent
 local speedupCorner = Instance.new("UICorner")
 speedupCorner.CornerRadius = UDim.new(0, 8)
 speedupCorner.Parent = speedupFrame
@@ -478,14 +495,13 @@ local speedupButtonCorner = Instance.new("UICorner")
 speedupButtonCorner.CornerRadius = UDim.new(0, 6)
 speedupButtonCorner.Parent = speedupButton
 
--- No Lag Frame
 local nolagFrame = Instance.new("Frame")
 nolagFrame.Size = UDim2.new(0, 190, 0, 80)
 nolagFrame.Position = UDim2.new(0, 25, 0, 290)
 nolagFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 nolagFrame.BackgroundTransparency = 0.4
 nolagFrame.ZIndex = 11
-nolagFrame.Parent = featuresContent
+nolagFrame.Parent = homeContent
 local nolagCorner = Instance.new("UICorner")
 nolagCorner.CornerRadius = UDim.new(0, 8)
 nolagCorner.Parent = nolagFrame
@@ -529,14 +545,123 @@ local nolagButtonCorner = Instance.new("UICorner")
 nolagButtonCorner.CornerRadius = UDim.new(0, 6)
 nolagButtonCorner.Parent = nolagButton
 
--- Content: Settings
-local settingsContent = Instance.new("Frame")
-settingsContent.Size = UDim2.new(1, 0, 1, 0)
-settingsContent.BackgroundTransparency = 1
-settingsContent.ZIndex = 10
-settingsContent.Parent = contentFrame
-settingsContent.Visible = false
+-- Features Content Frames
+local speedFrameFeatures = Instance.new("Frame")
+speedFrameFeatures.Size = UDim2.new(0, 190, 0, 80)
+speedFrameFeatures.Position = UDim2.new(0, 25, 0, 20)
+speedFrameFeatures.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+speedFrameFeatures.BackgroundTransparency = 0.4
+speedFrameFeatures.ZIndex = 11
+speedFrameFeatures.Parent = featuresContent
+local speedCornerFeatures = Instance.new("UICorner")
+speedCornerFeatures.CornerRadius = UDim.new(0, 8)
+speedCornerFeatures.Parent = speedFrameFeatures
 
+local speedTitleFeatures = Instance.new("TextLabel")
+speedTitleFeatures.Size = UDim2.new(0, 180, 0, 20)
+speedTitleFeatures.Position = UDim2.new(0, 5, 0, 5)
+speedTitleFeatures.BackgroundTransparency = 1
+speedTitleFeatures.Text = translations.en.speed_title
+speedTitleFeatures.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedTitleFeatures.TextSize = 14
+speedTitleFeatures.Font = Enum.Font.GothamBold
+speedTitleFeatures.TextXAlignment = Enum.TextXAlignment.Left
+speedTitleFeatures.ZIndex = 12
+speedTitleFeatures.Parent = speedFrameFeatures
+
+local speedDescFeatures = Instance.new("TextLabel")
+speedDescFeatures.Size = UDim2.new(0, 180, 0, 20)
+speedDescFeatures.Position = UDim2.new(0, 5, 0, 25)
+speedDescFeatures.BackgroundTransparency = 1
+speedDescFeatures.Text = translations.en.speed_desc
+speedDescFeatures.TextColor3 = Color3.fromRGB(200, 200, 200)
+speedDescFeatures.TextSize = 12
+speedDescFeatures.Font = Enum.Font.Gotham
+speedDescFeatures.TextXAlignment = Enum.TextXAlignment.Left
+speedDescFeatures.ZIndex = 12
+speedDescFeatures.Parent = speedFrameFeatures
+
+local speedInputFeatures = Instance.new("TextBox")
+speedInputFeatures.Size = UDim2.new(0, 100, 0, 25)
+speedInputFeatures.Position = UDim2.new(0, 5, 0, 50)
+speedInputFeatures.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+speedInputFeatures.BackgroundTransparency = 0.4
+speedInputFeatures.Text = "16"
+speedInputFeatures.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedInputFeatures.Font = Enum.Font.Gotham
+speedInputFeatures.TextSize = 14
+speedInputFeatures.PlaceholderText = "Enter speed"
+speedInputFeatures.ZIndex = 12
+speedInputFeatures.Parent = speedFrameFeatures
+local speedInputCornerFeatures = Instance.new("UICorner")
+speedInputCornerFeatures.CornerRadius = UDim.new(0, 6)
+speedInputCornerFeatures.Parent = speedInputFeatures
+
+local applySpeedButtonFeatures = Instance.new("TextButton")
+applySpeedButtonFeatures.Size = UDim2.new(0, 70, 0, 25)
+applySpeedButtonFeatures.Position = UDim2.new(0, 110, 0, 50)
+applySpeedButtonFeatures.Text = translations.en.speed_button
+applySpeedButtonFeatures.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+applySpeedButtonFeatures.BackgroundTransparency = 0.4
+applySpeedButtonFeatures.TextColor3 = Color3.fromRGB(255, 255, 255)
+applySpeedButtonFeatures.Font = Enum.Font.Gotham
+applySpeedButtonFeatures.TextSize = 14
+applySpeedButtonFeatures.ZIndex = 12
+applySpeedButtonFeatures.Parent = speedFrameFeatures
+local applySpeedCornerFeatures = Instance.new("UICorner")
+applySpeedCornerFeatures.CornerRadius = UDim.new(0, 6)
+applySpeedCornerFeatures.Parent = applySpeedButtonFeatures
+
+local jumpFrameFeatures = Instance.new("Frame")
+jumpFrameFeatures.Size = UDim2.new(0, 190, 0, 80)
+jumpFrameFeatures.Position = UDim2.new(0, 25, 0, 110)
+jumpFrameFeatures.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+jumpFrameFeatures.BackgroundTransparency = 0.4
+jumpFrameFeatures.ZIndex = 11
+jumpFrameFeatures.Parent = featuresContent
+local jumpCornerFeatures = Instance.new("UICorner")
+jumpCornerFeatures.CornerRadius = UDim.new(0, 8)
+jumpCornerFeatures.Parent = jumpFrameFeatures
+
+local jumpTitleFeatures = Instance.new("TextLabel")
+jumpTitleFeatures.Size = UDim2.new(0, 180, 0, 20)
+jumpTitleFeatures.Position = UDim2.new(0, 5, 0, 5)
+jumpTitleFeatures.BackgroundTransparency = 1
+jumpTitleFeatures.Text = translations.en.jump_title
+jumpTitleFeatures.TextColor3 = Color3.fromRGB(255, 255, 255)
+jumpTitleFeatures.TextSize = 14
+jumpTitleFeatures.Font = Enum.Font.GothamBold
+jumpTitleFeatures.TextXAlignment = Enum.TextXAlignment.Left
+jumpTitleFeatures.ZIndex = 12
+jumpTitleFeatures.Parent = jumpFrameFeatures
+
+local jumpDescFeatures = Instance.new("TextLabel")
+jumpDescFeatures.Size = UDim2.new(0, 180, 0, 20)
+jumpDescFeatures.Position = UDim2.new(0, 5, 0, 25)
+jumpDescFeatures.BackgroundTransparency = 1
+jumpDescFeatures.Text = translations.en.jump_desc
+jumpDescFeatures.TextColor3 = Color3.fromRGB(200, 200, 200)
+jumpDescFeatures.TextSize = 12
+jumpDescFeatures.Font = Enum.Font.Gotham
+jumpDescFeatures.TextXAlignment = Enum.TextXAlignment.Left
+jumpDescFeatures.ZIndex = 12
+jumpDescFeatures.Parent = jumpFrameFeatures
+
+local jumpButtonFeatures = Instance.new("TextButton")
+jumpButtonFeatures.Size = UDim2.new(0, 180, 0, 25)
+jumpButtonFeatures.Position = UDim2.new(0, 5, 0, 50)
+jumpButtonFeatures.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+jumpButtonFeatures.BackgroundTransparency = 0.4
+jumpButtonFeatures.TextColor3 = Color3.fromRGB(255, 255, 255)
+jumpButtonFeatures.Font = Enum.Font.Gotham
+jumpButtonFeatures.TextSize = 14
+jumpButtonFeatures.ZIndex = 12
+jumpButtonFeatures.Parent = jumpFrameFeatures
+local jumpButtonCornerFeatures = Instance.new("UICorner")
+jumpButtonCornerFeatures.CornerRadius = UDim.new(0, 6)
+jumpButtonCornerFeatures.Parent = jumpButtonFeatures
+
+-- Settings Content Frames
 local themeFrame = Instance.new("Frame")
 themeFrame.Size = UDim2.new(0, 190, 0, 80)
 themeFrame.Position = UDim2.new(0, 25, 0, 20)
@@ -685,6 +810,11 @@ local function updateUIText()
         jumpTitle.Text = translations[currentLanguage].jump_title
         jumpDesc.Text = translations[currentLanguage].jump_desc
         jumpButton.Text = string.format(translations[currentLanguage].jump_button, infiniteJumpEnabled and "On" or "Off")
+        speedTitleFeatures.Text = translations[currentLanguage].speed_title
+        speedDescFeatures.Text = translations[currentLanguage].speed_desc
+        jumpTitleFeatures.Text = translations[currentLanguage].jump_title
+        jumpDescFeatures.Text = translations[currentLanguage].jump_desc
+        jumpButtonFeatures.Text = string.format(translations[currentLanguage].jump_button, infiniteJumpEnabled and "On" or "Off")
         speedupTitle.Text = translations[currentLanguage].speedup_title
         speedupDesc.Text = translations[currentLanguage].speedup_desc
         speedupButton.Text = translations[currentLanguage].speedup_button
@@ -698,6 +828,7 @@ local function updateUIText()
         langDesc.Text = translations[currentLanguage].lang_desc
         langButton.Text = string.format(translations[currentLanguage].lang_button, currentLanguage == "en" and "English" or "Tiếng Việt")
         applySpeedButton.Text = translations[currentLanguage].speed_button
+        applySpeedButtonFeatures.Text = translations[currentLanguage].speed_button
         credit.Text = translations[currentLanguage].credit
     end)
     if not success then
@@ -881,9 +1012,9 @@ table.insert(connections, UserInputService.InputChanged:Connect(function(input)
 end))
 
 -- Speed Control
-applySpeedButton.MouseButton1Click:Connect(function()
+local function applySpeed(inputBox, button)
     local success, err = pcall(function()
-        local speed = tonumber(speedInput.Text)
+        local speed = tonumber(inputBox.Text)
         if not speed or speed < 0 or speed > 1000 then
             error("Invalid speed input")
         end
@@ -899,7 +1030,10 @@ applySpeedButton.MouseButton1Click:Connect(function()
         warn("Speed error: " .. tostring(err))
         showNotification(translations[currentLanguage].speed_error, Color3.fromRGB(255, 80, 80))
     end
-end)
+end
+
+applySpeedButton.MouseButton1Click:Connect(function() applySpeed(speedInput, applySpeedButton) end)
+applySpeedButtonFeatures.MouseButton1Click:Connect(function() applySpeed(speedInputFeatures, applySpeedButtonFeatures) end)
 
 -- Infinite Jump
 local infiniteJumpEnabled = false
@@ -921,15 +1055,17 @@ local function setupInfiniteJump()
         else
             infiniteJumpEnabled = false
             jumpButton.Text = string.format(translations[currentLanguage].jump_button, "Off")
+            jumpButtonFeatures.Text = string.format(translations[currentLanguage].jump_button, "Off")
             showNotification(translations[currentLanguage].jump_error, Color3.fromRGB(255, 80, 80))
         end
     end
 end
 
-jumpButton.MouseButton1Click:Connect(function()
+local function toggleJump()
     local success, err = pcall(function()
         infiniteJumpEnabled = not infiniteJumpEnabled
         jumpButton.Text = string.format(translations[currentLanguage].jump_button, infiniteJumpEnabled and "On" or "Off")
+        jumpButtonFeatures.Text = string.format(translations[currentLanguage].jump_button, infiniteJumpEnabled and "On" or "Off")
         if infiniteJumpEnabled then
             setupInfiniteJump()
             if jumpConnection then
@@ -948,12 +1084,16 @@ jumpButton.MouseButton1Click:Connect(function()
         showNotification(translations[currentLanguage].jump_error, Color3.fromRGB(255, 80, 80))
         infiniteJumpEnabled = false
         jumpButton.Text = string.format(translations[currentLanguage].jump_button, "Off")
+        jumpButtonFeatures.Text = string.format(translations[currentLanguage].jump_button, "Off")
         if jumpConnection then
             jumpConnection:Disconnect()
             jumpConnection = nil
         end
     end
-end)
+end
+
+jumpButton.MouseButton1Click:Connect(toggleJump)
+jumpButtonFeatures.MouseButton1Click:Connect(toggleJump)
 
 -- Speed Up X
 speedupButton.MouseButton1Click:Connect(function()
@@ -1024,7 +1164,9 @@ local function addHoverEffect(button)
 end
 
 addHoverEffect(applySpeedButton)
+addHoverEffect(applySpeedButtonFeatures)
 addHoverEffect(jumpButton)
+addHoverEffect(jumpButtonFeatures)
 addHoverEffect(speedupButton)
 addHoverEffect(nolagButton)
 addHoverEffect(closeButton)
@@ -1035,7 +1177,7 @@ addHoverEffect(settingsButton)
 addHoverEffect(themeButton)
 addHoverEffect(langButton)
 
--- Loading Animation (Updated)
+-- Loading Animation (Fixed)
 local function startLoading()
     local success, err = pcall(function()
         if not LoadingFrame or not LoadingFrame.Parent then
@@ -1052,12 +1194,19 @@ local function startLoading()
         LoadingFrame.BackgroundTransparency = 0.2
         print("Starting loading at: " .. tostring(tick()))
 
-        task.wait(5)
-
-        LoadingFrame.Visible = false
-        frame.Visible = true
-        toggleButton.Visible = true
-        print("Loading completed at: " .. tostring(tick()))
+        task.spawn(function()
+            task.wait(5)
+            if LoadingFrame and LoadingFrame.Parent then
+                LoadingFrame.Visible = false
+            end
+            if frame and frame.Parent then
+                frame.Visible = true
+            end
+            if toggleButton and toggleButton.Parent then
+                toggleButton.Visible = true
+            end
+            print("Loading completed at: " .. tostring(tick()))
+        end)
     end)
     if not success then
         warn("Loading error: " .. tostring(err))
