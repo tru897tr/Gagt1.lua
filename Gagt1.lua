@@ -26,12 +26,11 @@ screenGui.IgnoreGuiInset = true
 -- Menu Frame
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 340, 0, 240)
-frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+frame.Position = UDim2.new(0.5, -170, 0.5, -120) -- Center initially
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.5
 frame.Visible = true
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 14)
@@ -41,6 +40,13 @@ frameStroke.Thickness = 1.5
 frameStroke.Color = Color3.fromRGB(255, 255, 255)
 frameStroke.Transparency = 0.7
 frameStroke.Parent = frame
+
+-- Drag Frame (Top area for dragging)
+local dragFrame = Instance.new("Frame")
+dragFrame.Size = UDim2.new(1, 0, 0, 32)
+dragFrame.Position = UDim2.new(0, 0, 0, 0)
+dragFrame.BackgroundTransparency = 1
+dragFrame.Parent = frame
 
 -- Title Label
 local title = Instance.new("TextLabel")
@@ -321,6 +327,7 @@ local function showHome()
     settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Ensure text stays white
     themeDropdown.Visible = false
     print("Home selected, Home: (200, 200, 200, 0.3), Settings: (50, 50, 50, 0.4)")
+    print("SettingsButton Background: " .. tostring(settingsButton.BackgroundColor3) .. ", Transparency: " .. tostring(settingsButton.BackgroundTransparency) .. ", Stroke Transparency: " .. tostring(settingsStroke.Transparency))
 end
 
 local function showSettings()
@@ -344,10 +351,50 @@ local function showSettings()
     settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Ensure text stays white
     themeDropdown.Visible = false
     print("Settings selected, Home: (50, 50, 50, 0.4), Settings: (200, 200, 200, 0.3)")
+    print("SettingsButton Background: " .. tostring(settingsButton.BackgroundColor3) .. ", Transparency: " .. tostring(settingsButton.BackgroundTransparency) .. ", Stroke Transparency: " .. tostring(settingsStroke.Transparency))
 end
 
 homeButton.MouseButton1Click:Connect(showHome)
 settingsButton.MouseButton1Click:Connect(showSettings)
+
+-- Dragging Logic
+local isDragging = false
+local dragStart = nil
+local startPos = nil
+
+dragFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = true
+        dragStart = input.Position
+        startPos = frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                isDragging = false
+            end
+        end)
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        local newPos = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+        -- Clamp position within screen bounds
+        local viewportSize = game:GetService("Workspace").CurrentCamera.ViewportSize
+        local frameSize = frame.AbsoluteSize
+        newPos = UDim2.new(
+            0, math.clamp(newPos.X.Offset, 0, viewportSize.X - frameSize.X),
+            0, math.clamp(newPos.Y.Offset, 0, viewportSize.Y - frameSize.Y)
+        )
+        frame.Position = newPos
+        print("Frame moved to: " .. tostring(newPos))
+    end
+end)
 
 -- Input Handling (RightShift)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
@@ -486,4 +533,4 @@ for _, button in ipairs(themeDropdown:GetChildren()) do
 end
 
 -- Debug: Confirm GUI creation
-print("GrowGardenMenu created and fixed at center: " .. tostring(frame.Position))
+print("GrowGardenMenu created at: " .. tostring(frame.Position))
