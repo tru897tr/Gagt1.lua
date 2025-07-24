@@ -118,6 +118,7 @@ LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
 LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 LoadingFrame.BackgroundTransparency = 0.2
 LoadingFrame.ZIndex = 20
+LoadingFrame.Visible = true
 LoadingFrame.Parent = screenGui
 local loadingCorner = Instance.new("UICorner")
 loadingCorner.CornerRadius = UDim.new(0, 10)
@@ -134,6 +135,7 @@ ProgressBarFrame.Position = UDim2.new(0.5, -100, 0.5, 0)
 ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 ProgressBarFrame.BackgroundTransparency = 0.4
 ProgressBarFrame.ZIndex = 21
+ProgressBarFrame.ClipsDescendants = true -- Ensure ProgressBar doesn't overflow
 ProgressBarFrame.Parent = LoadingFrame
 local ProgressBarFrameCorner = Instance.new("UICorner")
 ProgressBarFrameCorner.CornerRadius = UDim.new(0, 6)
@@ -145,7 +147,7 @@ ProgressBarFrameStroke.Transparency = 0.5
 ProgressBarFrameStroke.Parent = ProgressBarFrame
 
 local ProgressBar = Instance.new("Frame")
-ProgressBar.Size = UDim2.new(0, 0, 1, 0)
+ProgressBar.Size = UDim2.new(0, 0, 1, 0) -- Start at 0 width
 ProgressBar.Position = UDim2.new(0, 0, 0, 0)
 ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 ProgressBar.ZIndex = 22
@@ -193,8 +195,7 @@ local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 340, 0, 240)
 frame.Position = UDim2.new(0.5, -170, 0.5, -120)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-frame.BorderSizePixel = 0
-frame.BackgroundTransparency = 1
+frame.BackgroundTransparency = 0.5
 frame.Visible = false
 frame.ZIndex = 10
 frame.Active = true
@@ -1346,9 +1347,27 @@ end
 
 -- Loading Animation
 local function startLoading()
-    local tween = TweenService:Create(ProgressBar, TweenInfo.new(5, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
+    -- Ensure ProgressBar starts at 0
+    ProgressBar.Size = UDim2.new(0, 0, 1, 0)
+    local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear)
+    local tween = TweenService:Create(ProgressBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
     tween:Play()
+    print("ProgressBar tween started")
+
+    -- Timeout to prevent getting stuck
+    local timeout = task.spawn(function()
+        task.wait(6) -- Slightly longer than tween duration
+        if LoadingFrame.Visible then
+            warn("Loading timeout triggered")
+            LoadingFrame.Visible = false
+            frame.Visible = true
+            frame.BackgroundTransparency = 0.5
+            print("Forced loading complete, showing main frame")
+        end
+    end)
+
     tween.Completed:Connect(function()
+        task.cancel(timeout) -- Cancel timeout if tween completes
         local fadeOut = TweenService:Create(LoadingFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
         fadeOut:Play()
         fadeOut.Completed:Connect(function()
