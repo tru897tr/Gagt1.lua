@@ -1214,7 +1214,7 @@ infiniteJumpButton.MouseButton1Click:Connect(function()
             end
             showNotification(translations[currentLanguage].jump_disabled, Color3.fromRGB(0, 200, 100))
             print("Infinite Jump disabled")
-        end
+        end)
     end)
     if not success then
         warn("Infinite Jump error: " .. tostring(err))
@@ -1398,85 +1398,76 @@ end
 -- Loading Animation
 local function startLoading()
     local success, err = pcall(function()
-        -- Đảm bảo ProgressBar bắt đầu từ 0
+        -- Kiểm tra instance tồn tại
         if not ProgressBar or not ProgressBar.Parent then
-            error("ProgressBar missing")
+            error("ProgressBar missing or destroyed")
         end
-        ProgressBar.Size = UDim2.new(0, 0, 1, 0)
-        print("ProgressBar reset to Size: " .. tostring(ProgressBar.Size))
-
-        -- Đảm bảo LoadingFrame hiển thị
         if not LoadingFrame or not LoadingFrame.Parent then
-            error("LoadingFrame missing")
+            error("LoadingFrame missing or destroyed")
         end
+        if not frame or not frame.Parent then
+            error("Main frame missing or destroyed")
+        end
+
+        -- Đặt lại ProgressBar
+        ProgressBar.Size = UDim2.new(0, 0, 1, 0)
         LoadingFrame.Visible = true
         LoadingFrame.BackgroundTransparency = 0.2
-        print("LoadingFrame shown with transparency: " .. tostring(LoadingFrame.BackgroundTransparency))
+        print("Starting loading animation at: " .. tostring(tick()))
 
         -- Tạo tween cho ProgressBar (chạy trong 5 giây)
-        local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
-        local tween = TweenService:Create(ProgressBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
-        tween:Play()
-        print("ProgressBar tween started at: " .. tostring(tick()))
+        local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
+        local progressTween = TweenService:Create(ProgressBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
+        progressTween:Play()
+        print("ProgressBar tween started, expected completion in 5 seconds")
 
-        -- Timeout dự phòng (5.5 giây) để tránh kẹt
-        local timeout = task.spawn(function()
-            task.wait(5.5)
-            if LoadingFrame and LoadingFrame.Visible then
-                warn("Loading timeout triggered at: " .. tostring(tick()))
-                local fadeOut = TweenService:Create(LoadingFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
-                fadeOut:Play()
-                fadeOut.Completed:Connect(function()
-                    LoadingFrame.Visible = false
-                    if frame and frame.Parent then
-                        frame.Visible = true
-                        frame.BackgroundTransparency = 0.5
-                        print("Forced loading complete, main frame visible at: " .. tostring(frame.Position))
-                        toggleButton.Visible = true
-                    else
-                        warn("Main frame missing after timeout")
-                    end
-                end)
-            end
-        end)
-
-        -- Xử lý khi tween hoàn tất
-        tween.Completed:Connect(function()
-            task.cancel(timeout)
-            print("ProgressBar tween completed at: " .. tostring(tick()))
-            if LoadingFrame and LoadingFrame.Parent then
-                local fadeOut = TweenService:Create(LoadingFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
-                fadeOut:Play()
-                fadeOut.Completed:Connect(function()
-                    LoadingFrame.Visible = false
-                    if frame and frame.Parent then
-                        frame.Visible = true
-                        local fadeIn = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5})
-                        fadeIn:Play()
-                        fadeIn.Completed:Connect(function()
-                            print("Loading completed, main frame fully visible at: " .. tostring(frame.Position))
-                            toggleButton.Visible = true
-                        end)
-                    else
-                        warn("Main frame missing after loading")
-                    end
-                end)
-            else
+        -- Khi tween hoàn tất
+        progressTween.Completed:Connect(function()
+            if not LoadingFrame or not LoadingFrame.Parent then
                 warn("LoadingFrame missing after tween completion")
+                return
             end
+            print("ProgressBar tween completed at: " .. tostring(tick()))
+
+            -- Fade out LoadingFrame
+            local fadeOutTween = TweenService:Create(LoadingFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 1})
+            fadeOutTween:Play()
+            fadeOutTween.Completed:Connect(function()
+                if LoadingFrame and LoadingFrame.Parent then
+                    LoadingFrame.Visible = false
+                    print("LoadingFrame hidden")
+                end
+                if frame and frame.Parent then
+                    frame.Visible = true
+                    local fadeInTween = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 0.5})
+                    fadeInTween:Play()
+                    fadeInTween.Completed:Connect(function()
+                        print("Main frame visible with transparency: " .. tostring(frame.BackgroundTransparency))
+                        if toggleButton and toggleButton.Parent then
+                            toggleButton.Visible = true
+                            print("ToggleButton visible")
+                        end
+                    end)
+                else
+                    warn("Main frame missing after fade out")
+                end
+            end)
         end)
     end)
     if not success then
         warn("Loading error: " .. tostring(err))
         showNotification(translations[currentLanguage].loading_error, Color3.fromRGB(255, 80, 80))
-        if LoadingFrame then
+        -- Fallback: ẩn LoadingFrame và hiển thị frame chính
+        if LoadingFrame and LoadingFrame.Parent then
             LoadingFrame.Visible = false
         end
-        if frame then
+        if frame and frame.Parent then
             frame.Visible = true
             frame.BackgroundTransparency = 0.5
         end
-        toggleButton.Visible = true
+        if toggleButton and toggleButton.Parent then
+            toggleButton.Visible = true
+        end
     end
 end
 
