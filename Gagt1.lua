@@ -15,12 +15,18 @@ local translations = {
         speed_desc = "Set custom walking speed",
         jump_title = "Infinite Jump",
         jump_desc = "Jump without touching ground",
+        speedup_title = "Speed Up X",
+        speedup_desc = "Run Speed Up X script",
+        nolag_title = "No Lag",
+        nolag_desc = "Run No Lag script",
         theme_title = "Theme",
         theme_desc = "Change interface theme",
         lang_title = "Language",
         lang_desc = "Change interface language",
         speed_button = "Apply",
         jump_button = "Infinite Jump: %s",
+        speedup_button = "Run Speed Up X",
+        nolag_button = "Run No Lag",
         theme_button = "Theme: %s",
         lang_button = "Language: %s",
         credit = "By Nguyễn Thanh Trứ",
@@ -29,6 +35,10 @@ local translations = {
         jump_enabled = "Infinite Jump Enabled!",
         jump_disabled = "Infinite Jump Disabled!",
         jump_error = "Infinite Jump Error!",
+        speedup_notification = "Speed Up X script loaded!",
+        speedup_error = "Failed to load Speed Up X!",
+        nolag_notification = "No Lag script loaded!",
+        nolag_error = "Failed to load No Lag!",
         theme_notification = "Theme changed: %s",
         lang_notification = "Language changed to %s",
         loading_error = "Loading failed!",
@@ -43,12 +53,18 @@ local translations = {
         speed_desc = "Đặt tốc độ chạy tùy chỉnh",
         jump_title = "Nhảy vô hạn",
         jump_desc = "Nhảy mà không cần chạm đất",
+        speedup_title = "Tăng tốc X",
+        speedup_desc = "Chạy script Tăng tốc X",
+        nolag_title = "Không lag",
+        nolag_desc = "Chạy script Không lag",
         theme_title = "Giao diện",
         theme_desc = "Thay đổi giao diện",
         lang_title = "Ngôn ngữ",
         lang_desc = "Thay đổi ngôn ngữ giao diện",
         speed_button = "Áp dụng",
         jump_button = "Nhảy vô hạn: %s",
+        speedup_button = "Chạy Tăng tốc X",
+        nolag_button = "Chạy Không lag",
         theme_button = "Giao diện: %s",
         lang_button = "Ngôn ngữ: %s",
         credit = "Bởi Nguyễn Thanh Trứ",
@@ -57,6 +73,10 @@ local translations = {
         jump_enabled = "Nhảy vô hạn đã bật!",
         jump_disabled = "Nhảy vô hạn đã tắt!",
         jump_error = "Lỗi nhảy vô hạn!",
+        speedup_notification = "Đã chạy script Tăng tốc X!",
+        speedup_error = "Không thể chạy Tăng tốc X!",
+        nolag_notification = "Đã chạy script Không lag!",
+        nolag_error = "Không thể chạy Không lag!",
         theme_notification = "Giao diện đã đổi: %s",
         lang_notification = "Ngôn ngữ thay đổi thành %s",
         loading_error = "Tải thất bại!",
@@ -122,30 +142,9 @@ LoadingFrame.ZIndex = 20
 LoadingFrame.Visible = true
 LoadingFrame.Parent = screenGui
 
-local ProgressBarFrame = Instance.new("Frame")
-ProgressBarFrame.Size = UDim2.new(0, 200, 0, 20)
-ProgressBarFrame.Position = UDim2.new(0.5, -100, 0.5, 0)
-ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-ProgressBarFrame.BackgroundTransparency = 0.4
-ProgressBarFrame.ZIndex = 21
-ProgressBarFrame.ClipsDescendants = true
-ProgressBarFrame.Parent = LoadingFrame
-local ProgressBarFrameCorner = Instance.new("UICorner")
-ProgressBarFrameCorner.CornerRadius = UDim.new(0, 6)
-ProgressBarFrameCorner.Parent = ProgressBarFrame
-
-local ProgressBar = Instance.new("Frame")
-ProgressBar.Size = UDim2.new(0, 0, 1, 0)
-ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-ProgressBar.ZIndex = 22
-ProgressBar.Parent = ProgressBarFrame
-local ProgressBarCorner = Instance.new("UICorner")
-ProgressBarCorner.CornerRadius = UDim.new(0, 6)
-ProgressBarCorner.Parent = ProgressBar
-
 local LoadingLabel = Instance.new("TextLabel")
 LoadingLabel.Size = UDim2.new(0, 200, 0, 20)
-LoadingLabel.Position = UDim2.new(0.5, -100, 0.5, -30)
+LoadingLabel.Position = UDim2.new(0.5, -100, 0.5, -10)
 LoadingLabel.BackgroundTransparency = 1
 LoadingLabel.Text = "Loading..."
 LoadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -183,8 +182,8 @@ end
 
 -- Menu Frame
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 340, 0, 240)
-frame.Position = UDim2.new(0.5, -170, 0.5, -120)
+frame.Size = UDim2.new(0, 340, 0, 300) -- Tăng chiều cao để chứa nút mới
+frame.Position = UDim2.new(0.5, -170, 0.5, -150)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Theme: Tối
 frame.BackgroundTransparency = 0.5
 frame.Visible = false
@@ -428,6 +427,108 @@ local jumpButtonCorner = Instance.new("UICorner")
 jumpButtonCorner.CornerRadius = UDim.new(0, 6)
 jumpButtonCorner.Parent = jumpButton
 
+-- Speed Up X Frame
+local speedupFrame = Instance.new("Frame")
+speedupFrame.Size = UDim2.new(0, 190, 0, 80)
+speedupFrame.Position = UDim2.new(0, 25, 0, 200)
+speedupFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+speedupFrame.BackgroundTransparency = 0.4
+speedupFrame.ZIndex = 11
+speedupFrame.Parent = featuresContent
+local speedupCorner = Instance.new("UICorner")
+speedupCorner.CornerRadius = UDim.new(0, 8)
+speedupCorner.Parent = speedupFrame
+
+local speedupTitle = Instance.new("TextLabel")
+speedupTitle.Size = UDim2.new(0, 180, 0, 20)
+speedupTitle.Position = UDim2.new(0, 5, 0, 5)
+speedupTitle.BackgroundTransparency = 1
+speedupTitle.Text = translations.en.speedup_title
+speedupTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedupTitle.TextSize = 14
+speedupTitle.Font = Enum.Font.GothamBold
+speedupTitle.TextXAlignment = Enum.TextXAlignment.Left
+speedupTitle.ZIndex = 12
+speedupTitle.Parent = speedupFrame
+
+local speedupDesc = Instance.new("TextLabel")
+speedupDesc.Size = UDim2.new(0, 180, 0, 20)
+speedupDesc.Position = UDim2.new(0, 5, 0, 25)
+speedupDesc.BackgroundTransparency = 1
+speedupDesc.Text = translations.en.speedup_desc
+speedupDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
+speedupDesc.TextSize = 12
+speedupDesc.Font = Enum.Font.Gotham
+speedupDesc.TextXAlignment = Enum.TextXAlignment.Left
+speedupDesc.ZIndex = 12
+speedupDesc.Parent = speedupFrame
+
+local speedupButton = Instance.new("TextButton")
+speedupButton.Size = UDim2.new(0, 180, 0, 25)
+speedupButton.Position = UDim2.new(0, 5, 0, 50)
+speedupButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+speedupButton.BackgroundTransparency = 0.4
+speedupButton.Text = translations.en.speedup_button
+speedupButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedupButton.Font = Enum.Font.Gotham
+speedupButton.TextSize = 14
+speedupButton.ZIndex = 12
+speedupButton.Parent = speedupFrame
+local speedupButtonCorner = Instance.new("UICorner")
+speedupButtonCorner.CornerRadius = UDim.new(0, 6)
+speedupButtonCorner.Parent = speedupButton
+
+-- No Lag Frame
+local nolagFrame = Instance.new("Frame")
+nolagFrame.Size = UDim2.new(0, 190, 0, 80)
+nolagFrame.Position = UDim2.new(0, 25, 0, 290)
+nolagFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+nolagFrame.BackgroundTransparency = 0.4
+nolagFrame.ZIndex = 11
+nolagFrame.Parent = featuresContent
+local nolagCorner = Instance.new("UICorner")
+nolagCorner.CornerRadius = UDim.new(0, 8)
+nolagCorner.Parent = nolagFrame
+
+local nolagTitle = Instance.new("TextLabel")
+nolagTitle.Size = UDim2.new(0, 180, 0, 20)
+nolagTitle.Position = UDim2.new(0, 5, 0, 5)
+nolagTitle.BackgroundTransparency = 1
+nolagTitle.Text = translations.en.nolag_title
+nolagTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+nolagTitle.TextSize = 14
+nolagTitle.Font = Enum.Font.GothamBold
+nolagTitle.TextXAlignment = Enum.TextXAlignment.Left
+nolagTitle.ZIndex = 12
+nolagTitle.Parent = nolagFrame
+
+local nolagDesc = Instance.new("TextLabel")
+nolagDesc.Size = UDim2.new(0, 180, 0, 20)
+nolagDesc.Position = UDim2.new(0, 5, 0, 25)
+nolagDesc.BackgroundTransparency = 1
+nolagDesc.Text = translations.en.nolag_desc
+nolagDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
+nolagDesc.TextSize = 12
+nolagDesc.Font = Enum.Font.Gotham
+nolagDesc.TextXAlignment = Enum.TextXAlignment.Left
+nolagDesc.ZIndex = 12
+nolagDesc.Parent = nolagFrame
+
+local nolagButton = Instance.new("TextButton")
+nolagButton.Size = UDim2.new(0, 180, 0, 25)
+nolagButton.Position = UDim2.new(0, 5, 0, 50)
+nolagButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+nolagButton.BackgroundTransparency = 0.4
+nolagButton.Text = translations.en.nolag_button
+nolagButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+nolagButton.Font = Enum.Font.Gotham
+nolagButton.TextSize = 14
+nolagButton.ZIndex = 12
+nolagButton.Parent = nolagFrame
+local nolagButtonCorner = Instance.new("UICorner")
+nolagButtonCorner.CornerRadius = UDim.new(0, 6)
+nolagButtonCorner.Parent = nolagButton
+
 -- Content: Settings
 local settingsContent = Instance.new("Frame")
 settingsContent.Size = UDim2.new(1, 0, 1, 0)
@@ -584,6 +685,12 @@ local function updateUIText()
         jumpTitle.Text = translations[currentLanguage].jump_title
         jumpDesc.Text = translations[currentLanguage].jump_desc
         jumpButton.Text = string.format(translations[currentLanguage].jump_button, infiniteJumpEnabled and "On" or "Off")
+        speedupTitle.Text = translations[currentLanguage].speedup_title
+        speedupDesc.Text = translations[currentLanguage].speedup_desc
+        speedupButton.Text = translations[currentLanguage].speedup_button
+        nolagTitle.Text = translations[currentLanguage].nolag_title
+        nolagDesc.Text = translations[currentLanguage].nolag_desc
+        nolagButton.Text = translations[currentLanguage].nolag_button
         themeTitle.Text = translations[currentLanguage].theme_title
         themeDesc.Text = translations[currentLanguage].theme_desc
         themeButton.Text = string.format(translations[currentLanguage].theme_button, currentTheme)
@@ -848,6 +955,30 @@ jumpButton.MouseButton1Click:Connect(function()
     end
 end)
 
+-- Speed Up X
+speedupButton.MouseButton1Click:Connect(function()
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+        showNotification(translations[currentLanguage].speedup_notification, Color3.fromRGB(0, 200, 100))
+    end)
+    if not success then
+        warn("Speed Up X error: " .. tostring(err))
+        showNotification(translations[currentLanguage].speedup_error, Color3.fromRGB(255, 80, 80))
+    end
+end)
+
+-- No Lag
+nolagButton.MouseButton1Click:Connect(function()
+    local success, err = pcall(function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
+        showNotification(translations[currentLanguage].nolag_notification, Color3.fromRGB(0, 200, 100))
+    end)
+    if not success then
+        warn("No Lag error: " .. tostring(err))
+        showNotification(translations[currentLanguage].nolag_error, Color3.fromRGB(255, 80, 80))
+    end
+end)
+
 -- Character Respawn
 table.insert(connections, player.CharacterAdded:Connect(function(character)
     if infiniteJumpEnabled then
@@ -894,6 +1025,8 @@ end
 
 addHoverEffect(applySpeedButton)
 addHoverEffect(jumpButton)
+addHoverEffect(speedupButton)
+addHoverEffect(nolagButton)
 addHoverEffect(closeButton)
 addHoverEffect(toggleButton)
 addHoverEffect(homeButton)
@@ -905,9 +1038,6 @@ addHoverEffect(langButton)
 -- Loading Animation (Updated)
 local function startLoading()
     local success, err = pcall(function()
-        if not ProgressBar or not ProgressBar.Parent then
-            error("ProgressBar missing")
-        end
         if not LoadingFrame or not LoadingFrame.Parent then
             error("LoadingFrame missing")
         end
@@ -918,28 +1048,16 @@ local function startLoading()
             error("ToggleButton missing")
         end
 
-        ProgressBar.Size = UDim2.new(0, 0, 1, 0)
         LoadingFrame.Visible = true
         LoadingFrame.BackgroundTransparency = 0.2
-        print("Starting loading animation at: " .. tostring(tick()))
+        print("Starting loading at: " .. tostring(tick()))
 
-        local startTime = tick()
-        local duration = 5
-        local connection
+        task.wait(5)
 
-        connection = RunService.RenderStepped:Connect(function()
-            local elapsed = tick() - startTime
-            local progress = math.clamp(elapsed / duration, 0, 1)
-            ProgressBar.Size = UDim2.new(progress, 0, 1, 0)
-
-            if elapsed >= duration then
-                connection:Disconnect()
-                LoadingFrame.Visible = false
-                frame.Visible = true
-                toggleButton.Visible = true
-                print("Loading completed at: " .. tostring(tick()))
-            end
-        end)
+        LoadingFrame.Visible = false
+        frame.Visible = true
+        toggleButton.Visible = true
+        print("Loading completed at: " .. tostring(tick()))
     end)
     if not success then
         warn("Loading error: " .. tostring(err))
