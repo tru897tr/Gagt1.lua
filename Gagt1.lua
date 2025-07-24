@@ -39,7 +39,8 @@ local translations = {
         speedx_error = "Speed Up X Error: Check console",
         nolag_notification = "No Lag Successful!",
         nolag_error = "No Lag Error: Check console",
-        client_error = "Client not supported!"
+        client_error = "Client not supported!",
+        loading_error = "Loading failed: Check console"
     },
     vi = {
         title = "Trồng một khu vườn",
@@ -73,7 +74,8 @@ local translations = {
         speedx_error = "Lỗi Speed Up X: Xem console",
         nolag_notification = "No Lag thành công!",
         nolag_error = "Lỗi No Lag: Xem console",
-        client_error = "Client không được hỗ trợ!"
+        client_error = "Client không được hỗ trợ!",
+        loading_error = "Tải thất bại: Xem console"
     }
 }
 
@@ -82,7 +84,7 @@ local player = Players.LocalPlayer
 local playerGui
 local attempts = 0
 local maxAttempts = 30
-while not playerGui and attempts < maxAttempts do
+while not playerGui and attempts < maxAttempts and player.Parent do
     playerGui = player:WaitForChild("PlayerGui", 2)
     attempts = attempts + 1
     if not playerGui then
@@ -91,7 +93,7 @@ while not playerGui and attempts < maxAttempts do
     end
 end
 if not playerGui then
-    warn("Failed to find PlayerGui after " .. maxAttempts .. " attempts")
+    warn("Failed to find PlayerGui after " .. maxAttempts .. " attempts or player disconnected")
     return
 end
 print("PlayerGui found after " .. attempts .. " attempts")
@@ -135,7 +137,7 @@ ProgressBarFrame.Position = UDim2.new(0.5, -100, 0.5, 0)
 ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 ProgressBarFrame.BackgroundTransparency = 0.4
 ProgressBarFrame.ZIndex = 21
-ProgressBarFrame.ClipsDescendants = true -- Ensure ProgressBar doesn't overflow
+ProgressBarFrame.ClipsDescendants = true
 ProgressBarFrame.Parent = LoadingFrame
 local ProgressBarFrameCorner = Instance.new("UICorner")
 ProgressBarFrameCorner.CornerRadius = UDim.new(0, 6)
@@ -147,7 +149,7 @@ ProgressBarFrameStroke.Transparency = 0.5
 ProgressBarFrameStroke.Parent = ProgressBarFrame
 
 local ProgressBar = Instance.new("Frame")
-ProgressBar.Size = UDim2.new(0, 0, 1, 0) -- Start at 0 width
+ProgressBar.Size = UDim2.new(0, 0, 1, 0)
 ProgressBar.Position = UDim2.new(0, 0, 0, 0)
 ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 ProgressBar.ZIndex = 22
@@ -195,7 +197,7 @@ local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 340, 0, 240)
 frame.Position = UDim2.new(0.5, -170, 0.5, -120)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-frame.BackgroundTransparency = 0.5
+frame.BackgroundTransparency = 1 -- Start hidden
 frame.Visible = false
 frame.ZIndex = 10
 frame.Active = true
@@ -212,9 +214,9 @@ print("Frame created at: " .. tostring(frame.Position))
 
 -- Drag Area
 local DragArea = Instance.new("Frame")
-DragArea.Size = UDim2.new(1, 0, 1, 0)
+DragArea.Size = UDim2.new(1, 0, 0, 32) -- Restrict to title bar
 DragArea.BackgroundTransparency = 1
-DragArea.ZIndex = 9
+DragArea.ZIndex = 12
 DragArea.Parent = frame
 
 -- Title Label
@@ -710,11 +712,11 @@ local languages = {
 
 -- Load saved theme and language
 local function loadThemeAndLanguage()
-    if isfile and isfile("gag.js") then
+    if isfile then
         local success, result = pcall(function()
-            local loaded = loadfile("gag.js")
-            if loaded then
-                return loaded()
+            if isfile("gag.js") then
+                local data = HttpService:JSONDecode(readfile("gag.js"))
+                return data
             end
         end)
         if success and result then
@@ -742,7 +744,7 @@ local function loadThemeAndLanguage()
             warn("Failed to load gag.js: " .. tostring(result))
         end
     else
-        print("No gag.js found, using defaults: theme=Tối, language=en")
+        print("No file system support, using defaults: theme=Tối, language=en")
     end
 end
 
@@ -751,7 +753,7 @@ local function saveThemeAndLanguage()
     if writefile then
         local success, err = pcall(function()
             local data = { theme = currentTheme, language = currentLanguage }
-            writefile("gag.js", "return " .. HttpService:JSONEncode(data))
+            writefile("gag.js", HttpService:JSONEncode(data))
         end)
         if success then
             print("Saved to gag.js: theme=" .. currentTheme .. ", language=" .. currentLanguage)
@@ -822,44 +824,52 @@ for i, theme in ipairs(themes) do
     optionCorner.Parent = optionButton
 
     optionButton.MouseButton1Click:Connect(function()
-        currentTheme = theme.Name
-        themeButton.Text = string.format(translations[currentLanguage].theme_button, currentTheme)
-        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
-        tween:Play()
-        tween.Completed:Connect(function()
-            themeDropdown.Visible = false
-            themeDropdown.Size = UDim2.new(0, 100, 0, 96)
-        end)
-        frame.BackgroundColor3 = theme.Color
-        sidebar.BackgroundColor3 = Color3.new(theme.Color.R * 1.1, theme.Color.G * 1.1, theme.Color.B * 1.1)
-        title.TextColor3 = theme.TextColor
-        themeButton.TextColor3 = theme.TextColor
-        languageButton.TextColor3 = theme.TextColor
-        closeXButton.TextColor3 = theme.TextColor
-        credit.TextColor3 = theme.TextColor
-        homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-        print("Theme changed to: " .. theme.Name)
-        saveThemeAndLanguage()
-        showNotification(string.format(translations[currentLanguage].theme_notification, theme.Name), Color3.fromRGB(0, 200, 100))
+        if frame and frame.Parent then
+            currentTheme = theme.Name
+            themeButton.Text = string.format(translations[currentLanguage].theme_button, currentTheme)
+            local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
+            tween:Play()
+            tween.Completed:Connect(function()
+                themeDropdown.Visible = false
+                themeDropdown.Size = UDim2.new(0, 100, 0, 96)
+            end)
+            frame.BackgroundColor3 = theme.Color
+            sidebar.BackgroundColor3 = Color3.new(theme.Color.R * 1.1, theme.Color.G * 1.1, theme.Color.B * 1.1)
+            title.TextColor3 = theme.TextColor
+            themeButton.TextColor3 = theme.TextColor
+            languageButton.TextColor3 = theme.TextColor
+            closeXButton.TextColor3 = theme.TextColor
+            credit.TextColor3 = theme.TextColor
+            homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            print("Theme changed to: " .. theme.Name)
+            saveThemeAndLanguage()
+            showNotification(string.format(translations[currentLanguage].theme_notification, theme.Name), Color3.fromRGB(0, 200, 100))
+        else
+            warn("Theme change failed: Frame missing")
+        end
     end)
 end
 
 themeButton.MouseButton1Click:Connect(function()
-    if themeDropdown.Visible then
-        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
-        tween:Play()
-        tween.Completed:Connect(function()
-            themeDropdown.Visible = false
-            themeDropdown.Size = UDim2.new(0, 100, 0, 96)
-        end)
+    if themeDropdown and themeDropdown.Parent then
+        if themeDropdown.Visible then
+            local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
+            tween:Play()
+            tween.Completed:Connect(function()
+                themeDropdown.Visible = false
+                themeDropdown.Size = UDim2.new(0, 100, 0, 96)
+            end)
+        else
+            themeDropdown.Visible = true
+            local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 96)})
+            tween:Play()
+        end
+        print("Theme dropdown toggled: " .. tostring(themeDropdown.Visible))
     else
-        themeDropdown.Visible = true
-        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 96)})
-        tween:Play()
+        warn("Theme dropdown toggle failed: Dropdown missing")
     end
-    print("Theme dropdown toggled: " .. tostring(themeDropdown.Visible))
 end)
 
 -- Language Dropdown
@@ -908,19 +918,23 @@ for i, lang in ipairs(languages) do
 end
 
 languageButton.MouseButton1Click:Connect(function()
-    if languageDropdown.Visible then
-        local tween = TweenService:Create(languageDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
-        tween:Play()
-        tween.Completed:Connect(function()
-            languageDropdown.Visible = false
-            languageDropdown.Size = UDim2.new(0, 100, 0, 48)
-        end)
+    if languageDropdown and languageDropdown.Parent then
+        if languageDropdown.Visible then
+            local tween = TweenService:Create(languageDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
+            tween:Play()
+            tween.Completed:Connect(function()
+                languageDropdown.Visible = false
+                languageDropdown.Size = UDim2.new(0, 100, 0, 48)
+            end)
+        else
+            languageDropdown.Visible = true
+            local tween = TweenService:Create(languageDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 48)})
+            tween:Play()
+        end
+        print("Language dropdown toggled: " .. tostring(languageDropdown.Visible))
     else
-        languageDropdown.Visible = true
-        local tween = TweenService:Create(languageDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 48)})
-        tween:Play()
-    end
-    print("Language dropdown toggled: " .. tostring(languageDropdown.Visible))
+        warn("Language dropdown toggle failed: Dropdown missing")
+    end)
 end)
 
 -- Credit Label
@@ -953,120 +967,136 @@ toggleCorner.Parent = toggleButton
 -- Menu Visibility
 local menuVisible = true
 local function toggleMenu()
-    menuVisible = not menuVisible
-    if menuVisible then
-        frame.Visible = true
-        local tween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5})
-        tween:Play()
+    if frame and frame.Parent then
+        menuVisible = not menuVisible
+        if menuVisible then
+            frame.Visible = true
+            local tween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5})
+            tween:Play()
+        else
+            local tween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
+            tween:Play()
+            tween.Completed:Connect(function()
+                frame.Visible = false
+            end)
+        end
+        toggleButton.BackgroundColor3 = menuVisible and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(200, 200, 200)
+        print("Menu toggled: " .. tostring(menuVisible))
     else
-        local tween = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
-        tween:Play()
-        tween.Completed:Connect(function()
-            frame.Visible = false
-        end)
+        warn("Toggle menu failed: Frame missing")
     end
-    toggleButton.BackgroundColor3 = menuVisible and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(200, 200, 200)
-    print("Menu toggled: " .. tostring(menuVisible))
 end
 
 -- Sidebar Navigation
 local function showHome()
-    homeContent.Visible = true
-    settingsContent.Visible = false
-    musicContent.Visible = false
-    local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-        BackgroundColor3 = Color3.fromRGB(200, 200, 200),
-        BackgroundTransparency = 0.3
-    })
-    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
-        BackgroundTransparency = 0.4
-    })
-    local tween3 = TweenService:Create(musicButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
-        BackgroundTransparency = 0.4
-    })
-    local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
-    local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
-    local strokeTween3 = TweenService:Create(musicStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
-    tween1:Play()
-    tween2:Play()
-    tween3:Play()
-    strokeTween1:Play()
-    strokeTween2:Play()
-    strokeTween3:Play()
-    homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    themeDropdown.Visible = false
-    languageDropdown.Visible = false
-    print("Home selected")
+    if homeContent and settingsContent and musicContent then
+        homeContent.Visible = true
+        settingsContent.Visible = false
+        musicContent.Visible = false
+        local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(200, 200, 200),
+            BackgroundTransparency = 0.3
+        })
+        local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+            BackgroundTransparency = 0.4
+        })
+        local tween3 = TweenService:Create(musicButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+            BackgroundTransparency = 0.4
+        })
+        local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
+        local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
+        local strokeTween3 = TweenService:Create(musicStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
+        tween1:Play()
+        tween2:Play()
+        tween3:Play()
+        strokeTween1:Play()
+        strokeTween2:Play()
+        strokeTween3:Play()
+        homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        themeDropdown.Visible = false
+        languageDropdown.Visible = false
+        print("Home selected")
+    else
+        warn("Navigation failed: Content frames missing")
+    end
 end
 
 local function showSettings()
-    homeContent.Visible = false
-    settingsContent.Visible = true
-    musicContent.Visible = false
-    local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
-        BackgroundTransparency = 0.4
-    })
-    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-        BackgroundColor3 = Color3.fromRGB(200, 200, 200),
-        BackgroundTransparency = 0.3
-    })
-    local tween3 = TweenService:Create(musicButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
-        BackgroundTransparency = 0.4
-    })
-    local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
-    local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
-    local strokeTween3 = TweenService:Create(musicStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
-    tween1:Play()
-    tween2:Play()
-    tween3:Play()
-    strokeTween1:Play()
-    strokeTween2:Play()
-    strokeTween3:Play()
-    homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    themeDropdown.Visible = false
-    languageDropdown.Visible = false
-    print("Settings selected")
+    if homeContent and settingsContent and musicContent then
+        homeContent.Visible = false
+        settingsContent.Visible = true
+        musicContent.Visible = false
+        local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+            BackgroundTransparency = 0.4
+        })
+        local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(200, 200, 200),
+            BackgroundTransparency = 0.3
+        })
+        local tween3 = TweenService:Create(musicButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+            BackgroundTransparency = 0.4
+        })
+        local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
+        local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
+        local strokeTween3 = TweenService:Create(musicStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
+        tween1:Play()
+        tween2:Play()
+        tween3:Play()
+        strokeTween1:Play()
+        strokeTween2:Play()
+        strokeTween3:Play()
+        homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        themeDropdown.Visible = false
+        languageDropdown.Visible = false
+        print("Settings selected")
+    else
+        warn("Navigation failed: Content frames missing")
+    end
 end
 
 local function showMusic()
-    homeContent.Visible = false
-    settingsContent.Visible = false
-    musicContent.Visible = true
-    local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
-        BackgroundTransparency = 0.4
-    })
-    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
-        BackgroundTransparency = 0.4
-    })
-    local tween3 = TweenService:Create(musicButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
-        BackgroundColor3 = Color3.fromRGB(200, 200, 200),
-        BackgroundTransparency = 0.3
-    })
-    local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
-    local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
-    local strokeTween3 = TweenService:Create(musicStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
-    tween1:Play()
-    tween2:Play()
-    tween3:Play()
-    strokeTween1:Play()
-    strokeTween2:Play()
-    strokeTween3:Play()
-    homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    themeDropdown.Visible = false
-    languageDropdown.Visible = false
-    print("Misic selected")
+    if homeContent and settingsContent and musicContent then
+        homeContent.Visible = false
+        settingsContent.Visible = false
+        musicContent.Visible = true
+        local tween1 = TweenService:Create(homeButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+            BackgroundTransparency = 0.4
+        })
+        local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+            BackgroundTransparency = 0.4
+        })
+        local tween3 = TweenService:Create(musicButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {
+            BackgroundColor3 = Color3.fromRGB(200, 200, 200),
+            BackgroundTransparency = 0.3
+        })
+        local strokeTween1 = TweenService:Create(homeStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
+        local strokeTween2 = TweenService:Create(settingsStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 1})
+        local strokeTween3 = TweenService:Create(musicStroke, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Transparency = 0.5})
+        tween1:Play()
+        tween2:Play()
+        tween3:Play()
+        strokeTween1:Play()
+        strokeTween2:Play()
+        strokeTween3:Play()
+        homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        themeDropdown.Visible = false
+        languageDropdown.Visible = false
+        print("Misic selected")
+    else
+        warn("Navigation failed: Content frames missing")
+    end
 end
 
 homeButton.MouseButton1Click:Connect(showHome)
@@ -1076,10 +1106,11 @@ musicButton.MouseButton1Click:Connect(showMusic)
 -- Dragging Logic
 local isDragging = false
 local offset = Vector2.new(0, 0)
+local connections = {}
 
 DragArea.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        if frame.Visible and frame.Parent then
+        if frame and frame.Parent and frame.Visible then
             isDragging = true
             local mousePos = Vector2.new(input.Position.X, input.Position.Y)
             local framePos = frame.AbsolutePosition
@@ -1098,7 +1129,7 @@ DragArea.InputEnded:Connect(function(input)
     end
 end)
 
-UserInputService.InputChanged:Connect(function(input)
+table.insert(connections, UserInputService.InputChanged:Connect(function(input)
     if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
         if frame and frame.Parent then
             local mousePos = Vector2.new(input.Position.X, input.Position.Y)
@@ -1107,19 +1138,19 @@ UserInputService.InputChanged:Connect(function(input)
             local newPosX = math.clamp(mousePos.X - offset.X, 0, math.max(0, viewportSize.X - frameSize.X))
             local newPosY = math.clamp(mousePos.Y - offset.Y, 0, math.max(0, viewportSize.Y - frameSize.Y))
             frame.Position = UDim2.new(0, newPosX, 0, newPosY)
-            print("Frame moved to: " .. tostring(frame.Position) .. ", mouse: " .. tostring(mousePos) .. ", viewport: " .. tostring(viewportSize) .. ", frameSize: " .. tostring(frameSize))
+            print("Frame moved to: " .. tostring(frame.Position))
         else
             isDragging = false
             warn("Drag stopped: Frame missing")
         end
     end
-end)
+end))
 
 -- Speed Control Logic
 applySpeedButton.MouseButton1Click:Connect(function()
     local success, err = pcall(function()
         local speed = tonumber(speedInput.Text)
-        if not speed then
+        if not speed or speed < 0 or speed > 1000 then
             error("Invalid speed input: " .. speedInput.Text)
         end
         local character = player.Character
@@ -1154,6 +1185,7 @@ local function setupInfiniteJump()
                 humanoid.Jump = true
                 print("Jump triggered")
             end)
+            table.insert(connections, jumpConnection)
             print("Infinite Jump connection established")
         else
             warn("Cannot enable Infinite Jump: Humanoid not found")
@@ -1196,20 +1228,20 @@ infiniteJumpButton.MouseButton1Click:Connect(function()
 end)
 
 -- Handle character respawn
-player.CharacterAdded:Connect(function(character)
+table.insert(connections, player.CharacterAdded:Connect(function(character)
     print("Character respawned")
     if infiniteJumpEnabled then
         task.wait(0.1) -- Wait for Humanoid to load
         setupInfiniteJump()
     end
-end)
+end))
 
 -- Input Handling (RightShift)
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
+table.insert(connections, UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed and input.KeyCode == Enum.KeyCode.RightShift then
         toggleMenu()
     end
-end)
+end))
 
 -- Speed Up X Logic
 speedButton.MouseButton1Click:Connect(function()
@@ -1238,7 +1270,7 @@ speedButton.MouseButton1Click:Connect(function()
 
     success, err = pcall(function()
         local response = game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true)
-        if response then
+        if response and response ~= "" then
             loadstring(response)()
             print("Executed Speed Up X script")
         else
@@ -1281,7 +1313,7 @@ noLagButton.MouseButton1Click:Connect(function()
 
     success, err = pcall(function()
         local response = game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua")
-        if response then
+        if response and response ~= "" then
             loadstring(response)()
             print("Executed No Lag script")
         else
@@ -1308,18 +1340,22 @@ local function addHoverEffect(button)
     local originalColor = button.BackgroundColor3
     local originalTransparency = button.BackgroundTransparency
     button.MouseEnter:Connect(function()
-        local tween = TweenService:Create(button, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
-            BackgroundColor3 = Color3.new(originalColor.R * 0.85, originalColor.G * 0.85, originalColor.B * 0.85),
-            BackgroundTransparency = math.max(0, originalTransparency - 0.1)
-        })
-        tween:Play()
+        if button and button.Parent then
+            local tween = TweenService:Create(button, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                BackgroundColor3 = Color3.new(originalColor.R * 0.85, originalColor.G * 0.85, originalColor.B * 0.85),
+                BackgroundTransparency = math.max(0, originalTransparency - 0.1)
+            })
+            tween:Play()
+        end
     end)
     button.MouseLeave:Connect(function()
-        local tween = TweenService:Create(button, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
-            BackgroundColor3 = originalColor,
-            BackgroundTransparency = originalTransparency
-        })
-        tween:Play()
+        if button and button.Parent then
+            local tween = TweenService:Create(button, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {
+                BackgroundColor3 = originalColor,
+                BackgroundTransparency = originalTransparency
+            })
+            tween:Play()
+        end
     end)
 end
 
@@ -1347,40 +1383,106 @@ end
 
 -- Loading Animation
 local function startLoading()
-    -- Ensure ProgressBar starts at 0
-    ProgressBar.Size = UDim2.new(0, 0, 1, 0)
-    local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear)
-    local tween = TweenService:Create(ProgressBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
-    tween:Play()
-    print("ProgressBar tween started")
-
-    -- Timeout to prevent getting stuck
-    local timeout = task.spawn(function()
-        task.wait(6) -- Slightly longer than tween duration
-        if LoadingFrame.Visible then
-            warn("Loading timeout triggered")
-            LoadingFrame.Visible = false
-            frame.Visible = true
-            frame.BackgroundTransparency = 0.5
-            print("Forced loading complete, showing main frame")
+    local success, err = pcall(function()
+        -- Đảm bảo ProgressBar bắt đầu từ 0
+        if not ProgressBar or not ProgressBar.Parent then
+            error("ProgressBar missing")
         end
-    end)
+        ProgressBar.Size = UDim2.new(0, 0, 1, 0)
+        print("ProgressBar reset to Size: " .. tostring(ProgressBar.Size))
 
-    tween.Completed:Connect(function()
-        task.cancel(timeout) -- Cancel timeout if tween completes
-        local fadeOut = TweenService:Create(LoadingFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
-        fadeOut:Play()
-        fadeOut.Completed:Connect(function()
-            LoadingFrame.Visible = false
-            frame.Visible = true
-            local fadeIn = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5})
-            fadeIn:Play()
-            print("Loading completed, showing main frame")
+        -- Đảm bảo LoadingFrame hiển thị
+        if not LoadingFrame or not LoadingFrame.Parent then
+            error("LoadingFrame missing")
+        end
+        LoadingFrame.Visible = true
+        LoadingFrame.BackgroundTransparency = 0.2
+        print("LoadingFrame shown with transparency: " .. tostring(LoadingFrame.BackgroundTransparency))
+
+        -- Tạo tween cho ProgressBar (chạy trong 5 giây)
+        local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+        local tween = TweenService:Create(ProgressBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
+        tween:Play()
+        print("ProgressBar tween started at: " .. tostring(tick()))
+
+        -- Timeout dự phòng (5.5 giây) để tránh kẹt
+        local timeout = task.spawn(function()
+            task.wait(5.5)
+            if LoadingFrame and LoadingFrame.Visible then
+                warn("Loading timeout triggered at: " .. tostring(tick()))
+                local fadeOut = TweenService:Create(LoadingFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
+                fadeOut:Play()
+                fadeOut.Completed:Connect(function()
+                    LoadingFrame.Visible = false
+                    if frame and frame.Parent then
+                        frame.Visible = true
+                        frame.BackgroundTransparency = 0.5
+                        print("Forced loading complete, main frame visible at: " .. tostring(frame.Position))
+                        toggleButton.Visible = true
+                    else
+                        warn("Main frame missing after timeout")
+                    end
+                end)
+            end
+        end)
+
+        -- Xử lý khi tween hoàn tất
+        tween.Completed:Connect(function()
+            task.cancel(timeout)
+            print("ProgressBar tween completed at: " .. tostring(tick()))
+            if LoadingFrame and LoadingFrame.Parent then
+                local fadeOut = TweenService:Create(LoadingFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
+                fadeOut:Play()
+                fadeOut.Completed:Connect(function()
+                    LoadingFrame.Visible = false
+                    if frame and frame.Parent then
+                        frame.Visible = true
+                        local fadeIn = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5})
+                        fadeIn:Play()
+                        fadeIn.Completed:Connect(function()
+                            print("Loading completed, main frame fully visible at: " .. tostring(frame.Position))
+                            toggleButton.Visible = true
+                        end)
+                    else
+                        warn("Main frame missing after loading")
+                    end
+                end)
+            else
+                warn("LoadingFrame missing after tween completion")
+            end
         end)
     end)
+    if not success then
+        warn("Loading error: " .. tostring(err))
+        showNotification(translations[currentLanguage].loading_error, Color3.fromRGB(255, 80, 80))
+        if LoadingFrame then
+            LoadingFrame.Visible = false
+        end
+        if frame then
+            frame.Visible = true
+            frame.BackgroundTransparency = 0.5
+        end
+        toggleButton.Visible = true
+    end
 end
 
+-- Cleanup on script end
+local function cleanup()
+    for _, connection in ipairs(connections) do
+        if connection then
+            connection:Disconnect()
+        end
+    end
+    if jumpConnection then
+        jumpConnection:Disconnect()
+    end
+    print("Script connections cleaned up")
+end
+
+game:BindToClose(cleanup)
+
+-- Start loading
 startLoading()
 
 -- Debug
-print("GrowGardenMenu fully initialized")
+print("GrowGardenMenu fully initialized at: " .. tostring(tick()))
