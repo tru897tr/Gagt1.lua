@@ -5,6 +5,78 @@ local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
 
+-- Translations
+local translations = {
+    en = {
+        title = "Grow a Garden",
+        home = "Home",
+        settings = "Settings",
+        music = "Misic",
+        speed_title = "Walk Speed",
+        speed_desc = "Set custom walking speed",
+        jump_title = "Infinite Jump",
+        jump_desc = "Jump without touching ground",
+        theme_title = "Theme",
+        theme_desc = "Change interface theme",
+        lang_title = "Language",
+        lang_desc = "Change interface language",
+        speed_button = "Apply",
+        jump_button = "Infinite Jump (%s)",
+        theme_button = "Theme: %s",
+        lang_button = "Language: %s",
+        credit = "By Nguyễn Thanh Trứ",
+        speed_notification = "Speed set to %s!",
+        speed_error = "Invalid speed!",
+        jump_enabled = "Infinite Jump Enabled!",
+        jump_disabled = "Infinite Jump Disabled!",
+        jump_error = "Infinite Jump Error!",
+        theme_notification = "Theme saved: %s",
+        theme_error = "Failed to save theme!",
+        theme_unsupported = "Theme saving not supported!",
+        lang_notification = "Language changed to %s",
+        lang_error = "Failed to save language!",
+        speedx_notification = "Speed Up X Successful!",
+        speedx_error = "Speed Up X Error: Check console",
+        nolag_notification = "No Lag Successful!",
+        nolag_error = "No Lag Error: Check console",
+        client_error = "Client not supported!"
+    },
+    vi = {
+        title = "Trồng một khu vườn",
+        home = "Trang chủ",
+        settings = "Cài đặt",
+        music = "Tính năng",
+        speed_title = "Tốc độ chạy",
+        speed_desc = "Đặt tốc độ chạy tùy chỉnh",
+        jump_title = "Nhảy vô hạn",
+        jump_desc = "Nhảy mà không cần chạm đất",
+        theme_title = "Giao diện",
+        theme_desc = "Thay đổi giao diện",
+        lang_title = "Ngôn ngữ",
+        lang_desc = "Thay đổi ngôn ngữ giao diện",
+        speed_button = "Áp dụng",
+        jump_button = "Nhảy vô hạn (%s)",
+        theme_button = "Giao diện: %s",
+        lang_button = "Ngôn ngữ: %s",
+        credit = "Bởi Nguyễn Thanh Trứ",
+        speed_notification = "Tốc độ đặt thành %s!",
+        speed_error = "Tốc độ không hợp lệ!",
+        jump_enabled = "Nhảy vô hạn đã bật!",
+        jump_disabled = "Nhảy vô hạn đã tắt!",
+        jump_error = "Lỗi nhảy vô hạn!",
+        theme_notification = "Giao diện đã lưu: %s",
+        theme_error = "Lưu giao diện thất bại!",
+        theme_unsupported = "Không hỗ trợ lưu giao diện!",
+        lang_notification = "Ngôn ngữ thay đổi thành %s",
+        lang_error = "Lưu ngôn ngữ thất bại!",
+        speedx_notification = "Speed Up X thành công!",
+        speedx_error = "Lỗi Speed Up X: Xem console",
+        nolag_notification = "No Lag thành công!",
+        nolag_error = "Lỗi No Lag: Xem console",
+        client_error = "Client không được hỗ trợ!"
+    }
+}
+
 -- GUI Setup
 local player = Players.LocalPlayer
 local playerGui
@@ -39,7 +111,7 @@ screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.DisplayOrder = 10
 print("ScreenGui created")
 
--- Loading Frame (Black Screen with Progress Bar)
+-- Loading Frame
 local LoadingFrame = Instance.new("Frame")
 LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
 LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
@@ -93,7 +165,7 @@ LoadingLabel.Font = Enum.Font.Gotham
 LoadingLabel.ZIndex = 21
 LoadingLabel.Parent = LoadingFrame
 
--- Notification Frame (Bottom-Right)
+-- Notification Frame
 local notificationFrame = Instance.new("Frame")
 notificationFrame.Size = UDim2.new(0, 190, 0, 20)
 notificationFrame.Position = UDim2.new(1, -200, 1, -40)
@@ -149,7 +221,7 @@ local title = Instance.new("TextLabel")
 title.Size = UDim2.new(0.9, -20, 0, 24)
 title.Position = UDim2.new(0.05, 10, 0, 8)
 title.BackgroundTransparency = 1
-title.Text = "Grow a Garden"
+title.Text = translations.en.title
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextSize = 18
 title.Font = Enum.Font.GothamBold
@@ -197,7 +269,7 @@ contentFrame.Parent = frame
 local homeButton = Instance.new("TextButton")
 homeButton.Size = UDim2.new(1, -10, 0, 32)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
-homeButton.Text = "Home"
+homeButton.Text = translations.en.home
 homeButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
 homeButton.BackgroundTransparency = 0.3
 homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -217,7 +289,7 @@ homeStroke.Parent = homeButton
 local settingsButton = Instance.new("TextButton")
 settingsButton.Size = UDim2.new(1, -10, 0, 32)
 settingsButton.Position = UDim2.new(0, 5, 0, 42)
-settingsButton.Text = "Settings"
+settingsButton.Text = translations.en.settings
 settingsButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 settingsButton.BackgroundTransparency = 0.4
 settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -237,7 +309,7 @@ settingsStroke.Parent = settingsButton
 local musicButton = Instance.new("TextButton")
 musicButton.Size = UDim2.new(1, -10, 0, 32)
 musicButton.Position = UDim2.new(0, 5, 0, 79)
-musicButton.Text = "Misic"
+musicButton.Text = translations.en.music
 musicButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 musicButton.BackgroundTransparency = 0.4
 musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -262,34 +334,114 @@ homeContent.ZIndex = 10
 homeContent.Parent = contentFrame
 homeContent.Visible = true
 
+local speedXFrame = Instance.new("Frame")
+speedXFrame.Size = UDim2.new(0, 190, 0, 80)
+speedXFrame.Position = UDim2.new(0, 25, 0, 20)
+speedXFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+speedXFrame.BackgroundTransparency = 0.4
+speedXFrame.ZIndex = 11
+speedXFrame.Parent = homeContent
+local speedXCorner = Instance.new("UICorner")
+speedXCorner.CornerRadius = UDim.new(0, 8)
+speedXCorner.Parent = speedXFrame
+local speedXStroke = Instance.new("UIStroke")
+speedXStroke.Thickness = 1
+speedXStroke.Color = Color3.fromRGB(255, 255, 255)
+speedXStroke.Transparency = 0.5
+speedXStroke.Parent = speedXFrame
+
+local speedXTitle = Instance.new("TextLabel")
+speedXTitle.Size = UDim2.new(0, 180, 0, 20)
+speedXTitle.Position = UDim2.new(0, 5, 0, 5)
+speedXTitle.BackgroundTransparency = 1
+speedXTitle.Text = "Speed Up X"
+speedXTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedXTitle.TextSize = 14
+speedXTitle.Font = Enum.Font.GothamBold
+speedXTitle.TextXAlignment = Enum.TextXAlignment.Left
+speedXTitle.ZIndex = 12
+speedXTitle.Parent = speedXFrame
+
+local speedXDesc = Instance.new("TextLabel")
+speedXDesc.Size = UDim2.new(0, 180, 0, 20)
+speedXDesc.Position = UDim2.new(0, 5, 0, 25)
+speedXDesc.BackgroundTransparency = 1
+speedXDesc.Text = "Boost game performance"
+speedXDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
+speedXDesc.TextSize = 12
+speedXDesc.Font = Enum.Font.Gotham
+speedXDesc.TextXAlignment = Enum.TextXAlignment.Left
+speedXDesc.ZIndex = 12
+speedXDesc.Parent = speedXFrame
+
 local speedButton = Instance.new("TextButton")
-speedButton.Size = UDim2.new(0, 190, 0, 32)
-speedButton.Position = UDim2.new(0, 25, 0, 20)
-speedButton.Text = "Speed Up X"
+speedButton.Size = UDim2.new(0, 180, 0, 25)
+speedButton.Position = UDim2.new(0, 5, 0, 50)
+speedButton.Text = "Execute"
 speedButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 speedButton.BackgroundTransparency = 0.4
 speedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 speedButton.Font = Enum.Font.Gotham
 speedButton.TextSize = 14
-speedButton.ZIndex = 11
-speedButton.Parent = homeContent
+speedButton.ZIndex = 12
+speedButton.Parent = speedXFrame
 local speedCorner = Instance.new("UICorner")
-speedCorner.CornerRadius = UDim.new(0, 8)
+speedCorner.CornerRadius = UDim.new(0, 6)
 speedCorner.Parent = speedButton
 
+local noLagFrame = Instance.new("Frame")
+noLagFrame.Size = UDim2.new(0, 190, 0, 80)
+noLagFrame.Position = UDim2.new(0, 25, 0, 110)
+noLagFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+noLagFrame.BackgroundTransparency = 0.4
+noLagFrame.ZIndex = 11
+noLagFrame.Parent = homeContent
+local noLagCorner = Instance.new("UICorner")
+noLagCorner.CornerRadius = UDim.new(0, 8)
+noLagCorner.Parent = noLagFrame
+local noLagStroke = Instance.new("UIStroke")
+noLagStroke.Thickness = 1
+noLagStroke.Color = Color3.fromRGB(255, 255, 255)
+noLagStroke.Transparency = 0.5
+noLagStroke.Parent = noLagFrame
+
+local noLagTitle = Instance.new("TextLabel")
+noLagTitle.Size = UDim2.new(0, 180, 0, 20)
+noLagTitle.Position = UDim2.new(0, 5, 0, 5)
+noLagTitle.BackgroundTransparency = 1
+noLagTitle.Text = "No Lag"
+noLagTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+noLagTitle.TextSize = 14
+noLagTitle.Font = Enum.Font.GothamBold
+noLagTitle.TextXAlignment = Enum.TextXAlignment.Left
+noLagTitle.ZIndex = 12
+noLagTitle.Parent = noLagFrame
+
+local noLagDesc = Instance.new("TextLabel")
+noLagDesc.Size = UDim2.new(0, 180, 0, 20)
+noLagDesc.Position = UDim2.new(0, 5, 0, 25)
+noLagDesc.BackgroundTransparency = 1
+noLagDesc.Text = "Reduce game lag"
+noLagDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
+noLagDesc.TextSize = 12
+noLagDesc.Font = Enum.Font.Gotham
+noLagDesc.TextXAlignment = Enum.TextXAlignment.Left
+noLagDesc.ZIndex = 12
+noLagDesc.Parent = noLagFrame
+
 local noLagButton = Instance.new("TextButton")
-noLagButton.Size = UDim2.new(0, 190, 0, 32)
-noLagButton.Position = UDim2.new(0, 25, 0, 58)
-noLagButton.Text = "No Lag"
+noLagButton.Size = UDim2.new(0, 180, 0, 25)
+noLagButton.Position = UDim2.new(0, 5, 0, 50)
+noLagButton.Text = "Execute"
 noLagButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 noLagButton.BackgroundTransparency = 0.4
 noLagButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 noLagButton.Font = Enum.Font.Gotham
 noLagButton.TextSize = 14
-noLagButton.ZIndex = 11
-noLagButton.Parent = homeContent
+noLagButton.ZIndex = 12
+noLagButton.Parent = noLagFrame
 local noLagCorner = Instance.new("UICorner")
-noLagCorner.CornerRadius = UDim.new(0, 8)
+noLagCorner.CornerRadius = UDim.new(0, 6)
 noLagCorner.Parent = noLagButton
 
 -- Content: Settings
@@ -300,7 +452,115 @@ settingsContent.ZIndex = 10
 settingsContent.Parent = contentFrame
 settingsContent.Visible = false
 
--- Content: Misic (Speed and Infinite Jump)
+local themeFrame = Instance.new("Frame")
+themeFrame.Size = UDim2.new(0, 190, 0, 80)
+themeFrame.Position = UDim2.new(0, 25, 0, 20)
+themeFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+themeFrame.BackgroundTransparency = 0.4
+themeFrame.ZIndex = 11
+themeFrame.Parent = settingsContent
+local themeCorner = Instance.new("UICorner")
+themeCorner.CornerRadius = UDim.new(0, 8)
+themeCorner.Parent = themeFrame
+local themeStroke = Instance.new("UIStroke")
+themeStroke.Thickness = 1
+themeStroke.Color = Color3.fromRGB(255, 255, 255)
+themeStroke.Transparency = 0.5
+themeStroke.Parent = themeFrame
+
+local themeTitle = Instance.new("TextLabel")
+themeTitle.Size = UDim2.new(0, 180, 0, 20)
+themeTitle.Position = UDim2.new(0, 5, 0, 5)
+themeTitle.BackgroundTransparency = 1
+themeTitle.Text = translations.en.theme_title
+themeTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+themeTitle.TextSize = 14
+themeTitle.Font = Enum.Font.GothamBold
+themeTitle.TextXAlignment = Enum.TextXAlignment.Left
+themeTitle.ZIndex = 12
+themeTitle.Parent = themeFrame
+
+local themeDesc = Instance.new("TextLabel")
+themeDesc.Size = UDim2.new(0, 180, 0, 20)
+themeDesc.Position = UDim2.new(0, 5, 0, 25)
+themeDesc.BackgroundTransparency = 1
+themeDesc.Text = translations.en.theme_desc
+themeDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
+themeDesc.TextSize = 12
+themeDesc.Font = Enum.Font.Gotham
+themeDesc.TextXAlignment = Enum.TextXAlignment.Left
+themeDesc.ZIndex = 12
+themeDesc.Parent = themeFrame
+
+local themeButton = Instance.new("TextButton")
+themeButton.Size = UDim2.new(0, 180, 0, 25)
+themeButton.Position = UDim2.new(0, 5, 0, 50)
+themeButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+themeButton.BackgroundTransparency = 0.4
+themeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+themeButton.Font = Enum.Font.Gotham
+themeButton.TextSize = 14
+themeButton.ZIndex = 12
+themeButton.Parent = themeFrame
+local themeButtonCorner = Instance.new("UICorner")
+themeButtonCorner.CornerRadius = UDim.new(0, 6)
+themeButtonCorner.Parent = themeButton
+
+local languageFrame = Instance.new("Frame")
+languageFrame.Size = UDim2.new(0, 190, 0, 80)
+languageFrame.Position = UDim2.new(0, 25, 0, 110)
+languageFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+languageFrame.BackgroundTransparency = 0.4
+languageFrame.ZIndex = 11
+languageFrame.Parent = settingsContent
+local languageCorner = Instance.new("UICorner")
+languageCorner.CornerRadius = UDim.new(0, 8)
+languageCorner.Parent = languageFrame
+local languageStroke = Instance.new("UIStroke")
+languageStroke.Thickness = 1
+languageStroke.Color = Color3.fromRGB(255, 255, 255)
+languageStroke.Transparency = 0.5
+languageStroke.Parent = languageFrame
+
+local languageTitle = Instance.new("TextLabel")
+languageTitle.Size = UDim2.new(0, 180, 0, 20)
+languageTitle.Position = UDim2.new(0, 5, 0, 5)
+languageTitle.BackgroundTransparency = 1
+languageTitle.Text = translations.en.lang_title
+languageTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+languageTitle.TextSize = 14
+languageTitle.Font = Enum.Font.GothamBold
+languageTitle.TextXAlignment = Enum.TextXAlignment.Left
+languageTitle.ZIndex = 12
+languageTitle.Parent = languageFrame
+
+local languageDesc = Instance.new("TextLabel")
+languageDesc.Size = UDim2.new(0, 180, 0, 20)
+languageDesc.Position = UDim2.new(0, 5, 0, 25)
+languageDesc.BackgroundTransparency = 1
+languageDesc.Text = translations.en.lang_desc
+languageDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
+languageDesc.TextSize = 12
+languageDesc.Font = Enum.Font.Gotham
+languageDesc.TextXAlignment = Enum.TextXAlignment.Left
+languageDesc.ZIndex = 12
+languageDesc.Parent = languageFrame
+
+local languageButton = Instance.new("TextButton")
+languageButton.Size = UDim2.new(0, 180, 0, 25)
+languageButton.Position = UDim2.new(0, 5, 0, 50)
+languageButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+languageButton.BackgroundTransparency = 0.4
+languageButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+languageButton.Font = Enum.Font.Gotham
+languageButton.TextSize = 14
+languageButton.ZIndex = 12
+languageButton.Parent = languageFrame
+local languageButtonCorner = Instance.new("UICorner")
+languageButtonCorner.CornerRadius = UDim.new(0, 6)
+languageButtonCorner.Parent = languageButton
+
+-- Content: Misic
 local musicContent = Instance.new("Frame")
 musicContent.Size = UDim2.new(1, 0, 1, 0)
 musicContent.BackgroundTransparency = 1
@@ -308,7 +568,6 @@ musicContent.ZIndex = 10
 musicContent.Parent = contentFrame
 musicContent.Visible = false
 
--- Speed Control Frame
 local speedControlFrame = Instance.new("Frame")
 speedControlFrame.Size = UDim2.new(0, 190, 0, 80)
 speedControlFrame.Position = UDim2.new(0, 25, 0, 20)
@@ -329,7 +588,7 @@ local speedControlTitle = Instance.new("TextLabel")
 speedControlTitle.Size = UDim2.new(0, 180, 0, 20)
 speedControlTitle.Position = UDim2.new(0, 5, 0, 5)
 speedControlTitle.BackgroundTransparency = 1
-speedControlTitle.Text = "Walk Speed"
+speedControlTitle.Text = translations.en.speed_title
 speedControlTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 speedControlTitle.TextSize = 14
 speedControlTitle.Font = Enum.Font.GothamBold
@@ -341,7 +600,7 @@ local speedControlDesc = Instance.new("TextLabel")
 speedControlDesc.Size = UDim2.new(0, 180, 0, 20)
 speedControlDesc.Position = UDim2.new(0, 5, 0, 25)
 speedControlDesc.BackgroundTransparency = 1
-speedControlDesc.Text = "Set custom walking speed"
+speedControlDesc.Text = translations.en.speed_desc
 speedControlDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
 speedControlDesc.TextSize = 12
 speedControlDesc.Font = Enum.Font.Gotham
@@ -368,7 +627,7 @@ speedInputCorner.Parent = speedInput
 local applySpeedButton = Instance.new("TextButton")
 applySpeedButton.Size = UDim2.new(0, 70, 0, 25)
 applySpeedButton.Position = UDim2.new(0, 110, 0, 50)
-applySpeedButton.Text = "Apply"
+applySpeedButton.Text = translations.en.speed_button
 applySpeedButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 applySpeedButton.BackgroundTransparency = 0.4
 applySpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -380,7 +639,6 @@ local applySpeedCorner = Instance.new("UICorner")
 applySpeedCorner.CornerRadius = UDim.new(0, 6)
 applySpeedCorner.Parent = applySpeedButton
 
--- Infinite Jump Frame
 local infiniteJumpFrame = Instance.new("Frame")
 infiniteJumpFrame.Size = UDim2.new(0, 190, 0, 80)
 infiniteJumpFrame.Position = UDim2.new(0, 25, 0, 110)
@@ -401,7 +659,7 @@ local infiniteJumpTitle = Instance.new("TextLabel")
 infiniteJumpTitle.Size = UDim2.new(0, 180, 0, 20)
 infiniteJumpTitle.Position = UDim2.new(0, 5, 0, 5)
 infiniteJumpTitle.BackgroundTransparency = 1
-infiniteJumpTitle.Text = "Infinite Jump"
+infiniteJumpTitle.Text = translations.en.jump_title
 infiniteJumpTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
 infiniteJumpTitle.TextSize = 14
 infiniteJumpTitle.Font = Enum.Font.GothamBold
@@ -413,7 +671,7 @@ local infiniteJumpDesc = Instance.new("TextLabel")
 infiniteJumpDesc.Size = UDim2.new(0, 180, 0, 20)
 infiniteJumpDesc.Position = UDim2.new(0, 5, 0, 25)
 infiniteJumpDesc.BackgroundTransparency = 1
-infiniteJumpDesc.Text = "Jump without touching ground"
+infiniteJumpDesc.Text = translations.en.jump_desc
 infiniteJumpDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
 infiniteJumpDesc.TextSize = 12
 infiniteJumpDesc.Font = Enum.Font.Gotham
@@ -424,7 +682,6 @@ infiniteJumpDesc.Parent = infiniteJumpFrame
 local infiniteJumpButton = Instance.new("TextButton")
 infiniteJumpButton.Size = UDim2.new(0, 180, 0, 25)
 infiniteJumpButton.Position = UDim2.new(0, 5, 0, 50)
-infiniteJumpButton.Text = "Infinite Jump (Off)"
 infiniteJumpButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 infiniteJumpButton.BackgroundTransparency = 0.4
 infiniteJumpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -436,92 +693,113 @@ local infiniteJumpButtonCorner = Instance.new("UICorner")
 infiniteJumpButtonCorner.CornerRadius = UDim.new(0, 6)
 infiniteJumpButtonCorner.Parent = infiniteJumpButton
 
--- Theme Selection
+-- Theme and Language Settings
 local currentTheme = "Tối"
+local currentLanguage = "en"
 local themes = {
     {Name = "Sáng", Color = Color3.fromRGB(220, 220, 220), TextColor = Color3.fromRGB(0, 0, 0)},
     {Name = "Tối", Color = Color3.fromRGB(20, 20, 20), TextColor = Color3.fromRGB(255, 255, 255)},
     {Name = "Xanh", Color = Color3.fromRGB(0, 80, 120), TextColor = Color3.fromRGB(255, 255, 255)},
     {Name = "Tím", Color = Color3.fromRGB(80, 0, 120), TextColor = Color3.fromRGB(255, 255, 255)}
 }
+local languages = {
+    {Name = "English", Code = "en"},
+    {Name = "Tiếng Việt", Code = "vi"}
+}
 
--- Load saved theme from gag.js
-local function loadTheme()
+-- Load saved theme and language
+local function loadThemeAndLanguage()
     if isfile and isfile("gag.js") then
         local success, result = pcall(function()
             local loaded = loadfile("gag.js")
             if loaded then
-                local data = loaded()
-                return data and data.theme
+                return loaded()
             end
         end)
         if success and result then
             for _, theme in ipairs(themes) do
-                if theme.Name == result then
+                if theme.Name == result.theme then
                     currentTheme = theme.Name
                     frame.BackgroundColor3 = theme.Color
                     sidebar.BackgroundColor3 = Color3.new(theme.Color.R * 1.1, theme.Color.G * 1.1, theme.Color.B * 1.1)
                     title.TextColor3 = theme.TextColor
                     closeXButton.TextColor3 = theme.TextColor
                     credit.TextColor3 = theme.TextColor
-                    print("Loaded theme from gag.js: " .. result)
-                    return
+                    themeButton.TextColor3 = theme.TextColor
+                    languageButton.TextColor3 = theme.TextColor
+                    break
                 end
             end
-            warn("Invalid theme in gag.js: " .. tostring(result))
+            for _, lang in ipairs(languages) do
+                if lang.Code == result.language then
+                    currentLanguage = lang.Code
+                    break
+                end
+            end
+            print("Loaded from gag.js: theme=" .. (result.theme or "none") .. ", language=" .. (result.language or "none"))
         else
             warn("Failed to load gag.js: " .. tostring(result))
         end
     else
-        print("No gag.js found, using default theme: Tối")
+        print("No gag.js found, using defaults: theme=Tối, language=en")
     end
 end
 
--- Save theme to gag.js
-local function saveTheme()
+-- Save theme and language
+local function saveThemeAndLanguage()
     if writefile then
         local success, err = pcall(function()
-            writefile("gag.js", "return { theme = \"" .. currentTheme .. "\" }")
+            local data = { theme = currentTheme, language = currentLanguage }
+            writefile("gag.js", "return " .. HttpService:JSONEncode(data))
         end)
         if success then
-            print("Saved theme to gag.js: " .. currentTheme)
+            print("Saved to gag.js: theme=" .. currentTheme .. ", language=" .. currentLanguage)
         else
             warn("Failed to save gag.js: " .. tostring(err))
-            showNotification("Failed to save theme!", Color3.fromRGB(255, 80, 80))
+            showNotification(translations[currentLanguage].theme_error, Color3.fromRGB(255, 80, 80))
         end
     else
         warn("Executor does not support writefile")
-        showNotification("Theme saving not supported!", Color3.fromRGB(255, 80, 80))
+        showNotification(translations[currentLanguage].theme_unsupported, Color3.fromRGB(255, 80, 80))
     end
 end
 
--- Load theme on startup
-loadTheme()
+-- Update UI text based on language
+local function updateUIText()
+    title.Text = translations[currentLanguage].title
+    homeButton.Text = translations[currentLanguage].home
+    settingsButton.Text = translations[currentLanguage].settings
+    musicButton.Text = translations[currentLanguage].music
+    speedControlTitle.Text = translations[currentLanguage].speed_title
+    speedControlDesc.Text = translations[currentLanguage].speed_desc
+    infiniteJumpTitle.Text = translations[currentLanguage].jump_title
+    infiniteJumpDesc.Text = translations[currentLanguage].jump_desc
+    infiniteJumpButton.Text = string.format(translations[currentLanguage].jump_button, infiniteJumpEnabled and "On" or "Off")
+    themeTitle.Text = translations[currentLanguage].theme_title
+    themeDesc.Text = translations[currentLanguage].theme_desc
+    themeButton.Text = string.format(translations[currentLanguage].theme_button, currentTheme)
+    languageTitle.Text = translations[currentLanguage].lang_title
+    languageDesc.Text = translations[currentLanguage].lang_desc
+    languageButton.Text = string.format(translations[currentLanguage].lang_button, currentLanguage == "en" and "English" or "Tiếng Việt")
+    applySpeedButton.Text = translations[currentLanguage].speed_button
+    credit.Text = translations[currentLanguage].credit
+end
 
-local themeButton = Instance.new("TextButton")
-themeButton.Size = UDim2.new(0, 190, 0, 30)
-themeButton.Position = UDim2.new(0, 25, 0, 20)
-themeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-themeButton.BackgroundTransparency = 0.4
-themeButton.Text = "Theme: " .. currentTheme
-themeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-themeButton.Font = Enum.Font.Gotham
-themeButton.TextSize = 14
-themeButton.ZIndex = 11
-themeButton.Parent = settingsContent
-local themeButtonCorner = Instance.new("UICorner")
-themeButtonCorner.CornerRadius = UDim.new(0, 6)
-themeButtonCorner.Parent = themeButton
+-- Load initial settings
+loadThemeAndLanguage()
+themeButton.Text = string.format(translations[currentLanguage].theme_button, currentTheme)
+languageButton.Text = string.format(translations[currentLanguage].lang_button, currentLanguage == "en" and "English" or "Tiếng Việt")
+updateUIText()
 
 -- Theme Dropdown
 local themeDropdown = Instance.new("Frame")
 themeDropdown.Size = UDim2.new(0, 100, 0, 96)
-themeDropdown.Position = UDim2.new(0, 25, 0, 54)
+themeDropdown.Position = UDim2.new(0, 5, 0, 80)
 themeDropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 themeDropdown.BackgroundTransparency = 0.5
 themeDropdown.Visible = false
-themeDropdown.ZIndex = 12
-themeDropdown.Parent = settingsContent
+themeDropdown.ZIndex = 13
+themeDropdown.Parent = themeFrame
 local dropdownCorner = Instance.new("UICorner")
 dropdownCorner.CornerRadius = UDim.new(0, 6)
 dropdownCorner.Parent = themeDropdown
@@ -536,7 +814,7 @@ for i, theme in ipairs(themes) do
     optionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     optionButton.Font = Enum.Font.Gotham
     optionButton.TextSize = 12
-    optionButton.ZIndex = 13
+    optionButton.ZIndex = 14
     optionButton.Parent = themeDropdown
     local optionCorner = Instance.new("UICorner")
     optionCorner.CornerRadius = UDim.new(0, 4)
@@ -544,7 +822,7 @@ for i, theme in ipairs(themes) do
 
     optionButton.MouseButton1Click:Connect(function()
         currentTheme = theme.Name
-        themeButton.Text = "Theme: " .. currentTheme
+        themeButton.Text = string.format(translations[currentLanguage].theme_button, currentTheme)
         local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
         tween:Play()
         tween.Completed:Connect(function()
@@ -555,14 +833,15 @@ for i, theme in ipairs(themes) do
         sidebar.BackgroundColor3 = Color3.new(theme.Color.R * 1.1, theme.Color.G * 1.1, theme.Color.B * 1.1)
         title.TextColor3 = theme.TextColor
         themeButton.TextColor3 = theme.TextColor
+        languageButton.TextColor3 = theme.TextColor
         closeXButton.TextColor3 = theme.TextColor
         credit.TextColor3 = theme.TextColor
         homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
         print("Theme changed to: " .. theme.Name)
-        saveTheme()
-        showNotification("Theme saved: " .. theme.Name, Color3.fromRGB(0, 200, 100))
+        saveThemeAndLanguage()
+        showNotification(string.format(translations[currentLanguage].theme_notification, theme.Name), Color3.fromRGB(0, 200, 100))
     end)
 end
 
@@ -582,12 +861,73 @@ themeButton.MouseButton1Click:Connect(function()
     print("Theme dropdown toggled: " .. tostring(themeDropdown.Visible))
 end)
 
+-- Language Dropdown
+local languageDropdown = Instance.new("Frame")
+languageDropdown.Size = UDim2.new(0, 100, 0, 48)
+languageDropdown.Position = UDim2.new(0, 5, 0, 80)
+languageDropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+languageDropdown.BackgroundTransparency = 0.5
+languageDropdown.Visible = false
+languageDropdown.ZIndex = 13
+languageDropdown.Parent = languageFrame
+local langDropdownCorner = Instance.new("UICorner")
+langDropdownCorner.CornerRadius = UDim.new(0, 6)
+langDropdownCorner.Parent = languageDropdown
+
+for i, lang in ipairs(languages) do
+    local optionButton = Instance.new("TextButton")
+    optionButton.Size = UDim2.new(1, -10, 0, 22)
+    optionButton.Position = UDim2.new(0, 5, 0, 4 + (i-1)*24)
+    optionButton.Text = lang.Name
+    optionButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    optionButton.BackgroundTransparency = 0.5
+    optionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    optionButton.Font = Enum.Font.Gotham
+    optionButton.TextSize = 12
+    optionButton.ZIndex = 14
+    optionButton.Parent = languageDropdown
+    local optionCorner = Instance.new("UICorner")
+    optionCorner.CornerRadius = UDim.new(0, 4)
+    optionCorner.Parent = optionButton
+
+    optionButton.MouseButton1Click:Connect(function()
+        currentLanguage = lang.Code
+        languageButton.Text = string.format(translations[currentLanguage].lang_button, lang.Name)
+        local tween = TweenService:Create(languageDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
+        tween:Play()
+        tween.Completed:Connect(function()
+            languageDropdown.Visible = false
+            languageDropdown.Size = UDim2.new(0, 100, 0, 48)
+        end)
+        updateUIText()
+        print("Language changed to: " .. lang.Name)
+        saveThemeAndLanguage()
+        showNotification(string.format(translations[currentLanguage].lang_notification, lang.Name), Color3.fromRGB(0, 200, 100))
+    end)
+end
+
+languageButton.MouseButton1Click:Connect(function()
+    if languageDropdown.Visible then
+        local tween = TweenService:Create(languageDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
+        tween:Play()
+        tween.Completed:Connect(function()
+            languageDropdown.Visible = false
+            languageDropdown.Size = UDim2.new(0, 100, 0, 48)
+        end)
+    else
+        languageDropdown.Visible = true
+        local tween = TweenService:Create(languageDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 48)})
+        tween:Play()
+    end
+    print("Language dropdown toggled: " .. tostring(languageDropdown.Visible))
+end)
+
 -- Credit Label
 local credit = Instance.new("TextLabel")
 credit.Size = UDim2.new(0, 120, 0, 14)
 credit.Position = UDim2.new(1, -128, 1, -18)
 credit.BackgroundTransparency = 1
-credit.Text = "By Nguyễn Thanh Trứ"
+credit.Text = translations.en.credit
 credit.TextColor3 = Color3.fromRGB(200, 200, 200)
 credit.TextSize = 10
 credit.Font = Enum.Font.Gotham
@@ -658,6 +998,7 @@ local function showHome()
     settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     themeDropdown.Visible = false
+    languageDropdown.Visible = false
     print("Home selected")
 end
 
@@ -690,6 +1031,7 @@ local function showSettings()
     settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     themeDropdown.Visible = false
+    languageDropdown.Visible = false
     print("Settings selected")
 end
 
@@ -722,6 +1064,7 @@ local function showMusic()
     settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     themeDropdown.Visible = false
+    languageDropdown.Visible = false
     print("Misic selected")
 end
 
@@ -729,7 +1072,7 @@ homeButton.MouseButton1Click:Connect(showHome)
 settingsButton.MouseButton1Click:Connect(showSettings)
 musicButton.MouseButton1Click:Connect(showMusic)
 
--- Dragging Logic (Only on DragArea)
+-- Dragging Logic
 local isDragging = false
 local offset = Vector2.new(0, 0)
 
@@ -771,7 +1114,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Speed Control Logic (No Limit)
+-- Speed Control Logic
 applySpeedButton.MouseButton1Click:Connect(function()
     local success, err = pcall(function()
         local speed = tonumber(speedInput.Text)
@@ -785,11 +1128,11 @@ applySpeedButton.MouseButton1Click:Connect(function()
         end
         humanoid.WalkSpeed = speed
         print("Speed set to: " .. speed)
-        showNotification("Speed set to " .. speed .. "!", Color3.fromRGB(0, 200, 100))
+        showNotification(string.format(translations[currentLanguage].speed_notification, speed), Color3.fromRGB(0, 200, 100))
     end)
     if not success then
         warn("Speed error: " .. tostring(err))
-        showNotification("Invalid speed!", Color3.fromRGB(255, 80, 80))
+        showNotification(translations[currentLanguage].speed_error, Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -797,39 +1140,66 @@ end)
 local infiniteJumpEnabled = false
 local jumpConnection = nil
 
+local function setupInfiniteJump()
+    if jumpConnection then
+        jumpConnection:Disconnect()
+        jumpConnection = nil
+    end
+    if infiniteJumpEnabled then
+        local character = player.Character
+        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            jumpConnection = UserInputService.JumpRequest:Connect(function()
+                humanoid.Jump = true
+                print("Jump triggered")
+            end)
+            print("Infinite Jump connection established")
+        else
+            warn("Cannot enable Infinite Jump: Humanoid not found")
+            infiniteJumpEnabled = false
+            infiniteJumpButton.Text = string.format(translations[currentLanguage].jump_button, "Off")
+            showNotification(translations[currentLanguage].jump_error, Color3.fromRGB(255, 80, 80))
+        end
+    end
+end
+
 infiniteJumpButton.MouseButton1Click:Connect(function()
     local success, err = pcall(function()
         infiniteJumpEnabled = not infiniteJumpEnabled
-        infiniteJumpButton.Text = "Infinite Jump (" .. (infiniteJumpEnabled and "On" or "Off") .. ")"
+        infiniteJumpButton.Text = string.format(translations[currentLanguage].jump_button, infiniteJumpEnabled and "On" or "Off")
         if infiniteJumpEnabled then
-            local character = player.Character
-            local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-            if not humanoid then
-                error("Humanoid not found")
+            setupInfiniteJump()
+            if jumpConnection then
+                showNotification(translations[currentLanguage].jump_enabled, Color3.fromRGB(0, 200, 100))
+                print("Infinite Jump enabled")
             end
-            jumpConnection = UserInputService.JumpRequest:Connect(function()
-                humanoid.Jump = true
-            end)
-            print("Infinite Jump enabled")
-            showNotification("Infinite Jump Enabled!", Color3.fromRGB(0, 200, 100))
         else
             if jumpConnection then
                 jumpConnection:Disconnect()
                 jumpConnection = nil
             end
+            showNotification(translations[currentLanguage].jump_disabled, Color3.fromRGB(0, 200, 100))
             print("Infinite Jump disabled")
-            showNotification("Infinite Jump Disabled!", Color3.fromRGB(0, 200, 100))
         end
     end)
     if not success then
         warn("Infinite Jump error: " .. tostring(err))
-        showNotification("Infinite Jump Error!", Color3.fromRGB(255, 80, 80))
+        showNotification(translations[currentLanguage].jump_error, Color3.fromRGB(255, 80, 80))
         infiniteJumpEnabled = false
-        infiniteJumpButton.Text = "Infinite Jump (Off)"
+        infiniteJumpButton.Text = string.format(translations[currentLanguage].jump_button, "Off")
         if jumpConnection then
             jumpConnection:Disconnect()
             jumpConnection = nil
         end
+    end
+end)
+
+-- Handle character respawn
+player.CharacterAdded:Connect(function(character)
+    print("Character respawned")
+    if infiniteJumpEnabled then
+        task.wait(0.1) -- Wait for Humanoid to load
+        setupInfiniteJump()
     end
 end)
 
@@ -861,7 +1231,7 @@ speedButton.MouseButton1Click:Connect(function()
 
     if not loadstringSupported then
         warn("Client does not support loadstring!")
-        showNotification("Client not supported!", Color3.fromRGB(255, 80, 80))
+        showNotification(translations[currentLanguage].client_error, Color3.fromRGB(255, 80, 80))
         return
     end
 
@@ -876,10 +1246,10 @@ speedButton.MouseButton1Click:Connect(function()
     end)
 
     if success then
-        showNotification("Speed Up X Successful!", Color3.fromRGB(0, 200, 100))
+        showNotification(translations[currentLanguage].speedx_notification, Color3.fromRGB(0, 200, 100))
     else
         warn("Error executing Speed Up X: " .. tostring(err))
-        showNotification("Speed Up X Error: Check console", Color3.fromRGB(255, 80, 80))
+        showNotification(translations[currentLanguage].speedx_error, Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -904,7 +1274,7 @@ noLagButton.MouseButton1Click:Connect(function()
 
     if not loadstringSupported then
         warn("Client does not support loadstring!")
-        showNotification("Client not supported!", Color3.fromRGB(255, 80, 80))
+        showNotification(translations[currentLanguage].client_error, Color3.fromRGB(255, 80, 80))
         return
     end
 
@@ -919,10 +1289,10 @@ noLagButton.MouseButton1Click:Connect(function()
     end)
 
     if success then
-        showNotification("No Lag Successful!", Color3.fromRGB(0, 200, 100))
+        showNotification(translations[currentLanguage].nolag_notification, Color3.fromRGB(0, 200, 100))
     else
         warn("Error executing No Lag: " .. tostring(err))
-        showNotification("No Lag Error: Check console", Color3.fromRGB(255, 80, 80))
+        showNotification(translations[currentLanguage].nolag_error, Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -962,7 +1332,13 @@ addHoverEffect(homeButton)
 addHoverEffect(settingsButton)
 addHoverEffect(musicButton)
 addHoverEffect(themeButton)
+addHoverEffect(languageButton)
 for _, button in ipairs(themeDropdown:GetChildren()) do
+    if button:IsA("TextButton") then
+        addHoverEffect(button)
+    end
+end
+for _, button in ipairs(languageDropdown:GetChildren()) do
     if button:IsA("TextButton") then
         addHoverEffect(button)
     end
