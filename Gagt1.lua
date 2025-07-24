@@ -25,16 +25,16 @@ screenGui.IgnoreGuiInset = true
 
 -- Menu Frame (Compact, Centered)
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 340, 0, 240) -- Slightly smaller for elegance
+frame.Size = UDim2.new(0, 340, 0, 240)
 frame.Position = UDim2.new(0.5, 0, 0.5, 0)
-frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Darker, modern
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.5
 frame.Visible = true
 frame.AnchorPoint = Vector2.new(0.5, 0.5)
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
-frameCorner.CornerRadius = UDim.new(0, 14) -- Smoother corners
+frameCorner.CornerRadius = UDim.new(0, 14)
 frameCorner.Parent = frame
 local frameStroke = Instance.new("UIStroke")
 frameStroke.Thickness = 1.5
@@ -53,6 +53,21 @@ title.TextSize = 18
 title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = frame
+
+-- Close Button (X, Top-Right)
+local closeXButton = Instance.new("TextButton")
+closeXButton.Size = UDim2.new(0, 20, 0, 20)
+closeXButton.Position = UDim2.new(1, -28, 0, 8)
+closeXButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+closeXButton.BackgroundTransparency = 0.4
+closeXButton.Text = "X"
+closeXButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeXButton.Font = Enum.Font.GothamBold
+closeXButton.TextSize = 12
+closeXButton.Parent = frame
+local closeXCorner = Instance.new("UICorner")
+closeXCorner.CornerRadius = UDim.new(0, 6)
+closeXCorner.Parent = closeXButton
 
 -- Sidebar Frame
 local sidebar = Instance.new("Frame")
@@ -111,7 +126,7 @@ homeContent.Visible = true
 local speedButton = Instance.new("TextButton")
 speedButton.Size = UDim2.new(0, 190, 0, 32)
 speedButton.Position = UDim2.new(0, 25, 0, 20)
-speedButton.Text = "Speed Up"
+speedButton.Text = "Speed Up X" -- Updated name
 speedButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
 speedButton.BackgroundTransparency = 0.4
 speedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -121,20 +136,6 @@ speedButton.Parent = homeContent
 local speedCorner = Instance.new("UICorner")
 speedCorner.CornerRadius = UDim.new(0, 8)
 speedCorner.Parent = speedButton
-
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 190, 0, 32)
-closeButton.Position = UDim2.new(0, 25, 0, 58)
-closeButton.Text = "Close Menu"
-closeButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-closeButton.BackgroundTransparency = 0.4
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Font = Enum.Font.Gotham
-closeButton.TextSize = 14
-closeButton.Parent = homeContent
-local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 8)
-closeCorner.Parent = closeButton
 
 -- Content: Settings
 local settingsContent = Instance.new("Frame")
@@ -207,6 +208,7 @@ for i, theme in ipairs(themes) do
         title.TextColor3 = theme.TextColor
         themeButton.TextColor3 = theme.TextColor
         credit.TextColor3 = theme.TextColor
+        closeXButton.TextColor3 = theme.TextColor
         print("Theme changed to: " .. theme.Name)
     end)
 end
@@ -227,7 +229,7 @@ themeButton.MouseButton1Click:Connect(function()
     print("Theme dropdown toggled: " .. tostring(themeDropdown.Visible))
 end)
 
--- Credit Label (Ensured)
+-- Credit Label
 local credit = Instance.new("TextLabel")
 credit.Size = UDim2.new(0, 120, 0, 14)
 credit.Position = UDim2.new(1, -128, 1, -18)
@@ -308,7 +310,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
--- Speed Up Logic (Client Hack Support)
+-- Speed Up X Logic
 speedButton.MouseButton1Click:Connect(function()
     local success, err
     local clientName = "Unknown"
@@ -323,55 +325,36 @@ speedButton.MouseButton1Click:Connect(function()
     print("Detected client: " .. clientName)
 
     success, err = pcall(function()
-        local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid.WalkSpeed = humanoid.WalkSpeed + 16
-            print("Speed increased to: " .. humanoid.WalkSpeed)
-        else
-            error("Humanoid not found")
-        end
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+        print("Executed Speed Up X script")
     end)
 
     if success then
         local successLabel = Instance.new("TextLabel")
         successLabel.Size = UDim2.new(0, 190, 0, 20)
-        successLabel.Position = UDim2.new(0, 25, 0, 98)
+        successLabel.Position = UDim2.new(0, 25, 0, 58)
         successLabel.BackgroundTransparency = 1
-        successLabel.Text = "Speed Up Successful!"
+        successLabel.Text = "Speed Up X Successful!"
         successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
         successLabel.TextSize = 12
         successLabel.Parent = homeContent
         game:GetService("Debris"):AddItem(successLabel, 3)
     else
-        success, err = pcall(function()
-            local scriptUrl = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"
-            local response = game:HttpGet(scriptUrl, true)
-            local func = loadstring(response)
-            if func then
-                func()
-                print("Executed external script via loadstring")
-            else
-                error("Failed to load script")
-            end
-        end)
-
-        if not success then
-            warn("Error executing Speed Up: " .. tostring(err))
-            local errorLabel = Instance.new("TextLabel")
-            errorLabel.Size = UDim2.new(0, 190, 0, 20)
-            errorLabel.Position = UDim2.new(0, 25, 0, 98)
-            errorLabel.BackgroundTransparency = 1
-            errorLabel.Text = "Error: Check console"
-            errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-            errorLabel.TextSize = 12
-            errorLabel.Parent = homeContent
-            game:GetService("Debris"):AddItem(errorLabel, 3)
-        end
+        warn("Error executing Speed Up X: " .. tostring(err))
+        local errorLabel = Instance.new("TextLabel")
+        errorLabel.Size = UDim2.new(0, 190, 0, 20)
+        errorLabel.Position = UDim2.new(0, 25, 0, 58)
+        errorLabel.BackgroundTransparency = 1
+        errorLabel.Text = "Error: Check console"
+        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        errorLabel.TextSize = 12
+        errorLabel.Parent = homeContent
+        game:GetService("Debris"):AddItem(errorLabel, 3)
     end
 end)
 
--- Close Button Logic
-closeButton.MouseButton1Click:Connect(function()
+-- Close X Button Logic
+closeXButton.MouseButton1Click:Connect(function()
     toggleMenu()
 end)
 
@@ -396,7 +379,7 @@ local function addHoverEffect(button)
 end
 
 addHoverEffect(speedButton)
-addHoverEffect(closeButton)
+addHoverEffect(closeXButton)
 addHoverEffect(toggleButton)
 addHoverEffect(homeButton)
 addHoverEffect(settingsButton)
