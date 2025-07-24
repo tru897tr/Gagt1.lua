@@ -25,22 +25,27 @@ screenGui.IgnoreGuiInset = true
 
 -- Menu Frame (Compact, Centered)
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 250)
+frame.Size = UDim2.new(0, 340, 0, 240) -- Slightly smaller for elegance
 frame.Position = UDim2.new(0.5, 0, 0.5, 0)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20) -- Darker, modern
 frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.5
 frame.Visible = true
 frame.AnchorPoint = Vector2.new(0.5, 0.5)
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
-frameCorner.CornerRadius = UDim.new(0, 12)
+frameCorner.CornerRadius = UDim.new(0, 14) -- Smoother corners
 frameCorner.Parent = frame
+local frameStroke = Instance.new("UIStroke")
+frameStroke.Thickness = 1.5
+frameStroke.Color = Color3.fromRGB(255, 255, 255)
+frameStroke.Transparency = 0.7
+frameStroke.Parent = frame
 
--- Title Label (Non-draggable)
+-- Title Label
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -20, 0, 25)
-title.Position = UDim2.new(0, 10, 0, 5)
+title.Size = UDim2.new(0.9, -20, 0, 24)
+title.Position = UDim2.new(0.05, 10, 0, 8)
 title.BackgroundTransparency = 1
 title.Text = "Grow a Garden"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -52,8 +57,8 @@ title.Parent = frame
 -- Sidebar Frame
 local sidebar = Instance.new("Frame")
 sidebar.Size = UDim2.new(0, 80, 1, -40)
-sidebar.Position = UDim2.new(0, 10, 0, 35)
-sidebar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+sidebar.Position = UDim2.new(0, 8, 0, 40)
+sidebar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 sidebar.BackgroundTransparency = 0.6
 sidebar.Parent = frame
 local sidebarCorner = Instance.new("UICorner")
@@ -62,17 +67,17 @@ sidebarCorner.Parent = sidebar
 
 -- Content Frame
 local contentFrame = Instance.new("Frame")
-contentFrame.Size = UDim2.new(0, 250, 1, -50)
-contentFrame.Position = UDim2.new(0, 95, 0, 35)
+contentFrame.Size = UDim2.new(0, 240, 1, -60)
+contentFrame.Position = UDim2.new(0, 96, 0, 40)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = frame
 
--- Sidebar Buttons (Rebuilt)
+-- Sidebar Buttons
 local homeButton = Instance.new("TextButton")
-homeButton.Size = UDim2.new(1, -10, 0, 35)
+homeButton.Size = UDim2.new(1, -10, 0, 32)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Home"
-homeButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255) -- Initial: Selected
+homeButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255) -- Selected
 homeButton.BackgroundTransparency = 0.4
 homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 homeButton.Font = Enum.Font.Gotham
@@ -83,10 +88,10 @@ homeCorner.CornerRadius = UDim.new(0, 6)
 homeCorner.Parent = homeButton
 
 local settingsButton = Instance.new("TextButton")
-settingsButton.Size = UDim2.new(1, -10, 0, 35)
-settingsButton.Position = UDim2.new(0, 5, 0, 45)
+settingsButton.Size = UDim2.new(1, -10, 0, 32)
+settingsButton.Position = UDim2.new(0, 5, 0, 42)
 settingsButton.Text = "Settings"
-settingsButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Initial: Unselected
+settingsButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Unselected
 settingsButton.BackgroundTransparency = 0.4
 settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 settingsButton.Font = Enum.Font.Gotham
@@ -104,7 +109,7 @@ homeContent.Parent = contentFrame
 homeContent.Visible = true
 
 local speedButton = Instance.new("TextButton")
-speedButton.Size = UDim2.new(0, 200, 0, 35)
+speedButton.Size = UDim2.new(0, 190, 0, 32)
 speedButton.Position = UDim2.new(0, 25, 0, 20)
 speedButton.Text = "Speed Up"
 speedButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
@@ -118,8 +123,8 @@ speedCorner.CornerRadius = UDim.new(0, 8)
 speedCorner.Parent = speedButton
 
 local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 200, 0, 35)
-closeButton.Position = UDim2.new(0, 25, 0, 60)
+closeButton.Size = UDim2.new(0, 190, 0, 32)
+closeButton.Position = UDim2.new(0, 25, 0, 58)
 closeButton.Text = "Close Menu"
 closeButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
 closeButton.BackgroundTransparency = 0.4
@@ -141,7 +146,7 @@ settingsContent.Visible = false
 -- Theme Selection
 local currentTheme = "Tối"
 local themeButton = Instance.new("TextButton")
-themeButton.Size = UDim2.new(0, 200, 0, 30)
+themeButton.Size = UDim2.new(0, 190, 0, 30)
 themeButton.Position = UDim2.new(0, 25, 0, 20)
 themeButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 themeButton.BackgroundTransparency = 0.4
@@ -156,8 +161,8 @@ themeButtonCorner.Parent = themeButton
 
 -- Theme Dropdown
 local themeDropdown = Instance.new("Frame")
-themeDropdown.Size = UDim2.new(0, 100, 0, 100)
-themeDropdown.Position = UDim2.new(0, 25, 0, 55)
+themeDropdown.Size = UDim2.new(0, 100, 0, 96)
+themeDropdown.Position = UDim2.new(0, 25, 0, 54)
 themeDropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 themeDropdown.BackgroundTransparency = 0.5
 themeDropdown.Visible = false
@@ -168,7 +173,7 @@ dropdownCorner.Parent = themeDropdown
 
 local themes = {
     {Name = "Sáng", Color = Color3.fromRGB(220, 220, 220), TextColor = Color3.fromRGB(0, 0, 0)},
-    {Name = "Tối", Color = Color3.fromRGB(25, 25, 25), TextColor = Color3.fromRGB(255, 255, 255)},
+    {Name = "Tối", Color = Color3.fromRGB(20, 20, 20), TextColor = Color3.fromRGB(255, 255, 255)},
     {Name = "Xanh", Color = Color3.fromRGB(0, 80, 120), TextColor = Color3.fromRGB(255, 255, 255)},
     {Name = "Tím", Color = Color3.fromRGB(80, 0, 120), TextColor = Color3.fromRGB(255, 255, 255)}
 }
@@ -176,7 +181,7 @@ local themes = {
 for i, theme in ipairs(themes) do
     local optionButton = Instance.new("TextButton")
     optionButton.Size = UDim2.new(1, -10, 0, 22)
-    optionButton.Position = UDim2.new(0, 5, 0, 5 + (i-1)*25)
+    optionButton.Position = UDim2.new(0, 5, 0, 4 + (i-1)*24)
     optionButton.Text = theme.Name
     optionButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     optionButton.BackgroundTransparency = 0.5
@@ -191,11 +196,11 @@ for i, theme in ipairs(themes) do
     optionButton.MouseButton1Click:Connect(function()
         currentTheme = theme.Name
         themeButton.Text = "Theme: " .. currentTheme
-        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2), {Size = UDim2.new(0, 100, 0, 0)})
+        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
         tween:Play()
         tween.Completed:Connect(function()
             themeDropdown.Visible = false
-            themeDropdown.Size = UDim2.new(0, 100, 0, 100)
+            themeDropdown.Size = UDim2.new(0, 100, 0, 96)
         end)
         frame.BackgroundColor3 = theme.Color
         sidebar.BackgroundColor3 = Color3.new(theme.Color.R * 1.1, theme.Color.G * 1.1, theme.Color.B * 1.1)
@@ -208,24 +213,24 @@ end
 
 themeButton.MouseButton1Click:Connect(function()
     if themeDropdown.Visible then
-        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2), {Size = UDim2.new(0, 100, 0, 0)})
+        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 0)})
         tween:Play()
         tween.Completed:Connect(function()
             themeDropdown.Visible = false
-            themeDropdown.Size = UDim2.new(0, 100, 0, 100)
+            themeDropdown.Size = UDim2.new(0, 100, 0, 96)
         end)
     else
         themeDropdown.Visible = true
-        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2), {Size = UDim2.new(0, 100, 0, 100)})
+        local tween = TweenService:Create(themeDropdown, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {Size = UDim2.new(0, 100, 0, 96)})
         tween:Play()
     end
     print("Theme dropdown toggled: " .. tostring(themeDropdown.Visible))
 end)
 
--- Credit Label
+-- Credit Label (Ensured)
 local credit = Instance.new("TextLabel")
-credit.Size = UDim2.new(0, 120, 0, 15)
-credit.Position = UDim2.new(1, -130, 1, -20)
+credit.Size = UDim2.new(0, 120, 0, 14)
+credit.Position = UDim2.new(1, -128, 1, -18)
 credit.BackgroundTransparency = 1
 credit.Text = "By Nguyễn Thanh Trứ"
 credit.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -233,17 +238,18 @@ credit.TextSize = 10
 credit.Font = Enum.Font.Gotham
 credit.TextXAlignment = Enum.TextXAlignment.Right
 credit.Parent = frame
+print("Credit added at: " .. tostring(credit.Position))
 
 -- Toggle Button (Circular, Top-Right)
 local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0, 28, 0, 28)
-toggleButton.Position = UDim2.new(1, -38, 0, 10)
+toggleButton.Size = UDim2.new(0, 26, 0, 26)
+toggleButton.Position = UDim2.new(1, -36, 0, 10)
 toggleButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
 toggleButton.BackgroundTransparency = 0.3
 toggleButton.Text = ""
 toggleButton.Parent = screenGui
 local toggleCorner = Instance.new("UICorner")
-toggleCorner.CornerRadius = UDim.new(0, 14)
+toggleCorner.CornerRadius = UDim.new(0, 13)
 toggleCorner.Parent = toggleButton
 
 -- Menu Visibility (Fade Effect)
@@ -265,7 +271,7 @@ local function toggleMenu()
     print("Menu toggled: " .. tostring(menuVisible))
 end
 
--- Sidebar Navigation (Rebuilt)
+-- Sidebar Navigation
 local function showHome()
     homeContent.Visible = true
     settingsContent.Visible = false
@@ -305,7 +311,6 @@ end)
 -- Speed Up Logic (Client Hack Support)
 speedButton.MouseButton1Click:Connect(function()
     local success, err
-    -- Check for common exploit environments
     local clientName = "Unknown"
     if is_sirhurt_closure then
         clientName = "Sirhurt"
@@ -317,11 +322,10 @@ speedButton.MouseButton1Click:Connect(function()
 
     print("Detected client: " .. clientName)
 
-    -- Try direct WalkSpeed modification first
     success, err = pcall(function()
         local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
         if humanoid then
-            humanoid.WalkSpeed = humanoid.WalkSpeed + 16 -- Increase speed
+            humanoid.WalkSpeed = humanoid.WalkSpeed + 16
             print("Speed increased to: " .. humanoid.WalkSpeed)
         else
             error("Humanoid not found")
@@ -330,8 +334,8 @@ speedButton.MouseButton1Click:Connect(function()
 
     if success then
         local successLabel = Instance.new("TextLabel")
-        successLabel.Size = UDim2.new(0, 200, 0, 20)
-        successLabel.Position = UDim2.new(0, 25, 0, 100)
+        successLabel.Size = UDim2.new(0, 190, 0, 20)
+        successLabel.Position = UDim2.new(0, 25, 0, 98)
         successLabel.BackgroundTransparency = 1
         successLabel.Text = "Speed Up Successful!"
         successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
@@ -339,7 +343,6 @@ speedButton.MouseButton1Click:Connect(function()
         successLabel.Parent = homeContent
         game:GetService("Debris"):AddItem(successLabel, 3)
     else
-        -- Fallback to loadstring if direct modification fails
         success, err = pcall(function()
             local scriptUrl = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"
             local response = game:HttpGet(scriptUrl, true)
@@ -355,8 +358,8 @@ speedButton.MouseButton1Click:Connect(function()
         if not success then
             warn("Error executing Speed Up: " .. tostring(err))
             local errorLabel = Instance.new("TextLabel")
-            errorLabel.Size = UDim2.new(0, 200, 0, 20)
-            errorLabel.Position = UDim2.new(0, 25, 0, 100)
+            errorLabel.Size = UDim2.new(0, 190, 0, 20)
+            errorLabel.Position = UDim2.new(0, 25, 0, 98)
             errorLabel.BackgroundTransparency = 1
             errorLabel.Text = "Error: Check console"
             errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
