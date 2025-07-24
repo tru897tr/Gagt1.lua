@@ -44,19 +44,54 @@ local LoadingFrame = Instance.new("Frame")
 LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
 LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
 LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-LoadingFrame.BackgroundTransparency = 0
+LoadingFrame.BackgroundTransparency = 0.2 -- Slightly transparent
 LoadingFrame.ZIndex = 20
 LoadingFrame.Parent = screenGui
+local loadingCorner = Instance.new("UICorner")
+loadingCorner.CornerRadius = UDim.new(0, 10)
+loadingCorner.Parent = LoadingFrame
+local loadingStroke = Instance.new("UIStroke")
+loadingStroke.Thickness = 2
+loadingStroke.Color = Color3.fromRGB(255, 255, 255)
+loadingStroke.Transparency = 0.5
+loadingStroke.Parent = LoadingFrame
+
+local ProgressBarFrame = Instance.new("Frame")
+ProgressBarFrame.Size = UDim2.new(0, 200, 0, 20)
+ProgressBarFrame.Position = UDim2.new(0.5, -100, 0.5, 0)
+ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ProgressBarFrame.BackgroundTransparency = 0.4
+ProgressBarFrame.ZIndex = 21
+ProgressBarFrame.Parent = LoadingFrame
+local ProgressBarFrameCorner = Instance.new("UICorner")
+ProgressBarFrameCorner.CornerRadius = UDim.new(0, 6)
+ProgressBarFrameCorner.Parent = ProgressBarFrame
+local ProgressBarFrameStroke = Instance.new("UIStroke")
+ProgressBarFrameStroke.Thickness = 1
+ProgressBarFrameStroke.Color = Color3.fromRGB(255, 255, 255)
+ProgressBarFrameStroke.Transparency = 0.5
+ProgressBarFrameStroke.Parent = ProgressBarFrame
 
 local ProgressBar = Instance.new("Frame")
-ProgressBar.Size = UDim2.new(0, 0, 0, 10)
-ProgressBar.Position = UDim2.new(0.5, -100, 0.5, -5)
-ProgressBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ProgressBar.ZIndex = 21
-ProgressBar.Parent = LoadingFrame
+ProgressBar.Size = UDim2.new(0, 0, 1, 0) -- Start at 0 width
+ProgressBar.Position = UDim2.new(0, 0, 0, 0)
+ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+ProgressBar.ZIndex = 22
+ProgressBar.Parent = ProgressBarFrame
 local ProgressBarCorner = Instance.new("UICorner")
-ProgressBarCorner.CornerRadius = UDim.new(0, 5)
+ProgressBarCorner.CornerRadius = UDim.new(0, 6)
 ProgressBarCorner.Parent = ProgressBar
+
+local LoadingLabel = Instance.new("TextLabel")
+LoadingLabel.Size = UDim2.new(0, 200, 0, 20)
+LoadingLabel.Position = UDim2.new(0.5, -100, 0.5, -30)
+LoadingLabel.BackgroundTransparency = 1
+LoadingLabel.Text = "Loading..."
+LoadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+LoadingLabel.TextSize = 14
+LoadingLabel.Font = Enum.Font.Gotham
+LoadingLabel.ZIndex = 21
+LoadingLabel.Parent = LoadingFrame
 
 -- Notification Frame (Bottom-Right)
 local notificationFrame = Instance.new("Frame")
@@ -637,7 +672,7 @@ end)
 local isSwimming = false
 local bodyVelocity = nil
 local bodyGyro = nil
-local swimSpeed = 30 -- Slower for swimming effect
+local swimSpeed = 30
 local swimConnection = nil
 local initialY = 0
 local swayConnection = nil
@@ -664,7 +699,7 @@ local function startSwim()
 
     bodyGyro = Instance.new("BodyGyro")
     bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-    bodyGyro.P = 5000 -- Reduced for smoother swimming
+    bodyGyro.P = 5000
     bodyGyro.D = 300
     bodyGyro.Parent = rootPart
 
@@ -693,7 +728,6 @@ local function startSwim()
         if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
             direction = direction - Vector3.new(0, 1, 0)
         end
-        -- Limit Y position (swimming in water)
         local currentY = rootPart.Position.Y
         if currentY > initialY + 10 then
             direction = direction - Vector3.new(0, currentY - (initialY + 10), 0)
@@ -704,10 +738,9 @@ local function startSwim()
         bodyGyro.CFrame = camera.CFrame
     end)
 
-    -- Swaying effect for swimming
     swayConnection = RunService.Heartbeat:Connect(function(dt)
         if bodyGyro and isSwimming then
-            local sway = math.sin(tick() * 2) * 0.1 -- Gentle swaying
+            local sway = math.sin(tick() * 2) * 0.1
             bodyGyro.CFrame = bodyGyro.CFrame * CFrame.Angles(0, sway, 0)
         end
     end)
@@ -903,14 +936,18 @@ end
 
 -- Loading Animation
 local function startLoading()
-    local tween = TweenService:Create(ProgressBar, TweenInfo.new(5, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 0, 10)})
+    local tween = TweenService:Create(ProgressBar, TweenInfo.new(5, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
     tween:Play()
     tween.Completed:Connect(function()
-        LoadingFrame.Visible = false
-        frame.Visible = true
-        local fadeIn = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5})
-        fadeIn:Play()
-        print("Loading completed, showing main frame")
+        local fadeOut = TweenService:Create(LoadingFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 1})
+        fadeOut:Play()
+        fadeOut.Completed:Connect(function()
+            LoadingFrame.Visible = false
+            frame.Visible = true
+            local fadeIn = TweenService:Create(frame, TweenInfo.new(0.3, Enum.EasingStyle.Quad), {BackgroundTransparency = 0.5})
+            fadeIn:Play()
+            print("Loading completed, showing main frame")
+        end)
     end)
 end
 
