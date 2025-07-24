@@ -2,6 +2,7 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
 
 -- GUI Setup
 local player = Players.LocalPlayer
@@ -48,7 +49,7 @@ title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = frame
 
--- Sidebar Frame (Narrower)
+-- Sidebar Frame
 local sidebar = Instance.new("Frame")
 sidebar.Size = UDim2.new(0, 80, 1, -40)
 sidebar.Position = UDim2.new(0, 10, 0, 35)
@@ -66,7 +67,7 @@ contentFrame.Position = UDim2.new(0, 95, 0, 35)
 contentFrame.BackgroundTransparency = 1
 contentFrame.Parent = frame
 
--- Sidebar Buttons
+-- Sidebar Buttons (Rebuilt)
 local homeButton = Instance.new("TextButton")
 homeButton.Size = UDim2.new(1, -10, 0, 35)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
@@ -221,7 +222,7 @@ themeButton.MouseButton1Click:Connect(function()
     print("Theme dropdown toggled: " .. tostring(themeDropdown.Visible))
 end)
 
--- Credit Label (Bottom-Right)
+-- Credit Label
 local credit = Instance.new("TextLabel")
 credit.Size = UDim2.new(0, 120, 0, 15)
 credit.Position = UDim2.new(1, -130, 1, -20)
@@ -264,7 +265,7 @@ local function toggleMenu()
     print("Menu toggled: " .. tostring(menuVisible))
 end
 
--- Sidebar Navigation
+-- Sidebar Navigation (Rebuilt)
 local function showHome()
     homeContent.Visible = true
     settingsContent.Visible = false
@@ -272,6 +273,8 @@ local function showHome()
     local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)})
     tween1:Play()
     tween2:Play()
+    homeButton.BackgroundTransparency = 0.4
+    settingsButton.BackgroundTransparency = 0.4
     themeDropdown.Visible = false
     print("Home selected, Home color: (0, 120, 255), Settings color: (0, 0, 0)")
 end
@@ -283,6 +286,8 @@ local function showSettings()
     local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
     tween1:Play()
     tween2:Play()
+    homeButton.BackgroundTransparency = 0.4
+    settingsButton.BackgroundTransparency = 0.4
     themeDropdown.Visible = false
     print("Settings selected, Home color: (0, 0, 0), Settings color: (0, 120, 255)")
 end
@@ -297,22 +302,68 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
--- Speed Button Logic
+-- Speed Up Logic (Client Hack Support)
 speedButton.MouseButton1Click:Connect(function()
-    local success, err = pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+    local success, err
+    -- Check for common exploit environments
+    local clientName = "Unknown"
+    if is_sirhurt_closure then
+        clientName = "Sirhurt"
+    elseif is_synapse_function then
+        clientName = "Synapse X"
+    elseif getgenv then
+        clientName = "KRNL/Fluxus"
+    end
+
+    print("Detected client: " .. clientName)
+
+    -- Try direct WalkSpeed modification first
+    success, err = pcall(function()
+        local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.WalkSpeed = humanoid.WalkSpeed + 16 -- Increase speed
+            print("Speed increased to: " .. humanoid.WalkSpeed)
+        else
+            error("Humanoid not found")
+        end
     end)
-    if not success then
-        warn("Error executing Speed Hub X: ", err)
-        local errorLabel = Instance.new("TextLabel")
-        errorLabel.Size = UDim2.new(0, 200, 0, 20)
-        errorLabel.Position = UDim2.new(0, 25, 0, 100)
-        errorLabel.BackgroundTransparency = 1
-        errorLabel.Text = "Error: Check console"
-        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        errorLabel.TextSize = 12
-        errorLabel.Parent = homeContent
-        game:GetService("Debris"):AddItem(errorLabel, 3)
+
+    if success then
+        local successLabel = Instance.new("TextLabel")
+        successLabel.Size = UDim2.new(0, 200, 0, 20)
+        successLabel.Position = UDim2.new(0, 25, 0, 100)
+        successLabel.BackgroundTransparency = 1
+        successLabel.Text = "Speed Up Successful!"
+        successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
+        successLabel.TextSize = 12
+        successLabel.Parent = homeContent
+        game:GetService("Debris"):AddItem(successLabel, 3)
+    else
+        -- Fallback to loadstring if direct modification fails
+        success, err = pcall(function()
+            local scriptUrl = "https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"
+            local response = game:HttpGet(scriptUrl, true)
+            local func = loadstring(response)
+            if func then
+                func()
+                print("Executed external script via loadstring")
+            else
+                error("Failed to load script")
+            end
+        end)
+
+        if not success then
+            warn("Error executing Speed Up: " .. tostring(err))
+            local errorLabel = Instance.new("TextLabel")
+            errorLabel.Size = UDim2.new(0, 200, 0, 20)
+            errorLabel.Position = UDim2.new(0, 25, 0, 100)
+            errorLabel.BackgroundTransparency = 1
+            errorLabel.Text = "Error: Check console"
+            errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+            errorLabel.TextSize = 12
+            errorLabel.Parent = homeContent
+            game:GetService("Debris"):AddItem(errorLabel, 3)
+        end
     end
 end)
 
