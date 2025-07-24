@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 
 -- GUI Setup
 local player = Players.LocalPlayer
@@ -38,10 +39,33 @@ screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 screenGui.DisplayOrder = 10
 print("ScreenGui created")
 
+-- Notification Frame (Bottom-Right)
+local notificationFrame = Instance.new("Frame")
+notificationFrame.Size = UDim2.new(0, 190, 0, 20)
+notificationFrame.Position = UDim2.new(1, -200, 1, -40)
+notificationFrame.BackgroundTransparency = 1
+notificationFrame.ZIndex = 15
+notificationFrame.Parent = screenGui
+
+local function showNotification(message, color)
+    local notificationLabel = Instance.new("TextLabel")
+    notificationLabel.Size = UDim2.new(1, 0, 1, 0)
+    notificationLabel.BackgroundTransparency = 1
+    notificationLabel.Text = message
+    notificationLabel.TextColor3 = color
+    notificationLabel.TextSize = 12
+    notificationLabel.Font = Enum.Font.Gotham
+    notificationLabel.TextXAlignment = Enum.TextXAlignment.Right
+    notificationLabel.ZIndex = 15
+    notificationLabel.Parent = notificationFrame
+    game:GetService("Debris"):AddItem(notificationLabel, 3)
+    print("Notification: " .. message)
+end
+
 -- Menu Frame
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 340, 0, 240)
-frame.Position = UDim2.new(0.5, -170, 0.5, -120) -- Center
+frame.Position = UDim2.new(0.5, -170, 0.5, -120)
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.5
@@ -160,7 +184,7 @@ settingsStroke.Parent = settingsButton
 local musicButton = Instance.new("TextButton")
 musicButton.Size = UDim2.new(1, -10, 0, 32)
 musicButton.Position = UDim2.new(0, 5, 0, 79)
-musicButton.Text = "Music"
+musicButton.Text = "Misic"
 musicButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 musicButton.BackgroundTransparency = 0.4
 musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -223,7 +247,7 @@ settingsContent.ZIndex = 10
 settingsContent.Parent = contentFrame
 settingsContent.Visible = false
 
--- Content: Music
+-- Content: Misic
 local musicContent = Instance.new("Frame")
 musicContent.Size = UDim2.new(1, 0, 1, 0)
 musicContent.BackgroundTransparency = 1
@@ -351,7 +375,7 @@ credit.ZIndex = 11
 credit.Parent = frame
 print("Credit added at: " .. tostring(credit.Position))
 
--- Toggle Button (Circular, Top-Right)
+-- Toggle Button
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 26, 0, 26)
 toggleButton.Position = UDim2.new(1, -36, 0, 10)
@@ -364,7 +388,7 @@ local toggleCorner = Instance.new("UICorner")
 toggleCorner.CornerRadius = UDim.new(0, 13)
 toggleCorner.Parent = toggleButton
 
--- Menu Visibility (Fade Effect)
+-- Menu Visibility
 local menuVisible = true
 local function toggleMenu()
     menuVisible = not menuVisible
@@ -383,7 +407,7 @@ local function toggleMenu()
     print("Menu toggled: " .. tostring(menuVisible))
 end
 
--- Sidebar Navigation (Highlight Effect)
+-- Sidebar Navigation
 local function showHome()
     homeContent.Visible = true
     settingsContent.Visible = false
@@ -413,8 +437,7 @@ local function showHome()
     settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     themeDropdown.Visible = false
-    print("Home selected, Home: (200, 200, 200, 0.3), Settings: (50, 50, 50, 0.4), Music: (50, 50, 50, 0.4)")
-    print("SettingsButton Background: " .. tostring(settingsButton.BackgroundColor3) .. ", Transparency: " .. tostring(settingsButton.BackgroundTransparency) .. ", Stroke Transparency: " .. tostring(settingsStroke.Transparency))
+    print("Home selected")
 end
 
 local function showSettings()
@@ -446,8 +469,7 @@ local function showSettings()
     settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     themeDropdown.Visible = false
-    print("Settings selected, Home: (50, 50, 50, 0.4), Settings: (200, 200, 200, 0.3), Music: (50, 50, 50, 0.4)")
-    print("SettingsButton Background: " .. tostring(settingsButton.BackgroundColor3) .. ", Transparency: " .. tostring(settingsButton.BackgroundTransparency) .. ", Stroke Transparency: " .. tostring(settingsStroke.Transparency))
+    print("Settings selected")
 end
 
 local function showMusic()
@@ -479,49 +501,41 @@ local function showMusic()
     settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     themeDropdown.Visible = false
-    print("Music selected, Home: (50, 50, 50, 0.4), Settings: (50, 50, 50, 0.4), Music: (200, 200, 200, 0.3)")
+    print("Misic selected")
 end
 
 homeButton.MouseButton1Click:Connect(showHome)
 settingsButton.MouseButton1Click:Connect(showSettings)
 musicButton.MouseButton1Click:Connect(showMusic)
 
--- Dragging Logic
+-- New Dragging Logic
 local isDragging = false
-local dragStart = nil
-local startPos = nil
+local offset = Vector2.new(0, 0)
 
 dragFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         isDragging = true
-        dragStart = input.Position
-        startPos = frame.Position
-        print("Drag started at: " .. tostring(dragStart))
+        local framePos = frame.AbsolutePosition
+        offset = input.Position - framePos
+        print("Drag started at: " .. tostring(input.Position) .. ", offset: " .. tostring(offset))
     end
 end)
 
 dragFrame.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         isDragging = false
         print("Drag ended")
     end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-    if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-        local delta = input.Position - dragStart
-        local newPos = UDim2.new(
-            0, startPos.X.Offset + delta.X,
-            0, startPos.Y.Offset + delta.Y
-        )
-        local viewportSize = game:GetService("Workspace").CurrentCamera.ViewportSize
+    if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local viewportSize = workspace.CurrentCamera.ViewportSize
         local frameSize = frame.AbsoluteSize
-        newPos = UDim2.new(
-            0, math.clamp(newPos.X.Offset, 0, viewportSize.X - frameSize.X),
-            0, math.clamp(newPos.Y.Offset, 0, viewportSize.Y - frameSize.Y)
-        )
-        frame.Position = newPos
-        print("Frame moved to: " .. tostring(newPos))
+        local newPosX = math.clamp(input.Position.X - offset.X, 0, viewportSize.X - frameSize.X)
+        local newPosY = math.clamp(input.Position.Y - offset.Y, 0, viewportSize.Y - frameSize.Y)
+        frame.Position = UDim2.new(0, newPosX, 0, newPosY)
+        print("Frame moved to: " .. tostring(frame.Position))
     end
 end)
 
@@ -530,101 +544,110 @@ local isFlying = false
 local bodyVelocity = nil
 local bodyGyro = nil
 local flySpeed = 50
+local flyConnection = nil
+
+local function startFly()
+    local character = player.Character
+    local rootPart = character and character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then
+        warn("Fly error: HumanoidRootPart not found")
+        showNotification("Fly Failed: No HumanoidRootPart", Color3.fromRGB(255, 80, 80))
+        return false
+    end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.PlatformStand = true
+    end
+
+    bodyVelocity = Instance.new("BodyVelocity")
+    bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+    bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    bodyVelocity.Parent = rootPart
+
+    bodyGyro = Instance.new("BodyGyro")
+    bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+    bodyGyro.P = 10000
+    bodyGyro.D = 500
+    bodyGyro.Parent = rootPart
+
+    local camera = workspace.CurrentCamera
+    flyConnection = RunService.Heartbeat:Connect(function()
+        if not isFlying or not rootPart or not bodyVelocity or not bodyGyro then
+            flyConnection:Disconnect()
+            return
+        end
+        local direction = Vector3.new(0, 0, 0)
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+            direction = direction + camera.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+            direction = direction - camera.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+            direction = direction - camera.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+            direction = direction + camera.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+            direction = direction + Vector3.new(0, 1, 0)
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+            direction = direction - Vector3.new(0, 1, 0)
+        end
+        bodyVelocity.Velocity = direction.Magnitude > 0 and direction.Unit * flySpeed or Vector3.new(0, 0, 0)
+        bodyGyro.CFrame = camera.CFrame
+    end)
+
+    return true
+end
+
+local function stopFly()
+    if bodyVelocity then
+        bodyVelocity:Destroy()
+        bodyVelocity = nil
+    end
+    if bodyGyro then
+        bodyGyro:Destroy()
+        bodyGyro = nil
+    end
+    if flyConnection then
+        flyConnection:Disconnect()
+        flyConnection = nil
+    end
+    local character = player.Character
+    local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+    if humanoid then
+        humanoid.PlatformStand = false
+    end
+end
 
 flyButton.MouseButton1Click:Connect(function()
     local success, err = pcall(function()
         if not isFlying then
-            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            if startFly() then
                 isFlying = true
                 flyButton.Text = "Fly (On)"
-                bodyVelocity = Instance.new("BodyVelocity")
-                bodyVelocity.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-                bodyVelocity.Parent = player.Character.HumanoidRootPart
-
-                bodyGyro = Instance.new("BodyGyro")
-                bodyGyro.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-                bodyGyro.P = 10000
-                bodyGyro.D = 500
-                bodyGyro.Parent = player.Character.HumanoidRootPart
-
-                local camera = game:GetService("Workspace").CurrentCamera
-                local function updateFly()
-                    if not isFlying then return end
-                    local direction = Vector3.new(0, 0, 0)
-                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-                        direction = direction + camera.CFrame.LookVector
-                    end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-                        direction = direction - camera.CFrame.LookVector
-                    end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-                        direction = direction - camera.CFrame.RightVector
-                    end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-                        direction = direction + camera.CFrame.RightVector
-                    end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-                        direction = direction + Vector3.new(0, 1, 0)
-                    end
-                    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
-                        direction = direction - Vector3.new(0, 1, 0)
-                    end
-                    bodyVelocity.Velocity = direction * flySpeed
-                    bodyGyro.CFrame = camera.CFrame
-                end
-
-                game:GetService("RunService").RenderStepped:Connect(updateFly)
-                local successLabel = Instance.new("TextLabel")
-                successLabel.Size = UDim2.new(0, 190, 0, 20)
-                successLabel.Position = UDim2.new(0, 25, 0, 58)
-                successLabel.BackgroundTransparency = 1
-                successLabel.Text = "Fly Enabled!"
-                successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
-                successLabel.TextSize = 12
-                successLabel.ZIndex = 11
-                successLabel.Parent = musicContent
-                game:GetService("Debris"):AddItem(successLabel, 3)
+                showNotification("Fly Enabled!", Color3.fromRGB(0, 200, 100))
                 print("Fly enabled")
             else
-                error("HumanoidRootPart not found")
+                error("Fly failed to start")
             end
         else
             isFlying = false
             flyButton.Text = "Fly"
-            if bodyVelocity then
-                bodyVelocity:Destroy()
-                bodyVelocity = nil
-            end
-            if bodyGyro then
-                bodyGyro:Destroy()
-                bodyGyro = nil
-            end
-            local successLabel = Instance.new("TextLabel")
-            successLabel.Size = UDim2.new(0, 190, 0, 20)
-            successLabel.Position = UDim2.new(0, 25, 0, 58)
-            successLabel.BackgroundTransparency = 1
-            successLabel.Text = "Fly Disabled!"
-            successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
-            successLabel.TextSize = 12
-            successLabel.ZIndex = 11
-            successLabel.Parent = musicContent
-            game:GetService("Debris"):AddItem(successLabel, 3)
+            stopFly()
+            showNotification("Fly Disabled!", Color3.fromRGB(0, 200, 100))
             print("Fly disabled")
         end
     end)
     if not success then
         warn("Fly error: " .. tostring(err))
-        local errorLabel = Instance.new("TextLabel")
-        errorLabel.Size = UDim2.new(0, 190, 0, 20)
-        errorLabel.Position = UDim2.new(0, 25, 0, 58)
-        errorLabel.BackgroundTransparency = 1
-        errorLabel.Text = "Error: Check console"
-        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        errorLabel.TextSize = 12
-        errorLabel.ZIndex = 11
-        errorLabel.Parent = musicContent
-        game:GetService("Debris"):AddItem(errorLabel, 3)
+        showNotification("Fly Error: Check console", Color3.fromRGB(255, 80, 80))
+        isFlying = false
+        flyButton.Text = "Fly"
+        stopFly()
     end
 end)
 
@@ -641,7 +664,6 @@ speedButton.MouseButton1Click:Connect(function()
     local clientName = "Unknown"
     local loadstringSupported = false
 
-    -- Check client compatibility
     if typeof(is_sirhurt_closure) == "function" then
         clientName = "Sirhurt"
         loadstringSupported = true
@@ -657,16 +679,7 @@ speedButton.MouseButton1Click:Connect(function()
 
     if not loadstringSupported then
         warn("Client does not support loadstring!")
-        local errorLabel = Instance.new("TextLabel")
-        errorLabel.Size = UDim2.new(0, 190, 0, 20)
-        errorLabel.Position = UDim2.new(0, 25, 0, 96)
-        errorLabel.BackgroundTransparency = 1
-        errorLabel.Text = "Client not supported!"
-        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        errorLabel.TextSize = 12
-        errorLabel.ZIndex = 11
-        errorLabel.Parent = homeContent
-        game:GetService("Debris"):AddItem(errorLabel, 3)
+        showNotification("Client not supported!", Color3.fromRGB(255, 80, 80))
         return
     end
 
@@ -681,28 +694,10 @@ speedButton.MouseButton1Click:Connect(function()
     end)
 
     if success then
-        local successLabel = Instance.new("TextLabel")
-        successLabel.Size = UDim2.new(0, 190, 0, 20)
-        successLabel.Position = UDim2.new(0, 25, 0, 96)
-        successLabel.BackgroundTransparency = 1
-        successLabel.Text = "Speed Up X Successful!"
-        successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
-        successLabel.TextSize = 12
-        successLabel.ZIndex = 11
-        successLabel.Parent = homeContent
-        game:GetService("Debris"):AddItem(successLabel, 3)
+        showNotification("Speed Up X Successful!", Color3.fromRGB(0, 200, 100))
     else
         warn("Error executing Speed Up X: " .. tostring(err))
-        local errorLabel = Instance.new("TextLabel")
-        errorLabel.Size = UDim2.new(0, 190, 0, 20)
-        errorLabel.Position = UDim2.new(0, 25, 0, 96)
-        errorLabel.BackgroundTransparency = 1
-        errorLabel.Text = "Error: Check console"
-        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        errorLabel.TextSize = 12
-        errorLabel.ZIndex = 11
-        errorLabel.Parent = homeContent
-        game:GetService("Debris"):AddItem(errorLabel, 3)
+        showNotification("Speed Up X Error: Check console", Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -727,16 +722,7 @@ noLagButton.MouseButton1Click:Connect(function()
 
     if not loadstringSupported then
         warn("Client does not support loadstring!")
-        local errorLabel = Instance.new("TextLabel")
-        errorLabel.Size = UDim2.new(0, 190, 0, 20)
-        errorLabel.Position = UDim2.new(0, 25, 0, 96)
-        errorLabel.BackgroundTransparency = 1
-        errorLabel.Text = "Client not supported!"
-        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        errorLabel.TextSize = 12
-        errorLabel.ZIndex = 11
-        errorLabel.Parent = homeContent
-        game:GetService("Debris"):AddItem(errorLabel, 3)
+        showNotification("Client not supported!", Color3.fromRGB(255, 80, 80))
         return
     end
 
@@ -751,42 +737,20 @@ noLagButton.MouseButton1Click:Connect(function()
     end)
 
     if success then
-        local successLabel = Instance.new("TextLabel")
-        successLabel.Size = UDim2.new(0, 190, 0, 20)
-        successLabel.Position = UDim2.new(0, 25, 0, 96)
-        successLabel.BackgroundTransparency = 1
-        successLabel.Text = "No Lag Successful!"
-        successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
-        successLabel.TextSize = 12
-        successLabel.ZIndex = 11
-        successLabel.Parent = homeContent
-        game:GetService("Debris"):AddItem(successLabel, 3)
+        showNotification("No Lag Successful!", Color3.fromRGB(0, 200, 100))
     else
         warn("Error executing No Lag: " .. tostring(err))
-        local errorLabel = Instance.new("TextLabel")
-        errorLabel.Size = UDim2.new(0, 190, 0, 20)
-        errorLabel.Position = UDim2.new(0, 25, 0, 96)
-        errorLabel.BackgroundTransparency = 1
-        errorLabel.Text = "Error: Check console"
-        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
-        errorLabel.TextSize = 12
-        errorLabel.ZIndex = 11
-        errorLabel.Parent = homeContent
-        game:GetService("Debris"):AddItem(errorLabel, 3)
+        showNotification("No Lag Error: Check console", Color3.fromRGB(255, 80, 80))
     end
 end)
 
 -- Close X Button Logic
-closeXButton.MouseButton1Click:Connect(function()
-    toggleMenu()
-end)
+closeXButton.MouseButton1Click:Connect(toggleMenu)
 
 -- Toggle Button Logic
-toggleButton.MouseButton1Click:Connect(function()
-    toggleMenu()
-end)
+toggleButton.MouseButton1Click:Connect(toggleMenu)
 
--- Hover Effects for Buttons
+-- Hover Effects
 local function addHoverEffect(button)
     local originalColor = button.BackgroundColor3
     local originalTransparency = button.BackgroundTransparency
@@ -821,5 +785,5 @@ for _, button in ipairs(themeDropdown:GetChildren()) do
     end
 end
 
--- Debug: Confirm GUI creation
+-- Debug
 print("GrowGardenMenu fully initialized")
