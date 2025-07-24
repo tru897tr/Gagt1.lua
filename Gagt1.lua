@@ -6,14 +6,26 @@ local HttpService = game:GetService("HttpService")
 
 -- GUI Setup
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui", 5)
+local playerGui
+local attempts = 0
+local maxAttempts = 30
+while not playerGui and attempts < maxAttempts do
+    playerGui = player:WaitForChild("PlayerGui", 2)
+    attempts = attempts + 1
+    if not playerGui then
+        warn("PlayerGui not found, attempt " .. attempts .. "/" .. maxAttempts)
+        task.wait(1)
+    end
+end
 if not playerGui then
-    warn("PlayerGui not found!")
+    warn("Failed to find PlayerGui after " .. maxAttempts .. " attempts")
     return
 end
+print("PlayerGui found after " .. attempts .. " attempts")
 
 if not player.Character then
     player.CharacterAdded:Wait()
+    print("Character loaded")
 end
 
 local screenGui = Instance.new("ScreenGui")
@@ -22,15 +34,19 @@ screenGui.Parent = playerGui
 screenGui.ResetOnSpawn = false
 screenGui.Enabled = true
 screenGui.IgnoreGuiInset = true
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+screenGui.DisplayOrder = 10
+print("ScreenGui created")
 
 -- Menu Frame
 local frame = Instance.new("Frame")
 frame.Size = UDim2.new(0, 340, 0, 240)
-frame.Position = UDim2.new(0.5, -170, 0.5, -120) -- Center initially
+frame.Position = UDim2.new(0.5, -170, 0.5, -120) -- Center
 frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 frame.BorderSizePixel = 0
 frame.BackgroundTransparency = 0.5
 frame.Visible = true
+frame.ZIndex = 10
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 14)
@@ -40,14 +56,16 @@ frameStroke.Thickness = 1.5
 frameStroke.Color = Color3.fromRGB(255, 255, 255)
 frameStroke.Transparency = 0.7
 frameStroke.Parent = frame
+print("Frame created at: " .. tostring(frame.Position))
 
--- Drag Frame (Top area for dragging)
+-- Drag Frame
 local dragFrame = Instance.new("Frame")
 dragFrame.Size = UDim2.new(1, 0, 0, 32)
 dragFrame.Position = UDim2.new(0, 0, 0, 0)
 dragFrame.BackgroundTransparency = 1
-dragFrame.ZIndex = 2 -- Ensure it receives input
+dragFrame.ZIndex = 12
 dragFrame.Parent = frame
+print("DragFrame created")
 
 -- Title Label
 local title = Instance.new("TextLabel")
@@ -59,6 +77,7 @@ title.TextColor3 = Color3.fromRGB(255, 255, 255)
 title.TextSize = 18
 title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
+title.ZIndex = 11
 title.Parent = frame
 
 -- Close Button (X)
@@ -71,7 +90,7 @@ closeXButton.Text = "X"
 closeXButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeXButton.Font = Enum.Font.GothamBold
 closeXButton.TextSize = 12
-closeXButton.ZIndex = 3 -- Above dragFrame
+closeXButton.ZIndex = 13
 closeXButton.Parent = frame
 local closeXCorner = Instance.new("UICorner")
 closeXCorner.CornerRadius = UDim.new(0, 6)
@@ -83,6 +102,7 @@ sidebar.Size = UDim2.new(0, 80, 1, -40)
 sidebar.Position = UDim2.new(0, 8, 0, 40)
 sidebar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 sidebar.BackgroundTransparency = 0.6
+sidebar.ZIndex = 10
 sidebar.Parent = frame
 local sidebarCorner = Instance.new("UICorner")
 sidebarCorner.CornerRadius = UDim.new(0, 8)
@@ -93,6 +113,7 @@ local contentFrame = Instance.new("Frame")
 contentFrame.Size = UDim2.new(0, 240, 1, -60)
 contentFrame.Position = UDim2.new(0, 96, 0, 40)
 contentFrame.BackgroundTransparency = 1
+contentFrame.ZIndex = 10
 contentFrame.Parent = frame
 
 -- Sidebar Buttons
@@ -100,11 +121,12 @@ local homeButton = Instance.new("TextButton")
 homeButton.Size = UDim2.new(1, -10, 0, 32)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Home"
-homeButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200) -- Selected
+homeButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
 homeButton.BackgroundTransparency = 0.3
 homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 homeButton.Font = Enum.Font.Gotham
 homeButton.TextSize = 14
+homeButton.ZIndex = 11
 homeButton.Parent = sidebar
 local homeCorner = Instance.new("UICorner")
 homeCorner.CornerRadius = UDim.new(0, 6)
@@ -119,11 +141,12 @@ local settingsButton = Instance.new("TextButton")
 settingsButton.Size = UDim2.new(1, -10, 0, 32)
 settingsButton.Position = UDim2.new(0, 5, 0, 42)
 settingsButton.Text = "Settings"
-settingsButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Unselected
+settingsButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 settingsButton.BackgroundTransparency = 0.4
 settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 settingsButton.Font = Enum.Font.Gotham
 settingsButton.TextSize = 14
+settingsButton.ZIndex = 11
 settingsButton.Parent = sidebar
 local settingsCorner = Instance.new("UICorner")
 settingsCorner.CornerRadius = UDim.new(0, 6)
@@ -138,11 +161,12 @@ local musicButton = Instance.new("TextButton")
 musicButton.Size = UDim2.new(1, -10, 0, 32)
 musicButton.Position = UDim2.new(0, 5, 0, 79)
 musicButton.Text = "Music"
-musicButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Unselected
+musicButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 musicButton.BackgroundTransparency = 0.4
 musicButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 musicButton.Font = Enum.Font.Gotham
 musicButton.TextSize = 14
+musicButton.ZIndex = 11
 musicButton.Parent = sidebar
 local musicCorner = Instance.new("UICorner")
 musicCorner.CornerRadius = UDim.new(0, 6)
@@ -157,6 +181,7 @@ musicStroke.Parent = musicButton
 local homeContent = Instance.new("Frame")
 homeContent.Size = UDim2.new(1, 0, 1, 0)
 homeContent.BackgroundTransparency = 1
+homeContent.ZIndex = 10
 homeContent.Parent = contentFrame
 homeContent.Visible = true
 
@@ -169,6 +194,7 @@ speedButton.BackgroundTransparency = 0.4
 speedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 speedButton.Font = Enum.Font.Gotham
 speedButton.TextSize = 14
+speedButton.ZIndex = 11
 speedButton.Parent = homeContent
 local speedCorner = Instance.new("UICorner")
 speedCorner.CornerRadius = UDim.new(0, 8)
@@ -183,6 +209,7 @@ noLagButton.BackgroundTransparency = 0.4
 noLagButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 noLagButton.Font = Enum.Font.Gotham
 noLagButton.TextSize = 14
+noLagButton.ZIndex = 11
 noLagButton.Parent = homeContent
 local noLagCorner = Instance.new("UICorner")
 noLagCorner.CornerRadius = UDim.new(0, 8)
@@ -192,6 +219,7 @@ noLagCorner.Parent = noLagButton
 local settingsContent = Instance.new("Frame")
 settingsContent.Size = UDim2.new(1, 0, 1, 0)
 settingsContent.BackgroundTransparency = 1
+settingsContent.ZIndex = 10
 settingsContent.Parent = contentFrame
 settingsContent.Visible = false
 
@@ -199,6 +227,7 @@ settingsContent.Visible = false
 local musicContent = Instance.new("Frame")
 musicContent.Size = UDim2.new(1, 0, 1, 0)
 musicContent.BackgroundTransparency = 1
+musicContent.ZIndex = 10
 musicContent.Parent = contentFrame
 musicContent.Visible = false
 
@@ -211,6 +240,7 @@ flyButton.BackgroundTransparency = 0.4
 flyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 flyButton.Font = Enum.Font.Gotham
 flyButton.TextSize = 14
+flyButton.ZIndex = 11
 flyButton.Parent = musicContent
 local flyCorner = Instance.new("UICorner")
 flyCorner.CornerRadius = UDim.new(0, 8)
@@ -227,6 +257,7 @@ themeButton.Text = "Theme: " .. currentTheme
 themeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 themeButton.Font = Enum.Font.Gotham
 themeButton.TextSize = 14
+themeButton.ZIndex = 11
 themeButton.Parent = settingsContent
 local themeButtonCorner = Instance.new("UICorner")
 themeButtonCorner.CornerRadius = UDim.new(0, 6)
@@ -239,6 +270,7 @@ themeDropdown.Position = UDim2.new(0, 25, 0, 54)
 themeDropdown.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 themeDropdown.BackgroundTransparency = 0.5
 themeDropdown.Visible = false
+themeDropdown.ZIndex = 12
 themeDropdown.Parent = settingsContent
 local dropdownCorner = Instance.new("UICorner")
 dropdownCorner.CornerRadius = UDim.new(0, 6)
@@ -261,6 +293,7 @@ for i, theme in ipairs(themes) do
     optionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     optionButton.Font = Enum.Font.Gotham
     optionButton.TextSize = 12
+    optionButton.ZIndex = 13
     optionButton.Parent = themeDropdown
     local optionCorner = Instance.new("UICorner")
     optionCorner.CornerRadius = UDim.new(0, 4)
@@ -314,6 +347,7 @@ credit.TextColor3 = Color3.fromRGB(200, 200, 200)
 credit.TextSize = 10
 credit.Font = Enum.Font.Gotham
 credit.TextXAlignment = Enum.TextXAlignment.Right
+credit.ZIndex = 11
 credit.Parent = frame
 print("Credit added at: " .. tostring(credit.Position))
 
@@ -324,6 +358,7 @@ toggleButton.Position = UDim2.new(1, -36, 0, 10)
 toggleButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
 toggleButton.BackgroundTransparency = 0.3
 toggleButton.Text = ""
+toggleButton.ZIndex = 11
 toggleButton.Parent = screenGui
 local toggleCorner = Instance.new("UICorner")
 toggleCorner.CornerRadius = UDim.new(0, 13)
@@ -479,7 +514,6 @@ UserInputService.InputChanged:Connect(function(input)
             0, startPos.X.Offset + delta.X,
             0, startPos.Y.Offset + delta.Y
         )
-        -- Clamp position within screen bounds
         local viewportSize = game:GetService("Workspace").CurrentCamera.ViewportSize
         local frameSize = frame.AbsoluteSize
         newPos = UDim2.new(
@@ -515,12 +549,6 @@ flyButton.MouseButton1Click:Connect(function()
                 bodyGyro.Parent = player.Character.HumanoidRootPart
 
                 local camera = game:GetService("Workspace").CurrentCamera
-                UserInputService.InputChanged:Connect(function(input)
-                    if isFlying and input.UserInputType == Enum.UserInputType.MouseMovement then
-                        -- Optional: Add mouse-based rotation if desired
-                    end
-                end)
-
                 local function updateFly()
                     if not isFlying then return end
                     local direction = Vector3.new(0, 0, 0)
@@ -554,9 +582,12 @@ flyButton.MouseButton1Click:Connect(function()
                 successLabel.Text = "Fly Enabled!"
                 successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
                 successLabel.TextSize = 12
+                successLabel.ZIndex = 11
                 successLabel.Parent = musicContent
                 game:GetService("Debris"):AddItem(successLabel, 3)
                 print("Fly enabled")
+            else
+                error("HumanoidRootPart not found")
             end
         else
             isFlying = false
@@ -576,6 +607,7 @@ flyButton.MouseButton1Click:Connect(function()
             successLabel.Text = "Fly Disabled!"
             successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
             successLabel.TextSize = 12
+            successLabel.ZIndex = 11
             successLabel.Parent = musicContent
             game:GetService("Debris"):AddItem(successLabel, 3)
             print("Fly disabled")
@@ -590,6 +622,7 @@ flyButton.MouseButton1Click:Connect(function()
         errorLabel.Text = "Error: Check console"
         errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
         errorLabel.TextSize = 12
+        errorLabel.ZIndex = 11
         errorLabel.Parent = musicContent
         game:GetService("Debris"):AddItem(errorLabel, 3)
     end
@@ -606,19 +639,45 @@ end)
 speedButton.MouseButton1Click:Connect(function()
     local success, err
     local clientName = "Unknown"
-    if is_sirhurt_closure then
+    local loadstringSupported = false
+
+    -- Check client compatibility
+    if typeof(is_sirhurt_closure) == "function" then
         clientName = "Sirhurt"
-    elseif is_synapse_function then
+        loadstringSupported = true
+    elseif typeof(is_synapse_function) == "function" then
         clientName = "Synapse X"
-    elseif getgenv then
+        loadstringSupported = true
+    elseif typeof(getgenv) == "function" then
         clientName = "KRNL/Fluxus"
+        loadstringSupported = true
     end
 
-    print("Detected client: " .. clientName)
+    print("Detected client: " .. clientName .. ", loadstring supported: " .. tostring(loadstringSupported))
+
+    if not loadstringSupported then
+        warn("Client does not support loadstring!")
+        local errorLabel = Instance.new("TextLabel")
+        errorLabel.Size = UDim2.new(0, 190, 0, 20)
+        errorLabel.Position = UDim2.new(0, 25, 0, 96)
+        errorLabel.BackgroundTransparency = 1
+        errorLabel.Text = "Client not supported!"
+        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        errorLabel.TextSize = 12
+        errorLabel.ZIndex = 11
+        errorLabel.Parent = homeContent
+        game:GetService("Debris"):AddItem(errorLabel, 3)
+        return
+    end
 
     success, err = pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
-        print("Executed Speed Up X script")
+        local response = game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true)
+        if response then
+            loadstring(response)()
+            print("Executed Speed Up X script")
+        else
+            error("Failed to fetch Speed Up X script")
+        end
     end)
 
     if success then
@@ -629,6 +688,7 @@ speedButton.MouseButton1Click:Connect(function()
         successLabel.Text = "Speed Up X Successful!"
         successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
         successLabel.TextSize = 12
+        successLabel.ZIndex = 11
         successLabel.Parent = homeContent
         game:GetService("Debris"):AddItem(successLabel, 3)
     else
@@ -640,6 +700,7 @@ speedButton.MouseButton1Click:Connect(function()
         errorLabel.Text = "Error: Check console"
         errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
         errorLabel.TextSize = 12
+        errorLabel.ZIndex = 11
         errorLabel.Parent = homeContent
         game:GetService("Debris"):AddItem(errorLabel, 3)
     end
@@ -649,19 +710,44 @@ end)
 noLagButton.MouseButton1Click:Connect(function()
     local success, err
     local clientName = "Unknown"
-    if is_sirhurt_closure then
+    local loadstringSupported = false
+
+    if typeof(is_sirhurt_closure) == "function" then
         clientName = "Sirhurt"
-    elseif is_synapse_function then
+        loadstringSupported = true
+    elseif typeof(is_synapse_function) == "function" then
         clientName = "Synapse X"
-    elseif getgenv then
+        loadstringSupported = true
+    elseif typeof(getgenv) == "function" then
         clientName = "KRNL/Fluxus"
+        loadstringSupported = true
     end
 
-    print("Detected client: " .. clientName)
+    print("Detected client: " .. clientName .. ", loadstring supported: " .. tostring(loadstringSupported))
+
+    if not loadstringSupported then
+        warn("Client does not support loadstring!")
+        local errorLabel = Instance.new("TextLabel")
+        errorLabel.Size = UDim2.new(0, 190, 0, 20)
+        errorLabel.Position = UDim2.new(0, 25, 0, 96)
+        errorLabel.BackgroundTransparency = 1
+        errorLabel.Text = "Client not supported!"
+        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        errorLabel.TextSize = 12
+        errorLabel.ZIndex = 11
+        errorLabel.Parent = homeContent
+        game:GetService("Debris"):AddItem(errorLabel, 3)
+        return
+    end
 
     success, err = pcall(function()
-        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
-        print("Executed No Lag script")
+        local response = game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua")
+        if response then
+            loadstring(response)()
+            print("Executed No Lag script")
+        else
+            error("Failed to fetch No Lag script")
+        end
     end)
 
     if success then
@@ -672,6 +758,7 @@ noLagButton.MouseButton1Click:Connect(function()
         successLabel.Text = "No Lag Successful!"
         successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
         successLabel.TextSize = 12
+        successLabel.ZIndex = 11
         successLabel.Parent = homeContent
         game:GetService("Debris"):AddItem(successLabel, 3)
     else
@@ -683,6 +770,7 @@ noLagButton.MouseButton1Click:Connect(function()
         errorLabel.Text = "Error: Check console"
         errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
         errorLabel.TextSize = 12
+        errorLabel.ZIndex = 11
         errorLabel.Parent = homeContent
         game:GetService("Debris"):AddItem(errorLabel, 3)
     end
@@ -734,4 +822,4 @@ for _, button in ipairs(themeDropdown:GetChildren()) do
 end
 
 -- Debug: Confirm GUI creation
-print("GrowGardenMenu created at: " .. tostring(frame.Position))
+print("GrowGardenMenu fully initialized")
