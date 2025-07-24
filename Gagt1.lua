@@ -902,7 +902,7 @@ addHoverEffect(settingsButton)
 addHoverEffect(themeButton)
 addHoverEffect(langButton)
 
--- Loading Animation
+-- Loading Animation (Updated)
 local function startLoading()
     local success, err = pcall(function()
         if not ProgressBar or not ProgressBar.Parent then
@@ -921,6 +921,7 @@ local function startLoading()
         ProgressBar.Size = UDim2.new(0, 0, 1, 0)
         LoadingFrame.Visible = true
         LoadingFrame.BackgroundTransparency = 0.2
+        print("Starting loading animation at: " .. tostring(tick()))
 
         local startTime = tick()
         local duration = 5
@@ -933,20 +934,10 @@ local function startLoading()
 
             if elapsed >= duration then
                 connection:Disconnect()
-                local fadeStart = tick()
-                local fadeDuration = 0.5
-                local fadeConnection = RunService.RenderStepped:Connect(function()
-                    local fadeElapsed = tick() - fadeStart
-                    local fadeProgress = math.clamp(fadeElapsed / fadeDuration, 0, 1)
-                    LoadingFrame.BackgroundTransparency = 0.2 + (0.8 * fadeProgress)
-
-                    if fadeElapsed >= fadeDuration then
-                        fadeConnection:Disconnect()
-                        LoadingFrame.Visible = false
-                        frame.Visible = true
-                        toggleButton.Visible = true
-                    end
-                end)
+                LoadingFrame.Visible = false
+                frame.Visible = true
+                toggleButton.Visible = true
+                print("Loading completed at: " .. tostring(tick()))
             end
         end)
     end)
