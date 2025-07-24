@@ -37,7 +37,8 @@ local translations = {
         nolag_notification = "No Lag Successful!",
         nolag_error = "No Lag Error: Check console",
         client_error = "Client not supported!",
-        loading_error = "Loading failed: Check console"
+        loading_error = "Loading failed: Check console",
+        init_error = "Initialization failed: Check console"
     },
     vi = {
         title = "Trồng một khu vườn",
@@ -69,40 +70,51 @@ local translations = {
         nolag_notification = "No Lag thành công!",
         nolag_error = "Lỗi No Lag: Xem console",
         client_error = "Client không được hỗ trợ!",
-        loading_error = "Tải thất bại: Xem console"
+        loading_error = "Tải thất bại: Xem console",
+        init_error = "Khởi tạo thất bại: Xem console"
     }
 }
 
 -- GUI Setup
 local player = Players.LocalPlayer
-local playerGui
-local attempts = 0
+local playerGui = nil
 local maxAttempts = 30
+local attempts = 0
+
+-- Chờ PlayerGui với timeout
 while not playerGui and attempts < maxAttempts and player.Parent do
-    playerGui = player:WaitForChild("PlayerGui", 2)
+    local success, result = pcall(function()
+        return player:WaitForChild("PlayerGui", 2)
+    end)
+    if success and result then
+        playerGui = result
+        print("PlayerGui found after " .. attempts .. " attempts")
+        break
+    end
     attempts = attempts + 1
-    if not playerGui then
-        warn("PlayerGui not found, attempt " .. attempts .. "/" .. maxAttempts)
-        task.wait(1)
-    end
+    warn("PlayerGui not found, attempt " .. attempts .. "/" .. maxAttempts)
+    task.wait(1)
 end
+
 if not playerGui then
-    warn("Failed to find PlayerGui after " .. maxAttempts .. " attempts or player disconnected")
+    warn("Failed to find PlayerGui after " .. maxAttempts .. " attempts")
     return
 end
-print("PlayerGui found after " .. attempts .. " attempts")
 
-local success, err = pcall(function()
-    if not player.Character then
-        player.CharacterAdded:Wait()
+-- Chờ Character
+local character = player.Character
+if not character then
+    local success, err = pcall(function()
+        character = player.CharacterAdded:Wait()
         print("Character loaded")
+    end)
+    if not success then
+        warn("Character loading failed: " .. tostring(err))
+        return
     end
-end)
-if not success then
-    warn("Character loading failed: " .. tostring(err))
-    return
 end
 
+-- Tạo ScreenGui
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "GrowGardenMenu"
 screenGui.Parent = playerGui
@@ -1251,14 +1263,8 @@ speedButton.MouseButton1Click:Connect(function()
     local loadstringSupported = false
 
     local successDetect, detectErr = pcall(function()
-        if typeof(is_sirhurt_closure) == "function" then
-            clientName = "Sirhurt"
-            loadstringSupported = true
-        elseif typeof(is_synapse_function) == "function" then
-            clientName = "Synapse X"
-            loadstringSupported = true
-        elseif typeof(getgenv) == "function" then
-            clientName = "KRNL/Fluxus"
+        if typeof(getgenv) == "function" then
+            clientName = "KRNL/Fluxus/Synapse"
             loadstringSupported = true
         end
     end)
@@ -1298,14 +1304,8 @@ noLagButton.MouseButton1Click:Connect(function()
     local loadstringSupported = false
 
     local successDetect, detectErr = pcall(function()
-        if typeof(is_sirhurt_closure) == "function" then
-            clientName = "Sirhurt"
-            loadstringSupported = true
-        elseif typeof(is_synapse_function) == "function" then
-            clientName = "Synapse X"
-            loadstringSupported = true
-        elseif typeof(getgenv) == "function" then
-            clientName = "KRNL/Fluxus"
+        if typeof(getgenv) == "function" then
+            clientName = "KRNL/Fluxus/Synapse"
             loadstringSupported = true
         end
     end)
@@ -1395,10 +1395,10 @@ for _, button in ipairs(languageDropdown:GetChildren()) do
     end
 end
 
--- Loading Animation
+-- Loading Animation (Sử dụng RunService thay vì TweenService)
 local function startLoading()
     local success, err = pcall(function()
-        -- Kiểm tra instance tồn tại
+        -- Kiểm tra instance
         if not ProgressBar or not ProgressBar.Parent then
             error("ProgressBar missing or destroyed")
         end
@@ -1408,6 +1408,9 @@ local function startLoading()
         if not frame or not frame.Parent then
             error("Main frame missing or destroyed")
         end
+        if not toggleButton or not toggleButton.Parent then
+            error("ToggleButton missing or destroyed")
+        end
 
         -- Đặt lại ProgressBar
         ProgressBar.Size = UDim2.new(0, 0, 1, 0)
@@ -1415,49 +1418,48 @@ local function startLoading()
         LoadingFrame.BackgroundTransparency = 0.2
         print("Starting loading animation at: " .. tostring(tick()))
 
-        -- Tạo tween cho ProgressBar (chạy trong 5 giây)
-        local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
-        local progressTween = TweenService:Create(ProgressBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
-        progressTween:Play()
-        print("ProgressBar tween started, expected completion in 5 seconds")
+        -- Thời gian chạy 5 giây
+        local startTime = tick()
+        local duration = 5
+        local connection
 
-        -- Khi tween hoàn tất
-        progressTween.Completed:Connect(function()
-            if not LoadingFrame or not LoadingFrame.Parent then
-                warn("LoadingFrame missing after tween completion")
-                return
+        -- Cập nhật ProgressBar bằng RunService
+        connection = RunService.RenderStepped:Connect(function()
+            local elapsed = tick() - startTime
+            local progress = math.clamp(elapsed / duration, 0, 1)
+            ProgressBar.Size = UDim2.new(progress, 0, 1, 0)
+
+            if elapsed >= duration then
+                connection:Disconnect()
+                print("Loading completed at: " .. tostring(tick()))
+
+                -- Fade out LoadingFrame
+                local fadeStart = tick()
+                local fadeDuration = 0.5
+                local fadeConnection = RunService.RenderStepped:Connect(function()
+                    local fadeElapsed = tick() - fadeStart
+                    local fadeProgress = math.clamp(fadeElapsed / fadeDuration, 0, 1)
+                    LoadingFrame.BackgroundTransparency = 0.2 + (0.8 * fadeProgress)
+
+                    if fadeElapsed >= fadeDuration then
+                        fadeConnection:Disconnect()
+                        LoadingFrame.Visible = false
+                        print("LoadingFrame hidden")
+
+                        -- Hiển thị frame chính
+                        frame.Visible = true
+                        frame.BackgroundTransparency = 0.5
+                        toggleButton.Visible = true
+                        print("Main frame and toggle button visible")
+                    end
+                end)
             end
-            print("ProgressBar tween completed at: " .. tostring(tick()))
-
-            -- Fade out LoadingFrame
-            local fadeOutTween = TweenService:Create(LoadingFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 1})
-            fadeOutTween:Play()
-            fadeOutTween.Completed:Connect(function()
-                if LoadingFrame and LoadingFrame.Parent then
-                    LoadingFrame.Visible = false
-                    print("LoadingFrame hidden")
-                end
-                if frame and frame.Parent then
-                    frame.Visible = true
-                    local fadeInTween = TweenService:Create(frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {BackgroundTransparency = 0.5})
-                    fadeInTween:Play()
-                    fadeInTween.Completed:Connect(function()
-                        print("Main frame visible with transparency: " .. tostring(frame.BackgroundTransparency))
-                        if toggleButton and toggleButton.Parent then
-                            toggleButton.Visible = true
-                            print("ToggleButton visible")
-                        end
-                    end)
-                else
-                    warn("Main frame missing after fade out")
-                end
-            end)
         end)
     end)
     if not success then
         warn("Loading error: " .. tostring(err))
         showNotification(translations[currentLanguage].loading_error, Color3.fromRGB(255, 80, 80))
-        -- Fallback: ẩn LoadingFrame và hiển thị frame chính
+        -- Fallback: hiển thị giao diện chính
         if LoadingFrame and LoadingFrame.Parent then
             LoadingFrame.Visible = false
         end
@@ -1492,7 +1494,22 @@ end
 game:BindToClose(cleanup)
 
 -- Start loading
-startLoading()
+local success, err = pcall(startLoading)
+if not success then
+    warn("Initialization failed: " .. tostring(err))
+    showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
+    -- Fallback: hiển thị giao diện chính
+    if LoadingFrame and LoadingFrame.Parent then
+        LoadingFrame.Visible = false
+    end
+    if frame and frame.Parent then
+        frame.Visible = true
+        frame.BackgroundTransparency = 0.5
+    end
+    if toggleButton and toggleButton.Parent then
+        toggleButton.Visible = true
+    end
+end
 
 -- Debug
 print("GrowGardenMenu fully initialized at: " .. tostring(tick()))
