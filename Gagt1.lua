@@ -94,7 +94,7 @@ homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Home"
 homeButton.BackgroundColor3 = Color3.fromRGB(200, 200, 200) -- Selected: Highlight
 homeButton.BackgroundTransparency = 0.3
-homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+homeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Fixed text color
 homeButton.Font = Enum.Font.Gotham
 homeButton.TextSize = 14
 homeButton.Parent = sidebar
@@ -113,7 +113,7 @@ settingsButton.Position = UDim2.new(0, 5, 0, 42)
 settingsButton.Text = "Settings"
 settingsButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Unselected
 settingsButton.BackgroundTransparency = 0.4
-settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Fixed text color
 settingsButton.Font = Enum.Font.Gotham
 settingsButton.TextSize = 14
 settingsButton.Parent = sidebar
@@ -146,6 +146,20 @@ speedButton.Parent = homeContent
 local speedCorner = Instance.new("UICorner")
 speedCorner.CornerRadius = UDim.new(0, 8)
 speedCorner.Parent = speedButton
+
+local noLagButton = Instance.new("TextButton")
+noLagButton.Size = UDim2.new(0, 190, 0, 32)
+noLagButton.Position = UDim2.new(0, 25, 0, 58)
+noLagButton.Text = "No Lag"
+noLagButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+noLagButton.BackgroundTransparency = 0.4
+noLagButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+noLagButton.Font = Enum.Font.Gotham
+noLagButton.TextSize = 14
+noLagButton.Parent = homeContent
+local noLagCorner = Instance.new("UICorner")
+noLagCorner.CornerRadius = UDim.new(0, 8)
+noLagCorner.Parent = noLagButton
 
 -- Content: Settings
 local settingsContent = Instance.new("Frame")
@@ -219,6 +233,8 @@ for i, theme in ipairs(themes) do
         themeButton.TextColor3 = theme.TextColor
         closeXButton.TextColor3 = theme.TextColor
         credit.TextColor3 = theme.TextColor
+        homeButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Keep text white
+        settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255) -- Keep text white
         print("Theme changed to: " .. theme.Name)
     end)
 end
@@ -358,7 +374,7 @@ speedButton.MouseButton1Click:Connect(function()
     if success then
         local successLabel = Instance.new("TextLabel")
         successLabel.Size = UDim2.new(0, 190, 0, 20)
-        successLabel.Position = UDim2.new(0, 25, 0, 58)
+        successLabel.Position = UDim2.new(0, 25, 0, 96)
         successLabel.BackgroundTransparency = 1
         successLabel.Text = "Speed Up X Successful!"
         successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
@@ -369,7 +385,50 @@ speedButton.MouseButton1Click:Connect(function()
         warn("Error executing Speed Up X: " .. tostring(err))
         local errorLabel = Instance.new("TextLabel")
         errorLabel.Size = UDim2.new(0, 190, 0, 20)
-        errorLabel.Position = UDim2.new(0, 25, 0, 58)
+        errorLabel.Position = UDim2.new(0, 25, 0, 96)
+        errorLabel.BackgroundTransparency = 1
+        errorLabel.Text = "Error: Check console"
+        errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+        errorLabel.TextSize = 12
+        errorLabel.Parent = homeContent
+        game:GetService("Debris"):AddItem(errorLabel, 3)
+    end
+end)
+
+-- No Lag Logic
+noLagButton.MouseButton1Click:Connect(function()
+    local success, err
+    local clientName = "Unknown"
+    if is_sirhurt_closure then
+        clientName = "Sirhurt"
+    elseif is_synapse_function then
+        clientName = "Synapse X"
+    elseif getgenv then
+        clientName = "KRNL/Fluxus"
+    end
+
+    print("Detected client: " .. clientName)
+
+    success, err = pcall(function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
+        print("Executed No Lag script")
+    end)
+
+    if success then
+        local successLabel = Instance.new("TextLabel")
+        successLabel.Size = UDim2.new(0, 190, 0, 20)
+        successLabel.Position = UDim2.new(0, 25, 0, 96)
+        successLabel.BackgroundTransparency = 1
+        successLabel.Text = "No Lag Successful!"
+        successLabel.TextColor3 = Color3.fromRGB(0, 200, 100)
+        successLabel.TextSize = 12
+        successLabel.Parent = homeContent
+        game:GetService("Debris"):AddItem(successLabel, 3)
+    else
+        warn("Error executing No Lag: " .. tostring(err))
+        local errorLabel = Instance.new("TextLabel")
+        errorLabel.Size = UDim2.new(0, 190, 0, 20)
+        errorLabel.Position = UDim2.new(0, 25, 0, 96)
         errorLabel.BackgroundTransparency = 1
         errorLabel.Text = "Error: Check console"
         errorLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
@@ -410,6 +469,7 @@ local function addHoverEffect(button)
 end
 
 addHoverEffect(speedButton)
+addHoverEffect(noLagButton)
 addHoverEffect(closeXButton)
 addHoverEffect(toggleButton)
 addHoverEffect(homeButton)
