@@ -24,16 +24,16 @@ screenGui.IgnoreGuiInset = true
 
 -- Menu Frame (Compact, Centered)
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 350, 0, 250) -- Smaller size
+frame.Size = UDim2.new(0, 350, 0, 250)
 frame.Position = UDim2.new(0.5, 0, 0.5, 0)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25) -- Darker, modern
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.BorderSizePixel = 0
-frame.BackgroundTransparency = 0.5 -- Slightly more transparent
+frame.BackgroundTransparency = 0.5
 frame.Visible = true
 frame.AnchorPoint = Vector2.new(0.5, 0.5)
 frame.Parent = screenGui
 local frameCorner = Instance.new("UICorner")
-frameCorner.CornerRadius = UDim.new(0, 12) -- Smoother corners
+frameCorner.CornerRadius = UDim.new(0, 12)
 frameCorner.Parent = frame
 
 -- Title Label (Non-draggable)
@@ -43,7 +43,7 @@ title.Position = UDim2.new(0, 10, 0, 5)
 title.BackgroundTransparency = 1
 title.Text = "Grow a Garden"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 18 -- Fixed size for consistency
+title.TextSize = 18
 title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = frame
@@ -71,7 +71,7 @@ local homeButton = Instance.new("TextButton")
 homeButton.Size = UDim2.new(1, -10, 0, 35)
 homeButton.Position = UDim2.new(0, 5, 0, 5)
 homeButton.Text = "Home"
-homeButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255) -- Brighter blue
+homeButton.BackgroundColor3 = Color3.fromRGB(0, 120, 255) -- Selected: Blue
 homeButton.BackgroundTransparency = 0.4
 homeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 homeButton.Font = Enum.Font.Gotham
@@ -85,7 +85,7 @@ local settingsButton = Instance.new("TextButton")
 settingsButton.Size = UDim2.new(1, -10, 0, 35)
 settingsButton.Position = UDim2.new(0, 5, 0, 45)
 settingsButton.Text = "Settings"
-settingsButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+settingsButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Unselected: Black
 settingsButton.BackgroundTransparency = 0.4
 settingsButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 settingsButton.Font = Enum.Font.Gotham
@@ -219,7 +219,7 @@ themeButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Credit Label (Smaller, Bottom-Right)
+-- Credit Label (Restored, Bottom-Right)
 local credit = Instance.new("TextLabel")
 credit.Size = UDim2.new(0, 120, 0, 15)
 credit.Position = UDim2.new(1, -130, 1, -20)
@@ -267,18 +267,18 @@ local function showHome()
     settingsContent.Visible = false
     local tween = TweenService:Create(homeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
     tween:Play()
-    tween = TweenService:Create(settingsButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(80, 80, 80)})
-    tween:Play()
+    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)})
+    tween2:Play()
     themeDropdown.Visible = false
 end
 
 local function showSettings()
     homeContent.Visible = false
     settingsContent.Visible = true
-    local tween = TweenService:Create(homeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(80, 80, 80)})
+    local tween = TweenService:Create(homeButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 0, 0)})
     tween:Play()
-    tween = TweenService:Create(settingsButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
-    tween:Play()
+    local tween2 = TweenService:Create(settingsButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 120, 255)})
+    tween2:Play()
     themeDropdown.Visible = false
 end
 
