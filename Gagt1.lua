@@ -6,6 +6,7 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "HackHub"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true -- Đảm bảo bao phủ toàn màn hình, bỏ qua thanh công cụ Roblox
 
 -- Tạo màn hình Loading
 local loadingFrame = Instance.new("Frame")
@@ -13,6 +14,7 @@ loadingFrame.Size = UDim2.new(1, 0, 1, 0)
 loadingFrame.Position = UDim2.new(0, 0, 0, 0)
 loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 loadingFrame.BackgroundTransparency = 0.5
+loadingFrame.ZIndex = 10 -- Đặt ZIndex cao để đảm bảo hiển thị trên cùng
 loadingFrame.Parent = screenGui
 
 local loadingText = Instance.new("TextLabel")
@@ -23,11 +25,14 @@ loadingText.Text = "Loading..."
 loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
 loadingText.TextSize = 32
 loadingText.Font = Enum.Font.SourceSansBold
+loadingText.ZIndex = 11 -- Đặt ZIndex cao hơn loadingFrame
 loadingText.Parent = loadingFrame
 
 -- Tắt màn hình loading sau 5 giây
-wait(5)
-loadingFrame:Destroy()
+spawn(function()
+    wait(5)
+    loadingFrame:Destroy()
+end)
 
 -- Tạo Frame chính
 local mainFrame = Instance.new("Frame")
@@ -35,6 +40,7 @@ mainFrame.Size = UDim2.new(0, 300, 0, 400)
 mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.BorderSizePixel = 0
+mainFrame.ZIndex = 5 -- Đặt ZIndex thấp hơn loading
 mainFrame.Parent = screenGui
 
 -- Tạo tiêu đề
@@ -46,9 +52,10 @@ titleLabel.Text = "Hack Hub"
 titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.TextSize = 24
 titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.ZIndex = 6
 titleLabel.Parent = mainFrame
 
--- Tạo nút ẩn/hiện ở góc phải
+-- Tạo nút ẩn/hiện hình tròn ở góc phải
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 50, 0, 50)
 toggleButton.Position = UDim2.new(1, -60, 0, 10)
@@ -57,7 +64,11 @@ toggleButton.Text = ">"
 toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 toggleButton.TextSize = 20
 toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.ZIndex = 7
 toggleButton.Parent = screenGui
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0.5, 0)
+uiCorner.Parent = toggleButton
 
 -- Biến trạng thái và lưu vị trí
 local isVisible = true
@@ -66,7 +77,12 @@ local savedPosition = mainFrame.Position
 -- Hàm chuyển đổi ẩn/hiện
 local function toggleUI()
     isVisible = not isVisible
-    local targetPosition = isVisible and savedPosition or UDim2.new(savedPosition.X.Scale, savedPosition.X.Offset, -1, -200)
+    local targetPosition
+    if isVisible then
+        targetPosition = savedPosition -- Sử dụng vị trí đã lưu
+    else
+        targetPosition = UDim2.new(savedPosition.X.Scale, savedPosition.X.Offset, -1, -200)
+    end
     local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
     local tween = TweenService:Create(mainFrame, tweenInfo, {Position = targetPosition})
     tween:Play()
@@ -91,8 +107,9 @@ local startPos
 
 local function updateInput(input)
     local delta = input.Position - dragStart
-    mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    savedPosition = mainFrame.Position -- Lưu vị trí mới
+    local newPosition = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    mainFrame.Position = newPosition
+    savedPosition = newPosition -- Cập nhật vị trí đã lưu
 end
 
 mainFrame.InputBegan:Connect(function(input)
