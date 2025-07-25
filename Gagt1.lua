@@ -6,15 +6,16 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "HackHub"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = true -- Đảm bảo bao phủ toàn màn hình, bỏ qua thanh công cụ Roblox
+screenGui.IgnoreGuiInset = true -- Bỏ qua thanh công cụ Roblox
+screenGui.DisplayOrder = 100 -- Đảm bảo hiển thị trên cùng
 
 -- Tạo màn hình Loading
 local loadingFrame = Instance.new("Frame")
 loadingFrame.Size = UDim2.new(1, 0, 1, 0)
 loadingFrame.Position = UDim2.new(0, 0, 0, 0)
 loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-loadingFrame.BackgroundTransparency = 0 -- Màu đen hoàn toàn, không trong suốt
-loadingFrame.ZIndex = 10 -- Đặt ZIndex cao để hiển thị trên cùng
+loadingFrame.BackgroundTransparency = 0 -- Màu đen hoàn toàn
+loadingFrame.ZIndex = 100 -- ZIndex cao
 loadingFrame.Parent = screenGui
 
 local loadingText = Instance.new("TextLabel")
@@ -25,7 +26,7 @@ loadingText.Text = "Loading..."
 loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
 loadingText.TextSize = 32
 loadingText.Font = Enum.Font.SourceSansBold
-loadingText.ZIndex = 11 -- Đặt ZIndex cao hơn loadingFrame
+loadingText.ZIndex = 101 -- Cao hơn loadingFrame
 loadingText.Parent = loadingFrame
 
 -- Tắt màn hình loading sau 5 giây
@@ -40,7 +41,7 @@ mainFrame.Size = UDim2.new(0, 300, 0, 400)
 mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.BorderSizePixel = 0
-mainFrame.ZIndex = 5 -- Đặt ZIndex thấp hơn loading
+mainFrame.ZIndex = 5
 mainFrame.Parent = screenGui
 
 -- Tạo tiêu đề
@@ -79,7 +80,7 @@ local function toggleUI()
     isVisible = not isVisible
     local targetPosition
     if isVisible then
-        targetPosition = savedPosition -- Sử dụng vị trí đã lưu
+        targetPosition = savedPosition
     else
         targetPosition = UDim2.new(savedPosition.X.Scale, savedPosition.X.Offset, -1, -200)
     end
@@ -99,7 +100,7 @@ end)
 -- Xử lý nút ẩn/hiện
 toggleButton.MouseButton1Click:Connect(toggleUI)
 
--- Làm khung có thể kéo và lưu vị trí
+-- Làm khung có thể kéo (hỗ trợ cả chuột và cảm ứng)
 local dragging
 local dragInput
 local dragStart
@@ -113,7 +114,7 @@ local function updateInput(input)
 end
 
 mainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         dragging = true
         dragStart = input.Position
         startPos = mainFrame.Position
@@ -126,7 +127,7 @@ mainFrame.InputBegan:Connect(function(input)
 end)
 
 mainFrame.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
         dragInput = input
     end
 end)
