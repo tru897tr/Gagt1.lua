@@ -15,7 +15,7 @@ local Frame = Instance.new("Frame")
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
-Frame.Size = UDim2.new(0, 300, 0, 220) -- Tăng chiều cao để chứa credit
+Frame.Size = UDim2.new(0, 300, 0, 220)
 Frame.BackgroundTransparency = 0.05
 Frame.Active = true
 Frame.Draggable = true
@@ -64,7 +64,7 @@ Credit.ZIndex = 2
 local ButtonContainer = Instance.new("Frame")
 ButtonContainer.Parent = Frame
 ButtonContainer.BackgroundTransparency = 1
-ButtonContainer.Position = UDim2.new(0, 0, 0, 55) -- Dịch xuống để chứa credit
+ButtonContainer.Position = UDim2.new(0, 0, 0, 55)
 ButtonContainer.Size = UDim2.new(1, 0, 1, -55)
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = ButtonContainer
@@ -98,8 +98,8 @@ NoLagButton.Parent = ButtonContainer
 NoLagButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
 NoLagButton.Size = UDim2.new(0.9, 0, 0, 45)
 NoLagButton.Text = "No Lag"
-NoLagButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-NoLagButton.TextSize = 16
+NoLagButton.TextColor3 = Color3.fromRGB(255, 100, 100) -- Đổi màu chữ đỏ để tránh lỗi
+NoLagButton.TextSize = 11
 NoLagButton.Font = Enum.Font.Gotham
 NoLagButton.BackgroundTransparency = 0.1
 local NoLagCorner = Instance.new("UICorner")
@@ -136,7 +136,7 @@ ToggleStroke.Parent = ToggleButton
 local LoadingFrame = Instance.new("Frame")
 LoadingFrame.Parent = ScreenGui
 LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-LoadingFrame.BackgroundTransparency = 0.3
+LoadingFrame.BackgroundTransparency = 0 -- Đen 100%, không trong suốt
 LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
 LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
 LoadingFrame.Visible = true -- Hiển thị ngay từ đầu
@@ -213,9 +213,18 @@ NotificationStroke.Parent = NotificationFrame
 -- Quản lý hàng đợi thông báo
 local notificationQueue = {}
 local isShowingNotification = false
+local lastNotification = nil -- Lưu thông báo cuối để tránh lặp
 
 local function showNotification(message, duration)
+    -- Kiểm tra nếu thông báo giống thông báo trước thì bỏ qua
+    if lastNotification == message then
+        return
+    end
+    lastNotification = message
+
+    -- Thêm vào hàng đợi
     table.insert(notificationQueue, {text = message, duration = duration or 2})
+
     if not isShowingNotification then
         isShowingNotification = true
         local function processQueue()
@@ -232,6 +241,7 @@ local function showNotification(message, duration)
                 tweenOut.Completed:Wait()
                 NotificationFrame.Visible = false
                 table.remove(notificationQueue, 1)
+                lastNotification = nil -- Reset sau khi hiển thị xong
             end
             isShowingNotification = false
         end
@@ -311,7 +321,7 @@ end
 -- Hàm hiển thị loading
 local function showLoading()
     LoadingFrame.Visible = true
-    LoadingFrame.BackgroundTransparency = 0.3
+    LoadingFrame.BackgroundTransparency = 0 -- Đen 100%
     ProgressBar.Size = UDim2.new(0, 0, 1, 0)
     return runProgressBar()
 end
