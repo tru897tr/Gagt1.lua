@@ -112,7 +112,100 @@ NoLagStroke.Color = Color3.fromRGB(255, 255, 255)
 NoLagStroke.Transparency = 0.8
 NoLagStroke.Parent = NoLagButton
 
--- Nút bật/tắt
+-- Nút đóng nhỏ trên Frame
+local CloseButton = Instance.new("TextButton")
+CloseButton.Parent = Frame
+CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseButton.Position = UDim2.new(1, -25, 0, 5)
+CloseButton.Size = UDim2.new(0, 20, 0, 20)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 12
+CloseButton.Font = Enum.Font.GothamBold
+CloseButton.ZIndex = 3
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0.5, 0)
+CloseCorner.Parent = CloseButton
+local CloseStroke = Instance.new("UIStroke")
+CloseStroke.Thickness = 1
+CloseStroke.Color = Color3.fromRGB(255, 255, 255)
+CloseStroke.Transparency = 0.8
+CloseStroke.Parent = CloseButton
+
+-- Bảng xác nhận thoát
+local ConfirmFrame = Instance.new("Frame")
+ConfirmFrame.Parent = ScreenGui
+ConfirmFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+ConfirmFrame.Position = UDim2.new(0.5, -100, 0.5, -75)
+ConfirmFrame.Size = UDim2.new(0, 200, 0, 150)
+ConfirmFrame.BackgroundTransparency = 0.05
+ConfirmFrame.Visible = false
+ConfirmFrame.ZIndex = 4
+local ConfirmCorner = Instance.new("UICorner")
+ConfirmCorner.CornerRadius = UDim.new(0, 10)
+ConfirmCorner.Parent = ConfirmFrame
+local ConfirmStroke = Instance.new("UIStroke")
+ConfirmStroke.Thickness = 1
+ConfirmStroke.Color = Color3.fromRGB(100, 100, 255)
+ConfirmStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+ConfirmStroke.Parent = ConfirmFrame
+
+-- Tiêu đề xác nhận
+local ConfirmTitle = Instance.new("TextLabel")
+ConfirmTitle.Parent = ConfirmFrame
+ConfirmTitle.BackgroundTransparency = 1
+ConfirmTitle.Position = UDim2.new(0, 0, 0, 10)
+ConfirmTitle.Size = UDim2.new(1, 0, 0, 30)
+ConfirmTitle.Text = "Bạn có chắc muốn tắt script không?"
+ConfirmTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+ConfirmTitle.TextSize = 12
+ConfirmTitle.Font = Enum.Font.GothamBold
+ConfirmTitle.TextWrapped = true
+ConfirmTitle.ZIndex = 5
+
+-- Nút "Có" (tắt script)
+local YesButton = Instance.new("TextButton")
+YesButton.Parent = ConfirmFrame
+YesButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+YesButton.Position = UDim2.new(0.15, 0, 0.6, 0)
+YesButton.Size = UDim2.new(0.35, 0, 0.25, 0)
+YesButton.Text = "Có"
+YesButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+YesButton.TextSize = 14
+YesButton.Font = Enum.Font.Gotham
+YesButton.BackgroundTransparency = 0.1
+YesButton.ZIndex = 5
+local YesCorner = Instance.new("UICorner")
+YesCorner.CornerRadius = UDim.new(0, 8)
+YesCorner.Parent = YesButton
+local YesStroke = Instance.new("UIStroke")
+YesStroke.Thickness = 1
+YesStroke.Color = Color3.fromRGB(255, 255, 255)
+YesStroke.Transparency = 0.8
+YesStroke.Parent = YesButton
+
+-- Nút "Không" (quay lại)
+local NoButton = Instance.new("TextButton")
+NoButton.Parent = ConfirmFrame
+NoButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+NoButton.Position = UDim2.new(0.5, 0, 0.6, 0)
+NoButton.Size = UDim2.new(0.35, 0, 0.25, 0)
+NoButton.Text = "Không"
+NoButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+NoButton.TextSize = 14
+NoButton.Font = Enum.Font.Gotham
+NoButton.BackgroundTransparency = 0.1
+NoButton.ZIndex = 5
+local NoCorner = Instance.new("UICorner")
+NoCorner.CornerRadius = UDim.new(0, 8)
+NoCorner.Parent = NoButton
+local NoStroke = Instance.new("UIStroke")
+NoStroke.Thickness = 1
+NoStroke.Color = Color3.fromRGB(255, 255, 255)
+NoStroke.Transparency = 0.8
+NoStroke.Parent = NoButton
+
+-- Nút bật/tắt (góc trên bên phải màn hình)
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Parent = ScreenGui
 ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
@@ -142,8 +235,8 @@ LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
 LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
 LoadingFrame.Visible = true -- Hiển thị ngay từ đầu
 LoadingFrame.ZIndex = 10
-LoadingFrame.AnchorPoint = Vector2.new(0, 0) -- Cố định góc trên bên trái
-LoadingFrame.ClipsDescendants = false -- Tắt cắt nội dung
+LoadingFrame.AnchorPoint = Vector2.new(0, 0)
+LoadingFrame.ClipsDescendants = false
 local LoadingCorner = Instance.new("UICorner")
 LoadingCorner.CornerRadius = UDim.new(0, 0)
 LoadingCorner.Parent = LoadingFrame
@@ -223,6 +316,10 @@ local function showNotification(message, duration)
         return
     end
     lastNotification = message
+    -- Giới hạn tối đa 3 thông báo
+    if #notificationQueue >= 3 then
+        table.remove(notificationQueue, 1)
+    end
     table.insert(notificationQueue, {text = message, duration = duration or 2})
     if not isShowingNotification then
         isShowingNotification = true
@@ -250,28 +347,33 @@ end
 
 -- Hiệu ứng hover cho nút
 local function applyHoverEffect(button)
-    local hoverTween, leaveTween
+    local isHovering = false
     button.MouseEnter:Connect(function()
-        if hoverTween then hoverTween:Cancel() end
-        if leaveTween then leaveTween:Cancel() end
+        if isHovering then return end
+        isHovering = true
         local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-        hoverTween = TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0, BackgroundColor3 = Color3.fromRGB(0, 150, 255)})
+        local hoverTween = TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0, BackgroundColor3 = Color3.fromRGB(0, 150, 255)})
         TweenService:Create(button:FindFirstChildOfClass("UIStroke"), tweenInfo, {Transparency = 0}):Play()
         hoverTween:Play()
+        hoverTween.Completed:Connect(function() isHovering = false end)
     end)
     button.MouseLeave:Connect(function()
-        if hoverTween then hoverTween:Cancel() end
-        if leaveTween then leaveTween:Cancel() end
+        if isHovering then return end
+        isHovering = true
         local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-        leaveTween = TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0.1, BackgroundColor3 = Color3.fromRGB(0, 120, 215)})
+        local leaveTween = TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0.1, BackgroundColor3 = Color3.fromRGB(0, 120, 215)})
         TweenService:Create(button:FindFirstChildOfClass("UIStroke"), tweenInfo, {Transparency = 0.8}):Play()
         leaveTween:Play()
+        leaveTween.Completed:Connect(function() isHovering = false end)
     end)
 end
 
 applyHoverEffect(SpeedUpButton)
 applyHoverEffect(NoLagButton)
 applyHoverEffect(ToggleButton)
+applyHoverEffect(CloseButton)
+applyHoverEffect(YesButton)
+applyHoverEffect(NoButton)
 
 -- Hiệu ứng bật/tắt Frame
 local currentTween = nil
@@ -294,6 +396,7 @@ local function toggleFrame()
         end)
     else
         Frame.Visible = true
+        Frame.Position = UDim2.new(0.5, -150, 0.5, -1000)
         currentTween = TweenService:Create(Frame, tweenInfo, {Position = UDim2.new(0.5, -150, 0.5, -100)})
         currentTween:Play()
         currentTween.Completed:Connect(function()
@@ -308,6 +411,23 @@ end
 -- Chức năng nút Toggle
 ToggleButton.MouseButton1Click:Connect(toggleFrame)
 
+-- Chức năng nút Close (hiện bảng xác nhận)
+CloseButton.MouseButton1Click:Connect(function()
+    ConfirmFrame.Visible = true
+    Frame.Visible = false -- Ẩn tạm Frame chính
+end)
+
+-- Chức năng nút Yes (tắt script)
+YesButton.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy() -- Tắt toàn bộ script
+end)
+
+-- Chức năng nút No (quay lại)
+NoButton.MouseButton1Click:Connect(function()
+    ConfirmFrame.Visible = false
+    Frame.Visible = true -- Hiện lại Frame chính
+end)
+
 -- Hàm chạy progress bar
 local function runProgressBar()
     ProgressBar.Size = UDim2.new(0, 0, 1, 0) -- Reset progress bar
@@ -320,7 +440,7 @@ end
 -- Hàm hiển thị loading
 local function showLoading()
     LoadingFrame.Visible = true
-    LoadingFrame.BackgroundTransparency = 0 -- Đen 100%
+    LoadingFrame.BackgroundTransparency = 0
     ProgressBar.Size = UDim2.new(0, 0, 1, 0)
     return runProgressBar()
 end
@@ -334,7 +454,7 @@ local function hideLoading()
         LoadingFrame.Visible = false
         Frame.Visible = true
         ToggleButton.Visible = true
-        Frame.Position = UDim2.new(0.5, -150, 0.5, -1000) -- Đặt vị trí ban đầu để trượt lên
+        Frame.Position = UDim2.new(0.5, -150, 0.5, -1000)
         local openTween = TweenService:Create(Frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -150, 0.5, -100)})
         openTween:Play()
         showNotification("Welcome to Hack Hub!", 2)
