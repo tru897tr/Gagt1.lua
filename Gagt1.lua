@@ -7,7 +7,8 @@ screenGui.Name = "HackHub"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true -- Bỏ qua thanh công cụ Roblox
-screenGui.DisplayOrder = 100 -- Đảm bảo hiển thị trên cùng
+screenGui.DisplayOrder = 1000 -- Tăng DisplayOrder để che phủ giao diện Roblox
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Đảm bảo che phủ toàn bộ
 
 -- Danh sách lưu trữ thông báo
 local notifications = {}
@@ -94,7 +95,7 @@ loadingFrame.Size = UDim2.new(1, 0, 1, 0)
 loadingFrame.Position = UDim2.new(0, 0, 0, 0)
 loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 loadingFrame.BackgroundTransparency = 0 -- Màu đen hoàn toàn
-loadingFrame.ZIndex = 100
+loadingFrame.ZIndex = 1000 -- ZIndex cao để che phủ giao diện Roblox và game
 loadingFrame.Parent = screenGui
 
 local loadingText = Instance.new("TextLabel")
@@ -105,7 +106,7 @@ loadingText.Text = "Loading..."
 loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
 loadingText.TextSize = 32
 loadingText.Font = Enum.Font.SourceSansBold
-loadingText.ZIndex = 101
+loadingText.ZIndex = 1001 -- Cao hơn loadingFrame
 loadingText.Parent = loadingFrame
 
 -- Tắt màn hình loading sau 5 giây và thông báo thành công
