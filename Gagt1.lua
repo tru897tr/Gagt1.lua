@@ -7,119 +7,143 @@ screenGui.Name = "HackHub"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true -- Bỏ qua thanh công cụ Roblox
-screenGui.DisplayOrder = 10000 -- Tăng cao để che phủ giao diện Roblox
+screenGui.DisplayOrder = 10000 -- Che phủ giao diện Roblox
 screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Đảm bảo che phủ toàn cục
 
--- Danh sách lưu trữ thông báo
+-- Danh sách lưu trữ thông báo và hàng đợi
 local notifications = {}
+local notificationQueue = {}
+local isProcessingQueue = false
 
--- Hàm tạo thông báo với hiệu ứng
+-- Hàm xử lý hàng đợi thông báo
+local function processNotificationQueue()
+    if isProcessingQueue then return end
+    isProcessingQueue = true
+
+    while #notificationQueue > 0 and #notifications < 3 do
+        local notifData = table.remove(notificationQueue, 1)
+        local message, isError = notifData.message, notifData.isError
+
+        -- In thông báo vào debug
+        if isError then
+            print("[HackHub Error] " .. message)
+        else
+            print("[HackHub Success] " .. message)
+        end
+
+        -- Xóa thông báo cũ nếu đã đủ 3
+        if #notifications >= 3 then
+            local oldestNotification = table.remove(notifications, 1)
+            if oldestNotification then
+                oldestNotification:Destroy()
+            end
+        end
+
+        -- Tạo khung thông báo
+        local notificationFrame = Instance.new("Frame")
+        notificationFrame.Size = UDim2.new(0, 200, 0, 50)
+        notificationFrame.Position = UDim2.new(0.5, -100, 0, -50) -- Bắt đầu ngoài màn hình
+        notificationFrame.BackgroundColor3 = isError and Color3.fromRGB(200, 50, 50) or Color3.fromRGB(20, 20, 20)
+        notificationFrame.BorderSizePixel = 0
+        notificationFrame.ZIndex = 15
+        notificationFrame.Parent = screenGui
+
+        local notificationText = Instance.new("TextLabel")
+        notificationText.Size = UDim2.new(1, 0, 1, 0)
+        notificationText.BackgroundTransparency = 1
+        notificationText.Text = message
+        notificationText.TextColor3 = Color3.fromRGB(255, 255, 255)
+        notificationText.TextSize = 16
+        notificationText.Font = Enum.Font.SourceSans
+        notificationText.ZIndex = 16
+        notificationText.Parent = notificationFrame
+
+        -- Thêm sự kiện nhấn để tắt thông báo
+        notificationFrame.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                local tweenOut = TweenService:Create(notificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0.5, -100, 0, notificationFrame.Position.Y.Offset + 20)
+                })
+                local tweenTextOut = TweenService:Create(notificationText, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                    TextTransparency = 1
+                })
+                tweenOut:Play()
+                tweenTextOut:Play()
+                tweenOut.Completed:Connect(function()
+                    for i, notif in ipairs(notifications) do
+                        if notif == notificationFrame then
+                            table.remove(notifications, i)
+                            break
+                        end
+                    end
+                    notificationFrame:Destroy()
+                    -- Cập nhật vị trí các thông báo còn lại
+                    for i, notif in ipairs(notifications) do
+                        local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                            Position = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
+                        })
+                        tweenUpdate:Play()
+                    end
+                    -- Tiếp tục xử lý hàng đợi
+                    isProcessingQueue = false
+                    processNotificationQueue()
+                end)
+            end
+        end)
+
+        -- Thêm vào danh sách thông báo
+        table.insert(notifications, notificationFrame)
+
+        -- Hiệu ứng di chuyển xuống
+        local tweenIn = TweenService:Create(notificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Position = UDim2.new(0.5, -100, 0, 10 + (#notifications - 1) * 60)
+        })
+        tweenIn:Play()
+
+        -- Hiệu ứng mờ dần và xóa sau 3 giây nếu không nhấn
+        spawn(function()
+            wait(3)
+            if notificationFrame.Parent then
+                local tweenOut = TweenService:Create(notificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                    BackgroundTransparency = 1,
+                    Position = UDim2.new(0.5, -100, 0, notificationFrame.Position.Y.Offset + 20)
+                })
+                local tweenTextOut = TweenService:Create(notificationText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                    TextTransparency = 1
+                })
+                tweenOut:Play()
+                tweenTextOut:Play()
+                tweenOut.Completed:Connect(function()
+                    for i, notif in ipairs(notifications) do
+                        if notif == notificationFrame then
+                            table.remove(notifications, i)
+                            break
+                        end
+                    end
+                    notificationFrame:Destroy()
+                    -- Cập nhật vị trí các thông báo còn lại
+                    for i, notif in ipairs(notifications) do
+                        local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                            Position = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
+                        })
+                        tweenUpdate:Play()
+                    end
+                    -- Tiếp tục xử lý hàng đợi
+                    isProcessingQueue = false
+                    processNotificationQueue()
+                end)
+            end
+        end)
+    end
+
+    isProcessingQueue = false
+end
+
+-- Hàm tạo thông báo (thêm vào hàng đợi)
 local function createNotification(message, isError)
-    -- In thông báo vào debug
-    if isError then
-        print("[HackHub Error] " .. message)
-    else
-        print("[HackHub Success] " .. message)
-    end
-
-    -- Xóa thông báo cũ nếu vượt quá 3
-    if #notifications >= 3 then
-        local oldestNotification = table.remove(notifications, 1)
-        if oldestNotification then
-            oldestNotification:Destroy()
-        end
-    end
-
-    -- Tạo khung thông báo
-    local notificationFrame = Instance.new("Frame")
-    notificationFrame.Size = UDim2.new(0, 200, 0, 50)
-    notificationFrame.Position = UDim2.new(0.5, -100, 0, -50) -- Bắt đầu ngoài màn hình
-    notificationFrame.BackgroundColor3 = isError and Color3.fromRGB(200, 50, 50) or Color3.fromRGB(20, 20, 20)
-    notificationFrame.BorderSizePixel = 0
-    notificationFrame.ZIndex = 15
-    notificationFrame.Parent = screenGui
-
-    local notificationText = Instance.new("TextLabel")
-    notificationText.Size = UDim2.new(1, 0, 1, 0)
-    notificationText.BackgroundTransparency = 1
-    notificationText.Text = message
-    notificationText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    notificationText.TextSize = 16
-    notificationText.Font = Enum.Font.SourceSans
-    notificationText.ZIndex = 16
-    notificationText.Parent = notificationFrame
-
-    -- Thêm sự kiện nhấn để tắt thông báo
-    notificationFrame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            local tweenOut = TweenService:Create(notificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0.5, -100, 0, notificationFrame.Position.Y.Offset + 20)
-            })
-            local tweenTextOut = TweenService:Create(notificationText, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                TextTransparency = 1
-            })
-            tweenOut:Play()
-            tweenTextOut:Play()
-            tweenOut.Completed:Connect(function()
-                for i, notif in ipairs(notifications) do
-                    if notif == notificationFrame then
-                        table.remove(notifications, i)
-                        break
-                    end
-                end
-                notificationFrame:Destroy()
-                -- Cập nhật vị trí các thông báo còn lại
-                for i, notif in ipairs(notifications) do
-                    local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                        Position = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
-                    })
-                    tweenUpdate:Play()
-                end
-            end)
-        end
-    end)
-
-    -- Thêm vào danh sách thông báo
-    table.insert(notifications, notificationFrame)
-
-    -- Hiệu ứng di chuyển xuống
-    local tweenIn = TweenService:Create(notificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Position = UDim2.new(0.5, -100, 0, 10 + (#notifications - 1) * 60)
-    })
-    tweenIn:Play()
-
-    -- Hiệu ứng mờ dần và xóa sau 3 giây nếu không nhấn
-    spawn(function()
-        wait(3)
-        if notificationFrame.Parent then
-            local tweenOut = TweenService:Create(notificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0.5, -100, 0, notificationFrame.Position.Y.Offset + 20)
-            })
-            local tweenTextOut = TweenService:Create(notificationText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-                TextTransparency = 1
-            })
-            tweenOut:Play()
-            tweenTextOut:Play()
-            tweenOut.Completed:Connect(function()
-                for i, notif in ipairs(notifications) do
-                    if notif == notificationFrame then
-                        table.remove(notifications, i)
-                        break
-                    end
-                end
-                notificationFrame:Destroy()
-                -- Cập nhật vị trí các thông báo còn lại
-                for i, notif in ipairs(notifications) do
-                    local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                        Position = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
-                    })
-                    tweenUpdate:Play()
-                end
-            end)
-        end
-    end)
+    table.insert(notificationQueue, {message = message, isError = isError})
+    processNotificationQueue()
 end
 
 -- Tạo màn hình Loading
@@ -128,7 +152,7 @@ loadingFrame.Size = UDim2.new(1, 0, 1, 0)
 loadingFrame.Position = UDim2.new(0, 0, 0, 0)
 loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 loadingFrame.BackgroundTransparency = 0 -- Màu đen hoàn toàn
-loadingFrame.ZIndex = 10000 -- ZIndex cực cao để che phủ giao diện Roblox
+loadingFrame.ZIndex = 10000 -- Che phủ giao diện Roblox
 loadingFrame.Parent = screenGui
 
 local loadingText = Instance.new("TextLabel")
@@ -139,7 +163,7 @@ loadingText.Text = "Loading..."
 loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
 loadingText.TextSize = 32
 loadingText.Font = Enum.Font.SourceSansBold
-loadingText.ZIndex = 10001 -- Cao hơn loadingFrame
+loadingText.ZIndex = 10001
 loadingText.Parent = loadingFrame
 
 -- Tắt màn hình loading sau 5 giây và thông báo thành công
