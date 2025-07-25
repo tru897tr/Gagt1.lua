@@ -1,8 +1,8 @@
 -- Dịch vụ
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
 local HttpService = game:GetService("HttpService")
+local LocalPlayer = Players.LocalPlayer
 
 -- Tạo ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
@@ -19,7 +19,7 @@ Frame.Size = UDim2.new(0, 300, 0, 200)
 Frame.BackgroundTransparency = 0.05
 Frame.Active = true
 Frame.Draggable = true
-Frame.Visible = false -- Ẩn ban đầu, chờ loading xong mới hiện
+Frame.Visible = false -- Ẩn ban đầu, chờ loading
 
 -- Bo góc Frame
 local FrameCorner = Instance.new("UICorner")
@@ -107,7 +107,7 @@ ToggleButton.Text = "X"
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleButton.TextSize = 14
 ToggleButton.Font = Enum.Font.GothamBold
-ToggleButton.Visible = false -- Ẩn ban đầu, chờ loading xong mới hiện
+ToggleButton.Visible = false -- Ẩn ban đầu
 local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.CornerRadius = UDim.new(0.5, 0)
 ToggleCorner.Parent = ToggleButton
@@ -124,7 +124,7 @@ LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 LoadingFrame.BackgroundTransparency = 0.3
 LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
 LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
-LoadingFrame.Visible = true -- Hiển thị đầu tiên
+LoadingFrame.Visible = true
 local LoadingCorner = Instance.new("UICorner")
 LoadingCorner.CornerRadius = UDim.new(0, 0)
 LoadingCorner.Parent = LoadingFrame
@@ -195,7 +195,6 @@ local isShowingNotification = false
 
 local function showNotification(message, duration)
     table.insert(notificationQueue, {text = message, duration = duration or 2})
-    
     if not isShowingNotification then
         isShowingNotification = true
         local function processQueue()
@@ -312,22 +311,33 @@ local function hideLoading()
     end)
 end
 
--- Hàm chạy script với loading
+-- Hàm chạy script với kiểm tra lỗi và thử lại
 local function runScript(url, scriptName)
     showNotification("Loading " .. scriptName .. "...", 2)
-    local success, result = pcall(function()
-        local scriptContent = game:HttpGet(url, true)
-        if scriptContent then
-            return loadstring(scriptContent)()
+    local maxRetries = 2
+    local retryDelay = 1
+    local success, result
+    for attempt = 1, maxRetries do
+        success, result = pcall(function()
+            local scriptContent = game:HttpGet(url, true)
+            if scriptContent and scriptContent ~= "" then
+                return loadstring(scriptContent)()
+            else
+                error("Failed to fetch script content")
+            end
+        end)
+        if success then
+            break
         else
-            error("Failed to fetch script content")
+            showNotification("Retry " .. attempt .. ": Failed to load " .. scriptName .. ": " .. tostring(result), 2)
+            wait(retryDelay)
         end
-    end)
+    end
     if success then
         showNotification(scriptName .. " Loaded!", 2)
     else
-        showNotification("Error: Failed to load " .. scriptName .. ": " .. tostring(result), 3)
-    end)
+        showNotification("Error: Failed to load " .. scriptName .. " after " .. maxRetries .. " attempts: " .. tostring(result), 3)
+    end
 end
 
 -- Chức năng nút Speed Up
