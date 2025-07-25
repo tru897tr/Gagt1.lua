@@ -13,8 +13,8 @@ local loadingFrame = Instance.new("Frame")
 loadingFrame.Size = UDim2.new(1, 0, 1, 0)
 loadingFrame.Position = UDim2.new(0, 0, 0, 0)
 loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-loadingFrame.BackgroundTransparency = 0.5
-loadingFrame.ZIndex = 10 -- Đặt ZIndex cao để đảm bảo hiển thị trên cùng
+loadingFrame.BackgroundTransparency = 0 -- Màu đen hoàn toàn, không trong suốt
+loadingFrame.ZIndex = 10 -- Đặt ZIndex cao để hiển thị trên cùng
 loadingFrame.Parent = screenGui
 
 local loadingText = Instance.new("TextLabel")
