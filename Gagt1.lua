@@ -24,7 +24,7 @@ local success, errorMessage = pcall(function()
     Frame.BackgroundTransparency = 0.05
     Frame.Active = true
     Frame.Draggable = true
-    Frame.Visible = true -- Hiện ngay từ đầu
+    Frame.Visible = true
     Frame.ZIndex = 200
     print("Frame created")
 
@@ -108,6 +108,7 @@ local success, errorMessage = pcall(function()
     SpeedUpStroke.Color = Color3.fromRGB(255, 255, 255)
     SpeedUpStroke.Transparency = 0.8
     SpeedUpStroke.Parent = SpeedUpButton
+    print("SpeedUpButton created")
 
     -- Nút No Lag
     local NoLagButton = Instance.new("TextButton")
@@ -128,6 +129,7 @@ local success, errorMessage = pcall(function()
     NoLagStroke.Color = Color3.fromRGB(255, 255, 255)
     NoLagStroke.Transparency = 0.8
     NoLagStroke.Parent = NoLagButton
+    print("NoLagButton created")
 
     -- Nút đóng nhỏ trên Frame
     local CloseButton = Instance.new("TextButton")
@@ -139,6 +141,7 @@ local success, errorMessage = pcall(function()
     CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     CloseButton.TextSize = 14
     CloseButton.Font = Enum.Font.SourceSansPro
+    CloseButton.Visible = true
     CloseButton.ZIndex = 202
     local CloseCorner = Instance.new("UICorner")
     CloseCorner.CornerRadius = UDim.new(0.5, 0)
@@ -148,6 +151,7 @@ local success, errorMessage = pcall(function()
     CloseStroke.Color = Color3.fromRGB(255, 255, 255)
     CloseStroke.Transparency = 0.8
     CloseStroke.Parent = CloseButton
+    print("CloseButton created")
 
     -- Bảng xác nhận thoát
     local ConfirmFrame = Instance.new("Frame")
@@ -166,6 +170,7 @@ local success, errorMessage = pcall(function()
     ConfirmStroke.Color = Color3.fromRGB(100, 100, 255)
     ConfirmStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
     ConfirmStroke.Parent = ConfirmFrame
+    print("ConfirmFrame created")
 
     -- Padding cho ConfirmFrame
     local ConfirmPadding = Instance.new("UIPadding")
@@ -251,7 +256,7 @@ local success, errorMessage = pcall(function()
     ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     ToggleButton.TextSize = 16
     ToggleButton.Font = Enum.Font.SourceSansPro
-    ToggleButton.Visible = true -- Hiện ngay từ đầu
+    ToggleButton.Visible = true
     ToggleButton.ZIndex = 500
     local ToggleCorner = Instance.new("UICorner")
     ToggleCorner.CornerRadius = UDim.new(0.5, 0)
@@ -294,19 +299,18 @@ local success, errorMessage = pcall(function()
     NotificationText.Text = ""
     NotificationText.TextWrapped = true
     NotificationText.ZIndex = 401
+    print("NotificationFrame created")
 
     -- Quản lý hàng đợi thông báo
     local notificationQueue = {}
     local isShowingNotification = false
-    local lastNotification = nil
 
     local function showNotification(message, duration)
-        if lastNotification == message then return end
-        lastNotification = message
-        if #notificationQueue >= 3 then
+        print("Showing notification: " .. message) -- Debug
+        table.insert(notificationQueue, {text = message, duration = duration or 2})
+        if #notificationQueue > 3 then
             table.remove(notificationQueue, 1)
         end
-        table.insert(notificationQueue, {text = message, duration = duration or 2})
         if not isShowingNotification then
             isShowingNotification = true
             local function processQueue()
@@ -323,7 +327,6 @@ local success, errorMessage = pcall(function()
                     tweenOut.Completed:Wait()
                     NotificationFrame.Visible = false
                     table.remove(notificationQueue, 1)
-                    lastNotification = nil
                 end
                 isShowingNotification = false
             end
@@ -409,6 +412,7 @@ local success, errorMessage = pcall(function()
     -- Chức năng nút Yes (tắt script)
     YesButton.MouseButton1Click:Connect(function()
         ScreenGui:Destroy()
+        showNotification("Hack Hub Closed", 1.5)
         print("Script destroyed")
     end)
 
@@ -438,6 +442,7 @@ local success, errorMessage = pcall(function()
                 break
             else
                 showNotification("Retry " .. attempt .. ": Failed to load " .. scriptName .. ": " .. tostring(result), 2)
+                print("Retry " .. attempt .. " failed: " .. tostring(result))
                 wait(retryDelay)
             end
         end
