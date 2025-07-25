@@ -1,7 +1,6 @@
 -- LocalScript under StarterPlayerScripts
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
 -- Translations
@@ -690,6 +689,7 @@ local function updateUIText()
     end)
     if not success then
         warn("Failed to update UI text: " .. tostring(err))
+        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -716,11 +716,19 @@ themeButton.MouseButton1Click:Connect(function()
         langButton.TextColor3 = themes[nextIndex].TextColor
         closeButton.TextColor3 = themes[nextIndex].TextColor
         credit.TextColor3 = themes[nextIndex].TextColor
+        homeButton.TextColor3 = themes[nextIndex].TextColor
+        featuresButton.TextColor3 = themes[nextIndex].TextColor
+        settingsButton.TextColor3 = themes[nextIndex].TextColor
+        speedupButton.TextColor3 = themes[nextIndex].TextColor
+        nolagButton.TextColor3 = themes[nextIndex].TextColor
+        applySpeedButtonFeatures.TextColor3 = themes[nextIndex].TextColor
+        jumpButtonFeatures.TextColor3 = themes[nextIndex].TextColor
         themeButton.Text = string.format(translations[currentLanguage].theme_button, currentTheme)
         showNotification(string.format(translations[currentLanguage].theme_notification, currentTheme), Color3.fromRGB(0, 200, 100))
     end)
     if not success then
         warn("Theme change failed: " .. tostring(err))
+        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -742,6 +750,7 @@ langButton.MouseButton1Click:Connect(function()
     end)
     if not success then
         warn("Language change failed: " .. tostring(err))
+        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -759,6 +768,7 @@ local function toggleMenu()
     end)
     if not success then
         warn("Toggle menu failed: " .. tostring(err))
+        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -777,6 +787,7 @@ local function showHome()
     end)
     if not success then
         warn("Navigation failed: " .. tostring(err))
+        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -794,6 +805,7 @@ local function showFeatures()
     end)
     if not success then
         warn("Navigation failed: " .. tostring(err))
+        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -811,6 +823,7 @@ local function showSettings()
     end)
     if not success then
         warn("Navigation failed: " .. tostring(err))
+        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -818,19 +831,33 @@ homeButton.MouseButton1Click:Connect(showHome)
 featuresButton.MouseButton1Click:Connect(showFeatures)
 settingsButton.MouseButton1Click:Connect(showSettings)
 
--- Dragging Logic
+-- Dragging Logic (Improved)
 local isDragging = false
-local offset = Vector2.new(0, 0)
-local connections = {}
+local dragConnection = nil
+local dragStartPos = nil
+local frameStartPos = nil
 
 DragArea.InputBegan:Connect(function(input)
     local success, err = pcall(function()
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             if frame and frame.Parent and frame.Visible then
                 isDragging = true
-                local mousePos = Vector2.new(input.Position.X, input.Position.Y)
-                local framePos = frame.AbsolutePosition
-                offset = mousePos - framePos
+                dragStartPos = Vector2.new(input.Position.X, input.Position.Y)
+                frameStartPos = frame.Position
+                if dragConnection then
+                    dragConnection:Disconnect()
+                end
+                dragConnection = RunService.RenderStepped:Connect(function()
+                    if isDragging and frame and frame.Parent then
+                        local currentPos = UserInputService:GetMouseLocation()
+                        local delta = currentPos - dragStartPos
+                        local viewportSize = workspace.CurrentCamera.ViewportSize
+                        local frameSize = frame.AbsoluteSize
+                        local newX = math.clamp(frameStartPos.X.Offset + delta.X, 0, viewportSize.X - frameSize.X)
+                        local newY = math.clamp(frameStartPos.Y.Offset + delta.Y, 36, viewportSize.Y - frameSize.Y)
+                        frame.Position = UDim2.new(0, newX, 0, newY)
+                    end
+                end)
             else
                 error("Frame not visible or missing")
             end
@@ -838,35 +865,19 @@ DragArea.InputBegan:Connect(function(input)
     end)
     if not success then
         warn("Drag failed: " .. tostring(err))
+        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
     end
 end)
 
 DragArea.InputEnded:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         isDragging = false
+        if dragConnection then
+            dragConnection:Disconnect()
+            dragConnection = nil
+        end
     end
 end)
-
-table.insert(connections, UserInputService.InputChanged:Connect(function(input)
-    local success, err = pcall(function()
-        if isDragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            if frame and frame.Parent then
-                local mousePos = Vector2.new(input.Position.X, input.Position.Y)
-                local viewportSize = workspace.CurrentCamera.ViewportSize
-                local frameSize = frame.AbsoluteSize
-                local newPosX = math.clamp(mousePos.X - offset.X, 0, math.max(0, viewportSize.X - frameSize.X))
-                local newPosY = math.clamp(mousePos.Y - offset.Y, 0, math.max(0, viewportSize.Y - frameSize.Y))
-                frame.Position = UDim2.new(0, newPosX, 0, newPosY)
-            else
-                isDragging = false
-                error("Frame missing")
-            end
-        end
-    end)
-    if not success then
-        warn("Drag stopped: " .. tostring(err))
-    end
-end))
 
 -- Speed Control
 local function applySpeed(inputBox, button)
@@ -894,6 +905,7 @@ applySpeedButtonFeatures.MouseButton1Click:Connect(function() applySpeed(speedIn
 -- Infinite Jump
 local infiniteJumpEnabled = false
 local jumpConnection = nil
+local connections = {}
 
 local function setupInfiniteJump()
     if jumpConnection then
@@ -992,9 +1004,12 @@ closeButton.MouseButton1Click:Connect(toggleMenu)
 -- Toggle Button
 toggleButton.MouseButton1Click:Connect(toggleMenu)
 
--- Hover Effects
+-- Hover Effects (Fixed)
 local function addHoverEffect(button)
     local success, err = pcall(function()
+        if not button or not button.Parent then
+            error("Button missing or not parented")
+        end
         local originalColor = button.BackgroundColor3
         local originalTransparency = button.BackgroundTransparency
         button.MouseEnter:Connect(function()
@@ -1011,7 +1026,8 @@ local function addHoverEffect(button)
         end)
     end)
     if not success then
-        warn("Hover effect failed: " .. tostring(err))
+        warn("Hover effect failed for button: " .. tostring(button.Name) .. " - " .. tostring(err))
+        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -1037,6 +1053,9 @@ local function cleanup()
         end
         if jumpConnection then
             jumpConnection:Disconnect()
+        end
+        if dragConnection then
+            dragConnection:Disconnect()
         end
     end)
     if not success then
