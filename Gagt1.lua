@@ -9,12 +9,31 @@ screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true -- Bỏ qua thanh công cụ Roblox
 screenGui.DisplayOrder = 100 -- Đảm bảo hiển thị trên cùng
 
--- Hàm tạo thông báo
-local function createNotification(message)
+-- Danh sách lưu trữ thông báo
+local notifications = {}
+
+-- Hàm tạo thông báo với hiệu ứng
+local function createNotification(message, isError)
+    -- In thông báo vào debug
+    if isError then
+        print("[HackHub Error] " .. message)
+    else
+        print("[HackHub Success] " .. message)
+    end
+
+    -- Xóa thông báo cũ nếu vượt quá 3
+    if #notifications >= 3 then
+        local oldestNotification = table.remove(notifications, 1)
+        if oldestNotification then
+            oldestNotification:Destroy()
+        end
+    end
+
+    -- Tạo khung thông báo
     local notificationFrame = Instance.new("Frame")
     notificationFrame.Size = UDim2.new(0, 200, 0, 50)
-    notificationFrame.Position = UDim2.new(0.5, -100, 0, 10)
-    notificationFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    notificationFrame.Position = UDim2.new(0.5, -100, 0, -50) -- Bắt đầu ngoài màn hình
+    notificationFrame.BackgroundColor3 = isError and Color3.fromRGB(200, 50, 50) or Color3.fromRGB(20, 20, 20)
     notificationFrame.BorderSizePixel = 0
     notificationFrame.ZIndex = 15
     notificationFrame.Parent = screenGui
@@ -29,9 +48,43 @@ local function createNotification(message)
     notificationText.ZIndex = 16
     notificationText.Parent = notificationFrame
 
+    -- Thêm vào danh sách thông báo
+    table.insert(notifications, notificationFrame)
+
+    -- Hiệu ứng di chuyển xuống
+    local tweenIn = TweenService:Create(notificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Position = UDim2.new(0.5, -100, 0, 10 + (#notifications - 1) * 60)
+    })
+    tweenIn:Play()
+
+    -- Hiệu ứng mờ dần và xóa sau 3 giây
     spawn(function()
         wait(3)
-        notificationFrame:Destroy()
+        local tweenOut = TweenService:Create(notificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0.5, -100, 0, notificationFrame.Position.Y.Offset + 20)
+        })
+        local tweenTextOut = TweenService:Create(notificationText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+            TextTransparency = 1
+        })
+        tweenOut:Play()
+        tweenTextOut:Play()
+        tweenOut.Completed:Connect(function()
+            for i, notif in ipairs(notifications) do
+                if notif == notificationFrame then
+                    table.remove(notifications, i)
+                    break
+                end
+            end
+            notificationFrame:Destroy()
+            -- Cập nhật vị trí các thông báo còn lại
+            for i, notif in ipairs(notifications) do
+                local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                    Position = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
+                })
+                tweenUpdate:Play()
+            end
+        end)
     end)
 end
 
@@ -59,7 +112,7 @@ loadingText.Parent = loadingFrame
 spawn(function()
     wait(5)
     loadingFrame:Destroy()
-    createNotification("Script loaded successfully!")
+    createNotification("Script loaded successfully!", false)
 end)
 
 -- Tạo Frame chính
@@ -194,7 +247,7 @@ local function toggleUI()
     local tween = TweenService:Create(mainFrame, tweenInfo, {Position = targetPosition})
     tween:Play()
     toggleButton.Text = isVisible and ">" or "<"
-    createNotification(isVisible and "Interface shown!" or "Interface hidden!")
+    createNotification(isVisible and "Interface shown!" or "Interface hidden!", false)
 end
 
 -- Xử lý nút ẩn/hiện
@@ -203,16 +256,19 @@ toggleButton.MouseButton1Click:Connect(toggleUI)
 -- Xử lý nút đóng
 closeButton.MouseButton1Click:Connect(function()
     confirmFrame.Visible = true
+    createNotification("Close confirmation opened!", false)
 end)
 
 -- Xử lý nút OK trong xác nhận
 confirmOkButton.MouseButton1Click:Connect(function()
+    createNotification("Script closed successfully!", false)
     screenGui:Destroy() -- Tắt hoàn toàn script
 end)
 
 -- Xử lý nút Cancel trong xác nhận
 confirmCancelButton.MouseButton1Click:Connect(function()
     confirmFrame.Visible = false
+    createNotification("Close cancelled!", false)
 end)
 
 -- Xử lý nút Speed Up X
@@ -221,9 +277,9 @@ speedUpButton.MouseButton1Click:Connect(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
     end)
     if success then
-        createNotification("Speed Up X executed successfully!")
+        createNotification("Speed Up X executed successfully!", false)
     else
-        createNotification("Error executing Speed Up X: " .. tostring(err))
+        createNotification("Error executing Speed Up X: " .. tostring(err), true)
     end
 end)
 
@@ -233,9 +289,9 @@ noLagButton.MouseButton1Click:Connect(function()
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
     end)
     if success then
-        createNotification("No Lag executed successfully!")
+        createNotification("No Lag executed successfully!", false)
     else
-        createNotification("Error executing No Lag: " .. tostring(err))
+        createNotification("Error executing No Lag: " .. tostring(err), true)
     end
 end)
 
