@@ -9,6 +9,7 @@ local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.IgnoreGuiInset = true -- Che cả thanh công cụ Roblox
 
 -- Tạo Frame chính (bảng chọn hack)
 local Frame = Instance.new("Frame")
@@ -98,8 +99,8 @@ NoLagButton.Parent = ButtonContainer
 NoLagButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
 NoLagButton.Size = UDim2.new(0.9, 0, 0, 45)
 NoLagButton.Text = "No Lag"
-NoLagButton.TextColor3 = Color3.fromRGB(255, 100, 100) -- Đổi màu chữ đỏ để tránh lỗi
-NoLagButton.TextSize = 11
+NoLagButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+NoLagButton.TextSize = 16
 NoLagButton.Font = Enum.Font.Gotham
 NoLagButton.BackgroundTransparency = 0.1
 local NoLagCorner = Instance.new("UICorner")
@@ -136,11 +137,13 @@ ToggleStroke.Parent = ToggleButton
 local LoadingFrame = Instance.new("Frame")
 LoadingFrame.Parent = ScreenGui
 LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-LoadingFrame.BackgroundTransparency = 0 -- Đen 100%, không trong suốt
+LoadingFrame.BackgroundTransparency = 0 -- Đen 100%
 LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
 LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
 LoadingFrame.Visible = true -- Hiển thị ngay từ đầu
 LoadingFrame.ZIndex = 10
+LoadingFrame.AnchorPoint = Vector2.new(0, 0) -- Cố định góc trên bên trái
+LoadingFrame.ClipsDescendants = false -- Tắt cắt nội dung
 local LoadingCorner = Instance.new("UICorner")
 LoadingCorner.CornerRadius = UDim.new(0, 0)
 LoadingCorner.Parent = LoadingFrame
@@ -213,18 +216,14 @@ NotificationStroke.Parent = NotificationFrame
 -- Quản lý hàng đợi thông báo
 local notificationQueue = {}
 local isShowingNotification = false
-local lastNotification = nil -- Lưu thông báo cuối để tránh lặp
+local lastNotification = nil
 
 local function showNotification(message, duration)
-    -- Kiểm tra nếu thông báo giống thông báo trước thì bỏ qua
     if lastNotification == message then
         return
     end
     lastNotification = message
-
-    -- Thêm vào hàng đợi
     table.insert(notificationQueue, {text = message, duration = duration or 2})
-
     if not isShowingNotification then
         isShowingNotification = true
         local function processQueue()
@@ -241,7 +240,7 @@ local function showNotification(message, duration)
                 tweenOut.Completed:Wait()
                 NotificationFrame.Visible = false
                 table.remove(notificationQueue, 1)
-                lastNotification = nil -- Reset sau khi hiển thị xong
+                lastNotification = nil
             end
             isShowingNotification = false
         end
