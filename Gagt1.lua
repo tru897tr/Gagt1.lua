@@ -1,6 +1,12 @@
+-- Prevent multiple executions
+if _G.HackHubLoaded then
+    warn("Hack Hub script already loaded!")
+    return
+end
+_G.HackHubLoaded = true
+
 -- Services
 local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui", 5)
@@ -25,23 +31,32 @@ local function createLoadingScreen()
     loadingFrame.Size = UDim2.new(1, 0, 1, 0)
     loadingFrame.Position = UDim2.new(0, 0, 0, 0)
     loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    loadingFrame.BackgroundTransparency = 0
     loadingFrame.ZIndex = 10
     loadingFrame.Parent = gui
 
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 10))
     }
     gradient.Rotation = 90
     gradient.Parent = loadingFrame
 
-    -- Fade out animation
-    local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-    local tween = TweenService:Create(loadingFrame, tweenInfo, {BackgroundTransparency = 1})
-    tween:Play()
-    tween.Completed:Connect(function()
+    local loadingText = Instance.new("TextLabel")
+    loadingText.Size = UDim2.new(0.5, 0, 0.2, 0)
+    loadingText.Position = UDim2.new(0.25, 0, 0.4, 0)
+    loadingText.BackgroundTransparency = 1
+    loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    loadingText.Text = "Loading"
+    loadingText.Font = Enum.Font.GothamBold
+    loadingText.TextSize = 36
+    loadingText.TextScaled = true
+    loadingText.ZIndex = 11
+    loadingText.Parent = loadingFrame
+
+    -- Destroy after 5 seconds
+    task.spawn(function()
+        task.wait(5)
         loadingFrame:Destroy()
     end)
 end
@@ -81,6 +96,7 @@ local function createTitle(parent)
     title.Text = "Grow a Garden Hack Hub"
     title.Font = Enum.Font.GothamBold
     title.TextSize = 16
+    title.ZIndex = 3
     title.Parent = parent
 
     local corner = Instance.new("UICorner")
@@ -143,6 +159,7 @@ end
 local function toggleGui()
     frame.Visible = not frame.Visible
     toggleButton.BackgroundColor3 = frame.Visible and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+    print("GUI toggled: " .. (frame.Visible and "Visible" or "Hidden"))
 end
 
 -- Initialize GUI
@@ -163,11 +180,15 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.RightShift then
         toggleGui()
+        print("Right Shift pressed: GUI toggled")
     end
 end)
 
 -- Bind Toggle Button Click
-toggleButton.MouseButton1Click:Connect(toggleGui)
+toggleButton.MouseButton1Click:Connect(function()
+    toggleGui()
+    print("Toggle button clicked")
+end)
 
 -- Debug
 print("Hack Hub GUI loaded successfully!")
