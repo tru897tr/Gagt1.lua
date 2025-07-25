@@ -56,6 +56,30 @@ titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.ZIndex = 6
 titleLabel.Parent = mainFrame
 
+-- Tạo nút Speed Up X
+local speedUpButton = Instance.new("TextButton")
+speedUpButton.Size = UDim2.new(0.8, 0, 0, 50)
+speedUpButton.Position = UDim2.new(0.1, 0, 0.2, 0)
+speedUpButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+speedUpButton.Text = "Speed Up X"
+speedUpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+speedUpButton.TextSize = 20
+speedUpButton.Font = Enum.Font.SourceSansBold
+speedUpButton.ZIndex = 6
+speedUpButton.Parent = mainFrame
+
+-- Tạo nút No Lag
+local noLagButton = Instance.new("TextButton")
+noLagButton.Size = UDim2.new(0.8, 0, 0, 50)
+noLagButton.Position = UDim2.new(0.1, 0, 0.35, 0)
+noLagButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+noLagButton.Text = "No Lag"
+noLagButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+noLagButton.TextSize = 20
+noLagButton.Font = Enum.Font.SourceSansBold
+noLagButton.ZIndex = 6
+noLagButton.Parent = mainFrame
+
 -- Tạo nút ẩn/hiện hình tròn ở góc phải
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 50, 0, 50)
@@ -99,6 +123,16 @@ end)
 
 -- Xử lý nút ẩn/hiện
 toggleButton.MouseButton1Click:Connect(toggleUI)
+
+-- Xử lý nút Speed Up X
+speedUpButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+end)
+
+-- Xử lý nút No Lag
+noLagButton.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
+end)
 
 -- Làm khung có thể kéo (hỗ trợ cả chuột và cảm ứng)
 local dragging
