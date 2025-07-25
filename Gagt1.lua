@@ -14,9 +14,9 @@ ScreenGui.IgnoreGuiInset = true -- Che cả thanh công cụ Roblox
 -- Tạo Frame chính (bảng chọn hack)
 local Frame = Instance.new("Frame")
 Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -100)
-Frame.Size = UDim2.new(0, 300, 0, 220)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.Position = UDim2.new(0.5, -175, 0.5, -125)
+Frame.Size = UDim2.new(0, 350, 0, 250)
 Frame.BackgroundTransparency = 0.05
 Frame.Active = true
 Frame.Draggable = true
@@ -25,67 +25,78 @@ Frame.ZIndex = 2
 
 -- Bo góc Frame
 local FrameCorner = Instance.new("UICorner")
-FrameCorner.CornerRadius = UDim.new(0, 10)
+FrameCorner.CornerRadius = UDim.new(0, 12)
 FrameCorner.Parent = Frame
 
 -- Viền Frame
 local FrameStroke = Instance.new("UIStroke")
-FrameStroke.Thickness = 1
+FrameStroke.Thickness = 1.5
 FrameStroke.Color = Color3.fromRGB(100, 100, 255)
 FrameStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 FrameStroke.Parent = Frame
+
+-- Padding cho Frame
+local FramePadding = Instance.new("UIPadding")
+FramePadding.PaddingTop = UDim.new(0, 10)
+FramePadding.PaddingLeft = UDim.new(0, 10)
+FramePadding.PaddingRight = UDim.new(0, 10)
+FramePadding.Parent = Frame
 
 -- Tiêu đề
 local Title = Instance.new("TextLabel")
 Title.Parent = Frame
 Title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Title.BackgroundTransparency = 0.3
-Title.Size = UDim2.new(1, 0, 0, 35)
+Title.BackgroundTransparency = 0.2
+Title.Size = UDim2.new(1, -20, 0, 40)
+Title.Position = UDim2.new(0, 0, 0, 0)
 Title.Text = "Hack Hub"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 20
-Title.Font = Enum.Font.GothamBold
-Title.TextStrokeTransparency = 0.8
+Title.TextSize = 22
+Title.Font = Enum.Font.SourceSansPro
+Title.TextStrokeTransparency = 0.7
 Title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+Title.ZIndex = 2
 
 -- Credit
 local Credit = Instance.new("TextLabel")
 Credit.Parent = Frame
 Credit.BackgroundTransparency = 1
-Credit.Position = UDim2.new(0, 0, 0, 35)
-Credit.Size = UDim2.new(1, 0, 0, 20)
+Credit.Position = UDim2.new(0, 0, 0, 45)
+Credit.Size = UDim2.new(1, -20, 0, 25)
 Credit.Text = "Created by Nguyễn Trứ"
 Credit.TextColor3 = Color3.fromRGB(150, 150, 255)
-Credit.TextSize = 12
-Credit.Font = Enum.Font.Gotham
-Credit.TextTransparency = 0.2
+Credit.TextSize = 14
+Credit.Font = Enum.Font.SourceSansPro
+Credit.TextTransparency = 0.1
 Credit.ZIndex = 2
 
 -- Container cho các nút
 local ButtonContainer = Instance.new("Frame")
 ButtonContainer.Parent = Frame
 ButtonContainer.BackgroundTransparency = 1
-ButtonContainer.Position = UDim2.new(0, 0, 0, 55)
-ButtonContainer.Size = UDim2.new(1, 0, 1, -55)
+ButtonContainer.Position = UDim2.new(0, 0, 0, 75)
+ButtonContainer.Size = UDim2.new(1, -20, 1, -85)
 local UIListLayout = Instance.new("UIListLayout")
 UIListLayout.Parent = ButtonContainer
 UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-UIListLayout.Padding = UDim.new(0, 8)
+UIListLayout.Padding = UDim.new(0, 10)
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+ButtonContainer.ZIndex = 2
 
 -- Nút Speed Up
 local SpeedUpButton = Instance.new("TextButton")
 SpeedUpButton.Parent = ButtonContainer
 SpeedUpButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-SpeedUpButton.Size = UDim2.new(0.9, 0, 0, 45)
+SpeedUpButton.Size = UDim2.new(0.9, 0, 0, 50)
 SpeedUpButton.Text = "Speed Up X"
 SpeedUpButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-SpeedUpButton.TextSize = 16
-SpeedUpButton.Font = Enum.Font.Gotham
+SpeedUpButton.TextSize = 18
+SpeedUpButton.Font = Enum.Font.SourceSansPro
 SpeedUpButton.BackgroundTransparency = 0.1
+SpeedUpButton.ZIndex = 2
 local SpeedUpCorner = Instance.new("UICorner")
-SpeedUpCorner.CornerRadius = UDim.new(0, 8)
+SpeedUpCorner.CornerRadius = UDim.new(0, 10)
 SpeedUpCorner.Parent = SpeedUpButton
 local SpeedUpStroke = Instance.new("UIStroke")
 SpeedUpStroke.Thickness = 1
@@ -97,14 +108,15 @@ SpeedUpStroke.Parent = SpeedUpButton
 local NoLagButton = Instance.new("TextButton")
 NoLagButton.Parent = ButtonContainer
 NoLagButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-NoLagButton.Size = UDim2.new(0.9, 0, 0, 45)
+NoLagButton.Size = UDim2.new(0.9, 0, 0, 50)
 NoLagButton.Text = "No Lag"
 NoLagButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-NoLagButton.TextSize = 16
-NoLagButton.Font = Enum.Font.Gotham
+NoLagButton.TextSize = 18
+NoLagButton.Font = Enum.Font.SourceSansPro
 NoLagButton.BackgroundTransparency = 0.1
+NoLagButton.ZIndex = 2
 local NoLagCorner = Instance.new("UICorner")
-NoLagCorner.CornerRadius = UDim.new(0, 8)
+NoLagCorner.CornerRadius = UDim.new(0, 10)
 NoLagCorner.Parent = NoLagButton
 local NoLagStroke = Instance.new("UIStroke")
 NoLagStroke.Thickness = 1
@@ -116,12 +128,12 @@ NoLagStroke.Parent = NoLagButton
 local CloseButton = Instance.new("TextButton")
 CloseButton.Parent = Frame
 CloseButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-CloseButton.Position = UDim2.new(1, -25, 0, 5)
-CloseButton.Size = UDim2.new(0, 20, 0, 20)
+CloseButton.Position = UDim2.new(1, -30, 0, 5)
+CloseButton.Size = UDim2.new(0, 25, 0, 25)
 CloseButton.Text = "X"
 CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-CloseButton.TextSize = 12
-CloseButton.Font = Enum.Font.GothamBold
+CloseButton.TextSize = 14
+CloseButton.Font = Enum.Font.SourceSansPro
 CloseButton.ZIndex = 3
 local CloseCorner = Instance.new("UICorner")
 CloseCorner.CornerRadius = UDim.new(0.5, 0)
@@ -135,44 +147,64 @@ CloseStroke.Parent = CloseButton
 -- Bảng xác nhận thoát
 local ConfirmFrame = Instance.new("Frame")
 ConfirmFrame.Parent = ScreenGui
-ConfirmFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-ConfirmFrame.Position = UDim2.new(0.5, -100, 0.5, -75)
-ConfirmFrame.Size = UDim2.new(0, 200, 0, 150)
+ConfirmFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ConfirmFrame.Position = UDim2.new(0.5, -125, 0.5, -90)
+ConfirmFrame.Size = UDim2.new(0, 250, 0, 180)
 ConfirmFrame.BackgroundTransparency = 0.05
 ConfirmFrame.Visible = false
 ConfirmFrame.ZIndex = 4
 local ConfirmCorner = Instance.new("UICorner")
-ConfirmCorner.CornerRadius = UDim.new(0, 10)
+ConfirmCorner.CornerRadius = UDim.new(0, 12)
 ConfirmCorner.Parent = ConfirmFrame
 local ConfirmStroke = Instance.new("UIStroke")
-ConfirmStroke.Thickness = 1
+ConfirmStroke.Thickness = 1.5
 ConfirmStroke.Color = Color3.fromRGB(100, 100, 255)
 ConfirmStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 ConfirmStroke.Parent = ConfirmFrame
+
+-- Padding cho ConfirmFrame
+local ConfirmPadding = Instance.new("UIPadding")
+ConfirmPadding.PaddingTop = UDim.new(0, 10)
+ConfirmPadding.PaddingLeft = UDim.new(0, 10)
+ConfirmPadding.PaddingRight = UDim.new(0, 10)
+ConfirmPadding.Parent = ConfirmFrame
 
 -- Tiêu đề xác nhận
 local ConfirmTitle = Instance.new("TextLabel")
 ConfirmTitle.Parent = ConfirmFrame
 ConfirmTitle.BackgroundTransparency = 1
 ConfirmTitle.Position = UDim2.new(0, 0, 0, 10)
-ConfirmTitle.Size = UDim2.new(1, 0, 0, 30)
+ConfirmTitle.Size = UDim2.new(1, -20, 0, 50)
 ConfirmTitle.Text = "Bạn có chắc muốn tắt script không?"
 ConfirmTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-ConfirmTitle.TextSize = 12
-ConfirmTitle.Font = Enum.Font.GothamBold
+ConfirmTitle.TextSize = 16
+ConfirmTitle.Font = Enum.Font.SourceSansPro
 ConfirmTitle.TextWrapped = true
 ConfirmTitle.ZIndex = 5
 
+-- Container cho nút xác nhận
+local ConfirmButtonContainer = Instance.new("Frame")
+ConfirmButtonContainer.Parent = ConfirmFrame
+ConfirmButtonContainer.BackgroundTransparency = 1
+ConfirmButtonContainer.Position = UDim2.new(0, 0, 0, 70)
+ConfirmButtonContainer.Size = UDim2.new(1, -20, 0, 80)
+ConfirmButtonContainer.ZIndex = 5
+local ConfirmListLayout = Instance.new("UIListLayout")
+ConfirmListLayout.Parent = ConfirmButtonContainer
+ConfirmListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+ConfirmListLayout.Padding = UDim.new(0, 10)
+ConfirmListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+ConfirmListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+
 -- Nút "Có" (tắt script)
 local YesButton = Instance.new("TextButton")
-YesButton.Parent = ConfirmFrame
+YesButton.Parent = ConfirmButtonContainer
 YesButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
-YesButton.Position = UDim2.new(0.15, 0, 0.6, 0)
-YesButton.Size = UDim2.new(0.35, 0, 0.25, 0)
+YesButton.Size = UDim2.new(0.45, 0, 0, 40)
 YesButton.Text = "Có"
 YesButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-YesButton.TextSize = 14
-YesButton.Font = Enum.Font.Gotham
+YesButton.TextSize = 16
+YesButton.Font = Enum.Font.SourceSansPro
 YesButton.BackgroundTransparency = 0.1
 YesButton.ZIndex = 5
 local YesCorner = Instance.new("UICorner")
@@ -186,14 +218,13 @@ YesStroke.Parent = YesButton
 
 -- Nút "Không" (quay lại)
 local NoButton = Instance.new("TextButton")
-NoButton.Parent = ConfirmFrame
+NoButton.Parent = ConfirmButtonContainer
 NoButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-NoButton.Position = UDim2.new(0.5, 0, 0.6, 0)
-NoButton.Size = UDim2.new(0.35, 0, 0.25, 0)
+NoButton.Size = UDim2.new(0.45, 0, 0, 40)
 NoButton.Text = "Không"
 NoButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-NoButton.TextSize = 14
-NoButton.Font = Enum.Font.Gotham
+NoButton.TextSize = 16
+NoButton.Font = Enum.Font.SourceSansPro
 NoButton.BackgroundTransparency = 0.1
 NoButton.ZIndex = 5
 local NoCorner = Instance.new("UICorner")
@@ -209,13 +240,13 @@ NoStroke.Parent = NoButton
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Parent = ScreenGui
 ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-ToggleButton.Position = UDim2.new(1, -40, 0, 5)
-ToggleButton.Size = UDim2.new(0, 35, 0, 35)
+ToggleButton.Position = UDim2.new(1, -45, 0, 10)
+ToggleButton.Size = UDim2.new(0, 40, 0, 40)
 ToggleButton.Text = "X"
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton.TextSize = 14
-ToggleButton.Font = Enum.Font.GothamBold
-ToggleButton.Visible = false -- Ẩn ban đầu
+ToggleButton.TextSize = 16
+ToggleButton.Font = Enum.Font.SourceSansPro
+ToggleButton.Visible = false
 ToggleButton.ZIndex = 5
 local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.CornerRadius = UDim.new(0.5, 0)
@@ -230,10 +261,10 @@ ToggleStroke.Parent = ToggleButton
 local LoadingFrame = Instance.new("Frame")
 LoadingFrame.Parent = ScreenGui
 LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-LoadingFrame.BackgroundTransparency = 0 -- Đen 100%
+LoadingFrame.BackgroundTransparency = 0
 LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
 LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
-LoadingFrame.Visible = true -- Hiển thị ngay từ đầu
+LoadingFrame.Visible = true
 LoadingFrame.ZIndex = 10
 LoadingFrame.AnchorPoint = Vector2.new(0, 0)
 LoadingFrame.ClipsDescendants = false
@@ -241,7 +272,7 @@ local LoadingCorner = Instance.new("UICorner")
 LoadingCorner.CornerRadius = UDim.new(0, 0)
 LoadingCorner.Parent = LoadingFrame
 local LoadingStroke = Instance.new("UIStroke")
-LoadingStroke.Thickness = 1
+LoadingStroke.Thickness = 1.5
 LoadingStroke.Color = Color3.fromRGB(100, 100, 255)
 LoadingStroke.Transparency = 0.8
 LoadingStroke.Parent = LoadingFrame
@@ -250,12 +281,12 @@ LoadingStroke.Parent = LoadingFrame
 local LoadingText = Instance.new("TextLabel")
 LoadingText.Parent = LoadingFrame
 LoadingText.BackgroundTransparency = 1
-LoadingText.Position = UDim2.new(0.5, -100, 0.4, 0)
-LoadingText.Size = UDim2.new(0, 200, 0, 30)
+LoadingText.Position = UDim2.new(0.5, -125, 0.4, 0)
+LoadingText.Size = UDim2.new(0, 250, 0, 40)
 LoadingText.Text = "Loading Hack Hub..."
 LoadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
-LoadingText.TextSize = 18
-LoadingText.Font = Enum.Font.GothamBold
+LoadingText.TextSize = 20
+LoadingText.Font = Enum.Font.SourceSansPro
 LoadingText.TextWrapped = true
 LoadingText.ZIndex = 11
 
@@ -263,11 +294,11 @@ LoadingText.ZIndex = 11
 local ProgressBarFrame = Instance.new("Frame")
 ProgressBarFrame.Parent = LoadingFrame
 ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-ProgressBarFrame.Position = UDim2.new(0.5, -100, 0.5, 0)
-ProgressBarFrame.Size = UDim2.new(0, 200, 0, 20)
+ProgressBarFrame.Position = UDim2.new(0.5, -125, 0.5, 0)
+ProgressBarFrame.Size = UDim2.new(0, 250, 0, 25)
 ProgressBarFrame.ZIndex = 11
 local ProgressBarCorner = Instance.new("UICorner")
-ProgressBarCorner.CornerRadius = UDim.new(0, 5)
+ProgressBarCorner.CornerRadius = UDim.new(0, 6)
 ProgressBarCorner.Parent = ProgressBarFrame
 local ProgressBar = Instance.new("Frame")
 ProgressBar.Parent = ProgressBarFrame
@@ -275,36 +306,40 @@ ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
 ProgressBar.Size = UDim2.new(0, 0, 1, 0)
 ProgressBar.ZIndex = 12
 local ProgressBarCornerInner = Instance.new("UICorner")
-ProgressBarCornerInner.CornerRadius = UDim.new(0, 5)
+ProgressBarCornerInner.CornerRadius = UDim.new(0, 6)
 ProgressBarCornerInner.Parent = ProgressBar
 
 -- Frame thông báo
 local NotificationFrame = Instance.new("Frame")
 NotificationFrame.Parent = ScreenGui
-NotificationFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-NotificationFrame.Position = UDim2.new(0.5, -100, 0.85, 0)
-NotificationFrame.Size = UDim2.new(0, 200, 0, 40)
+NotificationFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+NotificationFrame.Position = UDim2.new(0.5, -125, 0.85, 0)
+NotificationFrame.Size = UDim2.new(0, 250, 0, 50)
 NotificationFrame.BackgroundTransparency = 0.1
 NotificationFrame.Visible = false
 NotificationFrame.ZIndex = 3
 local NotificationCorner = Instance.new("UICorner")
-NotificationCorner.CornerRadius = UDim.new(0, 8)
+NotificationCorner.CornerRadius = UDim.new(0, 10)
 NotificationCorner.Parent = NotificationFrame
-local NotificationText = Instance.new("TextLabel")
-NotificationText.Parent = NotificationFrame
-NotificationText.BackgroundTransparency = 1
-NotificationText.Size = UDim2.new(1, 0, 1, 0)
-NotificationText.TextColor3 = Color3.fromRGB(255, 255, 255)
-NotificationText.TextSize = 12
-NotificationText.Font = Enum.Font.Gotham
-NotificationText.Text = ""
-NotificationText.TextWrapped = true
-NotificationText.ZIndex = 4
 local NotificationStroke = Instance.new("UIStroke")
-NotificationStroke.Thickness = 1
+NotificationStroke.Thickness = 1.5
 NotificationStroke.Color = Color3.fromRGB(100, 100, 255)
 NotificationStroke.Transparency = 0.8
 NotificationStroke.Parent = NotificationFrame
+local NotificationPadding = Instance.new("UIPadding")
+NotificationPadding.PaddingLeft = UDim.new(0, 10)
+NotificationPadding.PaddingRight = UDim.new(0, 10)
+NotificationPadding.Parent = NotificationFrame
+local NotificationText = Instance.new("TextLabel")
+NotificationText.Parent = NotificationFrame
+NotificationText.BackgroundTransparency = 1
+NotificationText.Size = UDim2.new(1, -20, 1, 0)
+NotificationText.TextColor3 = Color3.fromRGB(255, 255, 255)
+NotificationText.TextSize = 14
+NotificationText.Font = Enum.Font.SourceSansPro
+NotificationText.Text = ""
+NotificationText.TextWrapped = true
+NotificationText.ZIndex = 4
 
 -- Quản lý hàng đợi thông báo
 local notificationQueue = {}
@@ -312,11 +347,8 @@ local isShowingNotification = false
 local lastNotification = nil
 
 local function showNotification(message, duration)
-    if lastNotification == message then
-        return
-    end
+    if lastNotification == message then return end
     lastNotification = message
-    -- Giới hạn tối đa 3 thông báo
     if #notificationQueue >= 3 then
         table.remove(notificationQueue, 1)
     end
@@ -328,11 +360,11 @@ local function showNotification(message, duration)
                 local notif = notificationQueue[1]
                 NotificationText.Text = notif.text
                 NotificationFrame.Visible = true
-                local tweenIn = TweenService:Create(NotificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -100, 0.75, 0)})
+                local tweenIn = TweenService:Create(NotificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -125, 0.75, 0)})
                 tweenIn:Play()
                 tweenIn.Completed:Wait()
                 wait(notif.duration)
-                local tweenOut = TweenService:Create(NotificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(0.5, -100, 0.85, 0)})
+                local tweenOut = TweenService:Create(NotificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(0.5, -125, 0.85, 0)})
                 tweenOut:Play()
                 tweenOut.Completed:Wait()
                 NotificationFrame.Visible = false
@@ -355,7 +387,7 @@ local function applyHoverEffect(button)
         local hoverTween = TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0, BackgroundColor3 = Color3.fromRGB(0, 150, 255)})
         TweenService:Create(button:FindFirstChildOfClass("UIStroke"), tweenInfo, {Transparency = 0}):Play()
         hoverTween:Play()
-        hoverTween.Completed:Connect(function() isHovering = false end)
+        hoverTween.Com Completed:Connect(function() isHovering = false end)
     end)
     button.MouseLeave:Connect(function()
         if isHovering then return end
@@ -385,7 +417,7 @@ local function toggleFrame()
     if currentTween then currentTween:Cancel() end
     local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
     if Frame.Visible then
-        currentTween = TweenService:Create(Frame, tweenInfo, {Position = UDim2.new(0.5, -150, 0.5, -1000)})
+        currentTween = TweenService:Create(Frame, tweenInfo, {Position = UDim2.new(0.5, -175, 0.5, -1000)})
         currentTween:Play()
         currentTween.Completed:Connect(function()
             Frame.Visible = false
@@ -396,8 +428,8 @@ local function toggleFrame()
         end)
     else
         Frame.Visible = true
-        Frame.Position = UDim2.new(0.5, -150, 0.5, -1000)
-        currentTween = TweenService:Create(Frame, tweenInfo, {Position = UDim2.new(0.5, -150, 0.5, -100)})
+        Frame.Position = UDim2.new(0.5, -175, 0.5, -1000)
+        currentTween = TweenService:Create(Frame, tweenInfo, {Position = UDim2.new(0.5, -175, 0.5, -125)})
         currentTween:Play()
         currentTween.Completed:Connect(function()
             ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
@@ -414,23 +446,23 @@ ToggleButton.MouseButton1Click:Connect(toggleFrame)
 -- Chức năng nút Close (hiện bảng xác nhận)
 CloseButton.MouseButton1Click:Connect(function()
     ConfirmFrame.Visible = true
-    Frame.Visible = false -- Ẩn tạm Frame chính
+    Frame.Visible = false
 end)
 
 -- Chức năng nút Yes (tắt script)
 YesButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy() -- Tắt toàn bộ script
+    ScreenGui:Destroy()
 end)
 
 -- Chức năng nút No (quay lại)
 NoButton.MouseButton1Click:Connect(function()
     ConfirmFrame.Visible = false
-    Frame.Visible = true -- Hiện lại Frame chính
+    Frame.Visible = true
 end)
 
 -- Hàm chạy progress bar
 local function runProgressBar()
-    ProgressBar.Size = UDim2.new(0, 0, 1, 0) -- Reset progress bar
+    ProgressBar.Size = UDim2.new(0, 0, 1, 0)
     local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
     local tween = TweenService:Create(ProgressBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
     tween:Play()
@@ -454,8 +486,8 @@ local function hideLoading()
         LoadingFrame.Visible = false
         Frame.Visible = true
         ToggleButton.Visible = true
-        Frame.Position = UDim2.new(0.5, -150, 0.5, -1000)
-        local openTween = TweenService:Create(Frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -150, 0.5, -100)})
+        Frame.Position = UDim2.new(0.5, -175, 0.5, -1000)
+        local openTween = TweenService:Create(Frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -175, 0.5, -125)})
         openTween:Play()
         showNotification("Welcome to Hack Hub!", 2)
     end)
