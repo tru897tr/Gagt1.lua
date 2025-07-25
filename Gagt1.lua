@@ -2,8 +2,9 @@
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
--- Translations
+-- Translations (Only English)
 local translations = {
     en = {
         title = "Grow a Garden",
@@ -20,14 +21,11 @@ local translations = {
         nolag_desc = "Run No Lag script",
         theme_title = "Theme",
         theme_desc = "Change interface theme",
-        lang_title = "Language",
-        lang_desc = "Change interface language",
         speed_button = "Apply",
         jump_button = "Infinite Jump: %s",
         speedup_button = "Run Speed Up X",
         nolag_button = "Run No Lag",
         theme_button = "Theme: %s",
-        lang_button = "Language: %s",
         credit = "By Nguyễn Thanh Trứ",
         speed_notification = "Speed set to %s!",
         speed_error = "Invalid speed!",
@@ -39,45 +37,7 @@ local translations = {
         nolag_notification = "No Lag script loaded!",
         nolag_error = "Failed to load No Lag!",
         theme_notification = "Theme changed: %s",
-        lang_notification = "Language changed to %s",
         init_error = "Initialization failed!"
-    },
-    vi = {
-        title = "Trồng một khu vườn",
-        home = "Trang chủ",
-        features = "Tính năng",
-        settings = "Cài đặt",
-        speed_title = "Tốc độ chạy",
-        speed_desc = "Đặt tốc độ chạy tùy chỉnh",
-        jump_title = "Nhảy vô hạn",
-        jump_desc = "Nhảy mà không cần chạm đất",
-        speedup_title = "Tăng tốc X",
-        speedup_desc = "Chạy script Tăng tốc X",
-        nolag_title = "Không lag",
-        nolag_desc = "Chạy script Không lag",
-        theme_title = "Giao diện",
-        theme_desc = "Thay đổi giao diện",
-        lang_title = "Ngôn ngữ",
-        lang_desc = "Thay đổi ngôn ngữ giao diện",
-        speed_button = "Áp dụng",
-        jump_button = "Nhảy vô hạn: %s",
-        speedup_button = "Chạy Tăng tốc X",
-        nolag_button = "Chạy Không lag",
-        theme_button = "Giao diện: %s",
-        lang_button = "Ngôn ngữ: %s",
-        credit = "Bởi Nguyễn Thanh Trứ",
-        speed_notification = "Tốc độ đặt thành %s!",
-        speed_error = "Tốc độ không hợp lệ!",
-        jump_enabled = "Nhảy vô hạn đã bật!",
-        jump_disabled = "Nhảy vô hạn đã tắt!",
-        jump_error = "Lỗi nhảy vô hạn!",
-        speedup_notification = "Đã chạy script Tăng tốc X!",
-        speedup_error = "Không thể chạy Tăng tốc X!",
-        nolag_notification = "Đã chạy script Không lag!",
-        nolag_error = "Không thể chạy Không lag!",
-        theme_notification = "Giao diện đã đổi: %s",
-        lang_notification = "Ngôn ngữ thay đổi thành %s",
-        init_error = "Khởi tạo thất bại!"
     }
 }
 
@@ -171,9 +131,9 @@ local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 14)
 frameCorner.Parent = frame
 
--- Drag Area
+-- Drag Area (Expanded)
 local DragArea = Instance.new("Frame")
-DragArea.Size = UDim2.new(1, 0, 0, 32)
+DragArea.Size = UDim2.new(1, 0, 0, 50) -- Expanded height to 50
 DragArea.BackgroundTransparency = 1
 DragArea.ZIndex = 12
 DragArea.Parent = frame
@@ -237,6 +197,11 @@ homeContent.Visible = true
 homeContent.CanvasSize = UDim2.new(0, 0, 0, 200) -- Đủ để chứa Speed Up X và No Lag
 homeContent.ScrollBarThickness = 4
 homeContent.ScrollBarImageColor3 = Color3.fromRGB(200, 200, 200)
+homeContent.ScrollingEnabled = true
+local homeListLayout = Instance.new("UIListLayout")
+homeListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+homeListLayout.Padding = UDim.new(0, 10)
+homeListLayout.Parent = homeContent
 
 -- Content: Features (ScrollingFrame)
 local featuresContent = Instance.new("ScrollingFrame")
@@ -248,6 +213,11 @@ featuresContent.Visible = false
 featuresContent.CanvasSize = UDim2.new(0, 0, 0, 200) -- Đủ để chứa Walk Speed và Infinite Jump
 featuresContent.ScrollBarThickness = 4
 featuresContent.ScrollBarImageColor3 = Color3.fromRGB(200, 200, 200)
+featuresContent.ScrollingEnabled = true
+local featuresListLayout = Instance.new("UIListLayout")
+featuresListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+featuresListLayout.Padding = UDim.new(0, 10)
+featuresListLayout.Parent = featuresContent
 
 -- Content: Settings (ScrollingFrame)
 local settingsContent = Instance.new("ScrollingFrame")
@@ -256,9 +226,14 @@ settingsContent.BackgroundTransparency = 1
 settingsContent.ZIndex = 10
 settingsContent.Parent = contentFrame
 settingsContent.Visible = false
-settingsContent.CanvasSize = UDim2.new(0, 0, 0, 200) -- Đủ để chứa Theme và Language
+settingsContent.CanvasSize = UDim2.new(0, 0, 0, 110) -- Chỉ chứa Theme
 settingsContent.ScrollBarThickness = 4
 settingsContent.ScrollBarImageColor3 = Color3.fromRGB(200, 200, 200)
+settingsContent.ScrollingEnabled = true
+local settingsListLayout = Instance.new("UIListLayout")
+settingsListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+settingsListLayout.Padding = UDim.new(0, 10)
+settingsListLayout.Parent = settingsContent
 
 -- Sidebar Buttons
 local homeButton = Instance.new("TextButton")
@@ -306,13 +281,13 @@ local settingsCorner = Instance.new("UICorner")
 settingsCorner.CornerRadius = UDim.new(0, 6)
 settingsCorner.Parent = settingsButton
 
--- Home Content Frames (Chỉ Speed Up X và No Lag)
+-- Home Content Frames (Speed Up X và No Lag)
 local speedupFrame = Instance.new("Frame")
 speedupFrame.Size = UDim2.new(0, 190, 0, 80)
-speedupFrame.Position = UDim2.new(0, 25, 0, 20)
 speedupFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 speedupFrame.BackgroundTransparency = 0.4
 speedupFrame.ZIndex = 11
+speedupFrame.LayoutOrder = 0
 speedupFrame.Parent = homeContent
 local speedupCorner = Instance.new("UICorner")
 speedupCorner.CornerRadius = UDim.new(0, 8)
@@ -359,10 +334,10 @@ speedupButtonCorner.Parent = speedupButton
 
 local nolagFrame = Instance.new("Frame")
 nolagFrame.Size = UDim2.new(0, 190, 0, 80)
-nolagFrame.Position = UDim2.new(0, 25, 0, 110)
 nolagFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 nolagFrame.BackgroundTransparency = 0.4
 nolagFrame.ZIndex = 11
+nolagFrame.LayoutOrder = 1
 nolagFrame.Parent = homeContent
 local nolagCorner = Instance.new("UICorner")
 nolagCorner.CornerRadius = UDim.new(0, 8)
@@ -410,10 +385,10 @@ nolagButtonCorner.Parent = nolagButton
 -- Features Content Frames
 local speedFrameFeatures = Instance.new("Frame")
 speedFrameFeatures.Size = UDim2.new(0, 190, 0, 80)
-speedFrameFeatures.Position = UDim2.new(0, 25, 0, 20)
 speedFrameFeatures.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 speedFrameFeatures.BackgroundTransparency = 0.4
 speedFrameFeatures.ZIndex = 11
+speedFrameFeatures.LayoutOrder = 0
 speedFrameFeatures.Parent = featuresContent
 local speedCornerFeatures = Instance.new("UICorner")
 speedCornerFeatures.CornerRadius = UDim.new(0, 8)
@@ -476,10 +451,10 @@ applySpeedCornerFeatures.Parent = applySpeedButtonFeatures
 
 local jumpFrameFeatures = Instance.new("Frame")
 jumpFrameFeatures.Size = UDim2.new(0, 190, 0, 80)
-jumpFrameFeatures.Position = UDim2.new(0, 25, 0, 110)
 jumpFrameFeatures.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 jumpFrameFeatures.BackgroundTransparency = 0.4
 jumpFrameFeatures.ZIndex = 11
+jumpFrameFeatures.LayoutOrder = 1
 jumpFrameFeatures.Parent = featuresContent
 local jumpCornerFeatures = Instance.new("UICorner")
 jumpCornerFeatures.CornerRadius = UDim.new(0, 8)
@@ -523,13 +498,13 @@ local jumpButtonCornerFeatures = Instance.new("UICorner")
 jumpButtonCornerFeatures.CornerRadius = UDim.new(0, 6)
 jumpButtonCornerFeatures.Parent = jumpButtonFeatures
 
--- Settings Content Frames
+-- Settings Content Frames (Only Theme)
 local themeFrame = Instance.new("Frame")
 themeFrame.Size = UDim2.new(0, 190, 0, 80)
-themeFrame.Position = UDim2.new(0, 25, 0, 20)
 themeFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 themeFrame.BackgroundTransparency = 0.4
 themeFrame.ZIndex = 11
+themeFrame.LayoutOrder = 0
 themeFrame.Parent = settingsContent
 local themeCorner = Instance.new("UICorner")
 themeCorner.CornerRadius = UDim.new(0, 8)
@@ -573,55 +548,6 @@ local themeButtonCorner = Instance.new("UICorner")
 themeButtonCorner.CornerRadius = UDim.new(0, 6)
 themeButtonCorner.Parent = themeButton
 
-local langFrame = Instance.new("Frame")
-langFrame.Size = UDim2.new(0, 190, 0, 80)
-langFrame.Position = UDim2.new(0, 25, 0, 110)
-langFrame.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-langFrame.BackgroundTransparency = 0.4
-langFrame.ZIndex = 11
-langFrame.Parent = settingsContent
-local langCorner = Instance.new("UICorner")
-langCorner.CornerRadius = UDim.new(0, 8)
-langCorner.Parent = langFrame
-
-local langTitle = Instance.new("TextLabel")
-langTitle.Size = UDim2.new(0, 180, 0, 20)
-langTitle.Position = UDim2.new(0, 5, 0, 5)
-langTitle.BackgroundTransparency = 1
-langTitle.Text = translations.en.lang_title
-langTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-langTitle.TextSize = 14
-langTitle.Font = Enum.Font.GothamBold
-langTitle.TextXAlignment = Enum.TextXAlignment.Left
-langTitle.ZIndex = 12
-langTitle.Parent = langFrame
-
-local langDesc = Instance.new("TextLabel")
-langDesc.Size = UDim2.new(0, 180, 0, 20)
-langDesc.Position = UDim2.new(0, 5, 0, 25)
-langDesc.BackgroundTransparency = 1
-langDesc.Text = translations.en.lang_desc
-langDesc.TextColor3 = Color3.fromRGB(200, 200, 200)
-langDesc.TextSize = 12
-langDesc.Font = Enum.Font.Gotham
-langDesc.TextXAlignment = Enum.TextXAlignment.Left
-langDesc.ZIndex = 12
-langDesc.Parent = langFrame
-
-local langButton = Instance.new("TextButton")
-langButton.Size = UDim2.new(0, 180, 0, 25)
-langButton.Position = UDim2.new(0, 5, 0, 50)
-langButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-langButton.BackgroundTransparency = 0.4
-langButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-langButton.Font = Enum.Font.Gotham
-langButton.TextSize = 14
-langButton.ZIndex = 12
-langButton.Parent = langFrame
-local langButtonCorner = Instance.new("UICorner")
-langButtonCorner.CornerRadius = UDim.new(0, 6)
-langButtonCorner.Parent = langButton
-
 -- Toggle Button
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 26, 0, 26)
@@ -648,53 +574,44 @@ credit.TextXAlignment = Enum.TextXAlignment.Right
 credit.ZIndex = 11
 credit.Parent = frame
 
--- Theme and Language Settings
+-- Theme Settings
 local currentTheme = "Tối"
-local currentLanguage = "en"
 local themes = {
     {Name = "Sáng", Color = Color3.fromRGB(220, 220, 220), TextColor = Color3.fromRGB(0, 0, 0)},
     {Name = "Tối", Color = Color3.fromRGB(20, 20, 20), TextColor = Color3.fromRGB(255, 255, 255)}
 }
-local languages = {
-    {Name = "English", Code = "en"},
-    {Name = "Tiếng Việt", Code = "vi"}
-}
 
--- Update UI Text
+-- Update UI Text (No Language)
 local function updateUIText()
     local success, err = pcall(function()
-        title.Text = translations[currentLanguage].title
-        homeButton.Text = translations[currentLanguage].home
-        featuresButton.Text = translations[currentLanguage].features
-        settingsButton.Text = translations[currentLanguage].settings
-        speedTitleFeatures.Text = translations[currentLanguage].speed_title
-        speedDescFeatures.Text = translations[currentLanguage].speed_desc
-        jumpTitleFeatures.Text = translations[currentLanguage].jump_title
-        jumpDescFeatures.Text = translations[currentLanguage].jump_desc
-        jumpButtonFeatures.Text = string.format(translations[currentLanguage].jump_button, infiniteJumpEnabled and "On" or "Off")
-        speedupTitle.Text = translations[currentLanguage].speedup_title
-        speedupDesc.Text = translations[currentLanguage].speedup_desc
-        speedupButton.Text = translations[currentLanguage].speedup_button
-        nolagTitle.Text = translations[currentLanguage].nolag_title
-        nolagDesc.Text = translations[currentLanguage].nolag_desc
-        nolagButton.Text = translations[currentLanguage].nolag_button
-        themeTitle.Text = translations[currentLanguage].theme_title
-        themeDesc.Text = translations[currentLanguage].theme_desc
-        themeButton.Text = string.format(translations[currentLanguage].theme_button, currentTheme)
-        langTitle.Text = translations[currentLanguage].lang_title
-        langDesc.Text = translations[currentLanguage].lang_desc
-        langButton.Text = string.format(translations[currentLanguage].lang_button, currentLanguage == "en" and "English" or "Tiếng Việt")
-        applySpeedButtonFeatures.Text = translations[currentLanguage].speed_button
-        credit.Text = translations[currentLanguage].credit
+        title.Text = translations.en.title
+        homeButton.Text = translations.en.home
+        featuresButton.Text = translations.en.features
+        settingsButton.Text = translations.en.settings
+        speedTitleFeatures.Text = translations.en.speed_title
+        speedDescFeatures.Text = translations.en.speed_desc
+        jumpTitleFeatures.Text = translations.en.jump_title
+        jumpDescFeatures.Text = translations.en.jump_desc
+        jumpButtonFeatures.Text = string.format(translations.en.jump_button, infiniteJumpEnabled and "On" or "Off")
+        speedupTitle.Text = translations.en.speedup_title
+        speedupDesc.Text = translations.en.speedup_desc
+        speedupButton.Text = translations.en.speedup_button
+        nolagTitle.Text = translations.en.nolag_title
+        nolagDesc.Text = translations.en.nolag_desc
+        nolagButton.Text = translations.en.nolag_button
+        themeTitle.Text = translations.en.theme_title
+        themeDesc.Text = translations.en.theme_desc
+        themeButton.Text = string.format(translations.en.theme_button, currentTheme)
+        applySpeedButtonFeatures.Text = translations.en.speed_button
+        credit.Text = translations.en.credit
     end)
     if not success then
         warn("Failed to update UI text: " .. tostring(err))
-        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
-themeButton.Text = string.format(translations[currentLanguage].theme_button, currentTheme)
-langButton.Text = string.format(translations[currentLanguage].lang_button, currentLanguage == "en" and "English" or "Tiếng Việt")
+themeButton.Text = string.format(translations.en.theme_button, currentTheme)
 updateUIText()
 
 -- Theme Logic
@@ -713,7 +630,6 @@ themeButton.MouseButton1Click:Connect(function()
         sidebar.BackgroundColor3 = Color3.new(themes[nextIndex].Color.R * 1.1, themes[nextIndex].Color.G * 1.1, themes[nextIndex].Color.B * 1.1)
         title.TextColor3 = themes[nextIndex].TextColor
         themeButton.TextColor3 = themes[nextIndex].TextColor
-        langButton.TextColor3 = themes[nextIndex].TextColor
         closeButton.TextColor3 = themes[nextIndex].TextColor
         credit.TextColor3 = themes[nextIndex].TextColor
         homeButton.TextColor3 = themes[nextIndex].TextColor
@@ -723,34 +639,12 @@ themeButton.MouseButton1Click:Connect(function()
         nolagButton.TextColor3 = themes[nextIndex].TextColor
         applySpeedButtonFeatures.TextColor3 = themes[nextIndex].TextColor
         jumpButtonFeatures.TextColor3 = themes[nextIndex].TextColor
-        themeButton.Text = string.format(translations[currentLanguage].theme_button, currentTheme)
-        showNotification(string.format(translations[currentLanguage].theme_notification, currentTheme), Color3.fromRGB(0, 200, 100))
+        themeButton.Text = string.format(translations.en.theme_button, currentTheme)
+        showNotification(string.format(translations.en.theme_notification, currentTheme), Color3.fromRGB(0, 200, 100))
     end)
     if not success then
         warn("Theme change failed: " .. tostring(err))
-        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
-    end
-end)
-
--- Language Logic
-langButton.MouseButton1Click:Connect(function()
-    local success, err = pcall(function()
-        local currentIndex = 1
-        for i, lang in ipairs(languages) do
-            if lang.Code == currentLanguage then
-                currentIndex = i
-                break
-            end
-        end
-        local nextIndex = currentIndex % #languages + 1
-        currentLanguage = languages[nextIndex].Code
-        langButton.Text = string.format(translations[currentLanguage].lang_button, languages[nextIndex].Name)
-        updateUIText()
-        showNotification(string.format(translations[currentLanguage].lang_notification, languages[nextIndex].Name), Color3.fromRGB(0, 200, 100))
-    end)
-    if not success then
-        warn("Language change failed: " .. tostring(err))
-        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.init_error, Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -768,7 +662,7 @@ local function toggleMenu()
     end)
     if not success then
         warn("Toggle menu failed: " .. tostring(err))
-        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -787,7 +681,7 @@ local function showHome()
     end)
     if not success then
         warn("Navigation failed: " .. tostring(err))
-        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -805,7 +699,7 @@ local function showFeatures()
     end)
     if not success then
         warn("Navigation failed: " .. tostring(err))
-        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -823,7 +717,7 @@ local function showSettings()
     end)
     if not success then
         warn("Navigation failed: " .. tostring(err))
-        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -831,7 +725,7 @@ homeButton.MouseButton1Click:Connect(showHome)
 featuresButton.MouseButton1Click:Connect(showFeatures)
 settingsButton.MouseButton1Click:Connect(showSettings)
 
--- Dragging Logic (Improved)
+-- Dragging Logic (Improved with Expanded Area)
 local isDragging = false
 local dragConnection = nil
 local dragStartPos = nil
@@ -861,11 +755,11 @@ DragArea.InputBegan:Connect(function(input)
             else
                 error("Frame not visible or missing")
             end
-        end
+        end)
     end)
     if not success then
         warn("Drag failed: " .. tostring(err))
-        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.init_error, Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -878,6 +772,27 @@ DragArea.InputEnded:Connect(function(input)
         end
     end
 end)
+
+-- Update CanvasSize Dynamically
+local function updateCanvasSize(scrollingFrame)
+    local listLayout = scrollingFrame:FindFirstChildOfClass("UIListLayout")
+    if listLayout then
+        local contentHeight = 0
+        for _, child in ipairs(scrollingFrame:GetChildren()) do
+            if child:IsA("Frame") then
+                contentHeight = contentHeight + child.Size.Y.Offset + listLayout.Padding.Offset
+            end
+        end
+        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, contentHeight + 20) -- Thêm padding 20
+    end
+end
+
+homeContent.ChildAdded:Connect(function() updateCanvasSize(homeContent) end)
+homeContent.ChildRemoved:Connect(function() updateCanvasSize(homeContent) end)
+featuresContent.ChildAdded:Connect(function() updateCanvasSize(featuresContent) end)
+featuresContent.ChildRemoved:Connect(function() updateCanvasSize(featuresContent) end)
+settingsContent.ChildAdded:Connect(function() updateCanvasSize(settingsContent) end)
+settingsContent.ChildRemoved:Connect(function() updateCanvasSize(settingsContent) end)
 
 -- Speed Control
 local function applySpeed(inputBox, button)
@@ -892,11 +807,11 @@ local function applySpeed(inputBox, button)
             error("Humanoid not found")
         end
         humanoid.WalkSpeed = speed
-        showNotification(string.format(translations[currentLanguage].speed_notification, speed), Color3.fromRGB(0, 200, 100))
+        showNotification(string.format(translations.en.speed_notification, speed), Color3.fromRGB(0, 200, 100))
     end)
     if not success then
         warn("Speed error: " .. tostring(err))
-        showNotification(translations[currentLanguage].speed_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.speed_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -922,8 +837,8 @@ local function setupInfiniteJump()
             table.insert(connections, jumpConnection)
         else
             infiniteJumpEnabled = false
-            jumpButtonFeatures.Text = string.format(translations[currentLanguage].jump_button, "Off")
-            showNotification(translations[currentLanguage].jump_error, Color3.fromRGB(255, 80, 80))
+            jumpButtonFeatures.Text = string.format(translations.en.jump_button, "Off")
+            showNotification(translations.en.jump_error, Color3.fromRGB(255, 80, 80))
         end
     end
 end
@@ -931,25 +846,25 @@ end
 local function toggleJump()
     local success, err = pcall(function()
         infiniteJumpEnabled = not infiniteJumpEnabled
-        jumpButtonFeatures.Text = string.format(translations[currentLanguage].jump_button, infiniteJumpEnabled and "On" or "Off")
+        jumpButtonFeatures.Text = string.format(translations.en.jump_button, infiniteJumpEnabled and "On" or "Off")
         if infiniteJumpEnabled then
             setupInfiniteJump()
             if jumpConnection then
-                showNotification(translations[currentLanguage].jump_enabled, Color3.fromRGB(0, 200, 100))
+                showNotification(translations.en.jump_enabled, Color3.fromRGB(0, 200, 100))
             end
         else
             if jumpConnection then
                 jumpConnection:Disconnect()
                 jumpConnection = nil
             end
-            showNotification(translations[currentLanguage].jump_disabled, Color3.fromRGB(0, 200, 100))
+            showNotification(translations.en.jump_disabled, Color3.fromRGB(0, 200, 100))
         end
     end)
     if not success then
         warn("Infinite Jump error: " .. tostring(err))
-        showNotification(translations[currentLanguage].jump_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.jump_error, Color3.fromRGB(255, 80, 80))
         infiniteJumpEnabled = false
-        jumpButtonFeatures.Text = string.format(translations[currentLanguage].jump_button, "Off")
+        jumpButtonFeatures.Text = string.format(translations.en.jump_button, "Off")
         if jumpConnection then
             jumpConnection:Disconnect()
             jumpConnection = nil
@@ -963,11 +878,11 @@ jumpButtonFeatures.MouseButton1Click:Connect(toggleJump)
 speedupButton.MouseButton1Click:Connect(function()
     local success, err = pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
-        showNotification(translations[currentLanguage].speedup_notification, Color3.fromRGB(0, 200, 100))
+        showNotification(translations.en.speedup_notification, Color3.fromRGB(0, 200, 100))
     end)
     if not success then
         warn("Speed Up X error: " .. tostring(err))
-        showNotification(translations[currentLanguage].speedup_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.speedup_error, Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -975,11 +890,11 @@ end)
 nolagButton.MouseButton1Click:Connect(function()
     local success, err = pcall(function()
         loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
-        showNotification(translations[currentLanguage].nolag_notification, Color3.fromRGB(0, 200, 100))
+        showNotification(translations.en.nolag_notification, Color3.fromRGB(0, 200, 100))
     end)
     if not success then
         warn("No Lag error: " .. tostring(err))
-        showNotification(translations[currentLanguage].nolag_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.nolag_error, Color3.fromRGB(255, 80, 80))
     end
 end)
 
@@ -1004,7 +919,7 @@ closeButton.MouseButton1Click:Connect(toggleMenu)
 -- Toggle Button
 toggleButton.MouseButton1Click:Connect(toggleMenu)
 
--- Hover Effects (Fixed)
+-- Hover Effects (Redesigned with Tween)
 local function addHoverEffect(button)
     local success, err = pcall(function()
         if not button or not button.Parent then
@@ -1012,22 +927,34 @@ local function addHoverEffect(button)
         end
         local originalColor = button.BackgroundColor3
         local originalTransparency = button.BackgroundTransparency
+        local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         button.MouseEnter:Connect(function()
             if button and button.Parent then
-                button.BackgroundColor3 = Color3.new(originalColor.R * 0.85, originalColor.G * 0.85, originalColor.B * 0.85)
-                button.BackgroundTransparency = math.max(0, originalTransparency - 0.1)
+                local brighterColor = Color3.new(
+                    math.min(originalColor.R * 1.2, 1),
+                    math.min(originalColor.G * 1.2, 1),
+                    math.min(originalColor.B * 1.2, 1)
+                )
+                local tween = TweenService:Create(button, tweenInfo, {
+                    BackgroundColor3 = brighterColor,
+                    BackgroundTransparency = math.max(0, originalTransparency - 0.1)
+                })
+                tween:Play()
             end
         end)
         button.MouseLeave:Connect(function()
             if button and button.Parent then
-                button.BackgroundColor3 = originalColor
-                button.BackgroundTransparency = originalTransparency
+                local tween = TweenService:Create(button, tweenInfo, {
+                    BackgroundColor3 = originalColor,
+                    BackgroundTransparency = originalTransparency
+                })
+                tween:Play()
             end
         end)
     end)
     if not success then
         warn("Hover effect failed for button: " .. tostring(button.Name) .. " - " .. tostring(err))
-        showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
+        showNotification(translations.en.init_error, Color3.fromRGB(255, 80, 80))
     end
 end
 
@@ -1041,7 +968,6 @@ addHoverEffect(homeButton)
 addHoverEffect(featuresButton)
 addHoverEffect(settingsButton)
 addHoverEffect(themeButton)
-addHoverEffect(langButton)
 
 -- Cleanup
 local function cleanup()
@@ -1075,11 +1001,14 @@ local success, err = pcall(function()
     end
     frame.Visible = true
     toggleButton.Visible = true
+    updateCanvasSize(homeContent)
+    updateCanvasSize(featuresContent)
+    updateCanvasSize(settingsContent)
     print("Initialization completed at: " .. tostring(tick()))
 end)
 if not success then
     warn("Initialization failed: " .. tostring(err))
-    showNotification(translations[currentLanguage].init_error, Color3.fromRGB(255, 80, 80))
+    showNotification(translations.en.init_error, Color3.fromRGB(255, 80, 80))
     if frame and frame.Parent then
         frame.Visible = true
     end
