@@ -7,8 +7,8 @@ screenGui.Name = "HackHub"
 screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true -- Bỏ qua thanh công cụ Roblox
-screenGui.DisplayOrder = 1000 -- Tăng DisplayOrder để che phủ giao diện Roblox
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Đảm bảo che phủ toàn bộ
+screenGui.DisplayOrder = 10000 -- Tăng cao để che phủ giao diện Roblox
+screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Đảm bảo che phủ toàn cục
 
 -- Danh sách lưu trữ thông báo
 local notifications = {}
@@ -49,6 +49,37 @@ local function createNotification(message, isError)
     notificationText.ZIndex = 16
     notificationText.Parent = notificationFrame
 
+    -- Thêm sự kiện nhấn để tắt thông báo
+    notificationFrame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            local tweenOut = TweenService:Create(notificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.5, -100, 0, notificationFrame.Position.Y.Offset + 20)
+            })
+            local tweenTextOut = TweenService:Create(notificationText, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                TextTransparency = 1
+            })
+            tweenOut:Play()
+            tweenTextOut:Play()
+            tweenOut.Completed:Connect(function()
+                for i, notif in ipairs(notifications) do
+                    if notif == notificationFrame then
+                        table.remove(notifications, i)
+                        break
+                    end
+                end
+                notificationFrame:Destroy()
+                -- Cập nhật vị trí các thông báo còn lại
+                for i, notif in ipairs(notifications) do
+                    local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                        Position = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
+                    })
+                    tweenUpdate:Play()
+                end
+            end)
+        end
+    end)
+
     -- Thêm vào danh sách thông báo
     table.insert(notifications, notificationFrame)
 
@@ -58,34 +89,36 @@ local function createNotification(message, isError)
     })
     tweenIn:Play()
 
-    -- Hiệu ứng mờ dần và xóa sau 3 giây
+    -- Hiệu ứng mờ dần và xóa sau 3 giây nếu không nhấn
     spawn(function()
         wait(3)
-        local tweenOut = TweenService:Create(notificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0.5, -100, 0, notificationFrame.Position.Y.Offset + 20)
-        })
-        local tweenTextOut = TweenService:Create(notificationText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-            TextTransparency = 1
-        })
-        tweenOut:Play()
-        tweenTextOut:Play()
-        tweenOut.Completed:Connect(function()
-            for i, notif in ipairs(notifications) do
-                if notif == notificationFrame then
-                    table.remove(notifications, i)
-                    break
+        if notificationFrame.Parent then
+            local tweenOut = TweenService:Create(notificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0.5, -100, 0, notificationFrame.Position.Y.Offset + 20)
+            })
+            local tweenTextOut = TweenService:Create(notificationText, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+                TextTransparency = 1
+            })
+            tweenOut:Play()
+            tweenTextOut:Play()
+            tweenOut.Completed:Connect(function()
+                for i, notif in ipairs(notifications) do
+                    if notif == notificationFrame then
+                        table.remove(notifications, i)
+                        break
+                    end
                 end
-            end
-            notificationFrame:Destroy()
-            -- Cập nhật vị trí các thông báo còn lại
-            for i, notif in ipairs(notifications) do
-                local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                    Position = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
-                })
-                tweenUpdate:Play()
-            end
-        end)
+                notificationFrame:Destroy()
+                -- Cập nhật vị trí các thông báo còn lại
+                for i, notif in ipairs(notifications) do
+                    local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                        Position = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
+                    })
+                    tweenUpdate:Play()
+                end
+            end)
+        end
     end)
 end
 
@@ -95,7 +128,7 @@ loadingFrame.Size = UDim2.new(1, 0, 1, 0)
 loadingFrame.Position = UDim2.new(0, 0, 0, 0)
 loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 loadingFrame.BackgroundTransparency = 0 -- Màu đen hoàn toàn
-loadingFrame.ZIndex = 1000 -- ZIndex cao để che phủ giao diện Roblox và game
+loadingFrame.ZIndex = 10000 -- ZIndex cực cao để che phủ giao diện Roblox
 loadingFrame.Parent = screenGui
 
 local loadingText = Instance.new("TextLabel")
@@ -106,7 +139,7 @@ loadingText.Text = "Loading..."
 loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
 loadingText.TextSize = 32
 loadingText.Font = Enum.Font.SourceSansBold
-loadingText.ZIndex = 1001 -- Cao hơn loadingFrame
+loadingText.ZIndex = 10001 -- Cao hơn loadingFrame
 loadingText.Parent = loadingFrame
 
 -- Tắt màn hình loading sau 5 giây và thông báo thành công
@@ -234,6 +267,7 @@ uiCorner.Parent = toggleButton
 -- Biến trạng thái và lưu vị trí
 local isVisible = true
 local savedPosition = mainFrame.Position
+local savedTogglePosition = toggleButton.Position
 
 -- Hàm chuyển đổi ẩn/hiện
 local function toggleUI()
@@ -296,7 +330,7 @@ noLagButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Làm khung có thể kéo (hỗ trợ cả chuột và cảm ứng)
+-- Làm khung chính có thể kéo (hỗ trợ cả chuột và cảm ứng)
 local dragging
 local dragInput
 local dragStart
@@ -331,5 +365,43 @@ end)
 game:GetService("RunService").Stepped:Connect(function()
     if dragging and dragInput then
         updateInput(dragInput)
+    end
+end)
+
+-- Làm nút ẩn/hiện có thể kéo (hỗ trợ cả chuột và cảm ứng)
+local toggleDragging
+local toggleDragInput
+local toggleDragStart
+local toggleStartPos
+
+local function updateToggleInput(input)
+    local delta = input.Position - toggleDragStart
+    local newPosition = UDim2.new(toggleStartPos.X.Scale, toggleStartPos.X.Offset + delta.X, toggleStartPos.Y.Scale, toggleStartPos.Y.Offset + delta.Y)
+    toggleButton.Position = newPosition
+    savedTogglePosition = newPosition -- Cập nhật vị trí đã lưu
+end
+
+toggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        toggleDragging = true
+        toggleDragStart = input.Position
+        toggleStartPos = toggleButton.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                toggleDragging = false
+            end
+        end)
+    end
+end)
+
+toggleButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        toggleDragInput = input
+    end
+end)
+
+game:GetService("RunService").Stepped:Connect(function()
+    if toggleDragging and toggleDragInput then
+        updateToggleInput(toggleDragInput)
     end
 end)
