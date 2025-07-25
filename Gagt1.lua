@@ -306,7 +306,7 @@ local success, errorMessage = pcall(function()
     local isShowingNotification = false
 
     local function showNotification(message, duration)
-        print("Showing notification: " .. message) -- Debug
+        print("Showing notification: " .. message)
         table.insert(notificationQueue, {text = message, duration = duration or 2})
         if #notificationQueue > 3 then
             table.remove(notificationQueue, 1)
@@ -342,7 +342,10 @@ local success, errorMessage = pcall(function()
             isHovering = true
             local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
             local hoverTween = TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0, BackgroundColor3 = Color3.fromRGB(0, 150, 255)})
-            TweenService:Create(button:FindFirstChildOfClass("UIStroke"), tweenInfo, {Transparency = 0}):Play()
+            local stroke = button:FindFirstChildOfClass("UIStroke")
+            if stroke then
+                TweenService:Create(stroke, tweenInfo, {Transparency = 0}):Play()
+            end
             hoverTween:Play()
             hoverTween.Completed:Connect(function() isHovering = false end)
         end)
@@ -351,7 +354,10 @@ local success, errorMessage = pcall(function()
             isHovering = true
             local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
             local leaveTween = TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0.1, BackgroundColor3 = Color3.fromRGB(0, 120, 215)})
-            TweenService:Create(button:FindFirstChildOfClass("UIStroke"), tweenInfo, {Transparency = 0.8}):Play()
+            local stroke = button:FindFirstChildOfClass("UIStroke")
+            if stroke then
+                TweenService:Create(stroke, tweenInfo, {Transparency = 0.8}):Play()
+            end
             leaveTween:Play()
             leaveTween.Completed:Connect(function() isHovering = false end)
         end)
