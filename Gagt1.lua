@@ -13,6 +13,17 @@ screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global -- Đảm bảo che phủ 
 -- Danh sách lưu trữ thông báo
 local notifications = {}
 
+-- Hàm cập nhật vị trí các thông báo
+local function updateNotificationPositions()
+    for i, notif in ipairs(notifications) do
+        local targetPosition = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
+        local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+            Position = targetPosition
+        })
+        tweenUpdate:Play()
+    end
+end
+
 -- Hàm tạo thông báo với hiệu ứng
 local function createNotification(message, isError)
     -- In thông báo vào debug
@@ -25,7 +36,7 @@ local function createNotification(message, isError)
     -- Xóa thông báo cũ nếu vượt quá 3
     if #notifications >= 3 then
         local oldestNotification = table.remove(notifications, 1)
-        if oldestNotification then
+        if oldestNotification and oldestNotification.Parent then
             local tweenOut = TweenService:Create(oldestNotification, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0.5, -100, 0, oldestNotification.Position.Y.Offset + 20)
@@ -37,6 +48,7 @@ local function createNotification(message, isError)
             tweenTextOut:Play()
             tweenOut.Completed:Connect(function()
                 oldestNotification:Destroy()
+                updateNotificationPositions()
             end)
         end
     end
@@ -67,7 +79,7 @@ local function createNotification(message, isError)
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0.5, -100, 0, notificationFrame.Position.Y.Offset + 20)
             })
-            local tweenTextOut = TweenService:Create(notificationText, TweenInfo.new(0.3, Enum.EasingStyle.Quad,caldron, Enum.EasingDirection.In), {
+            local tweenTextOut = TweenService:Create(notificationText, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
                 TextTransparency = 1
             })
             tweenOut:Play()
@@ -80,13 +92,7 @@ local function createNotification(message, isError)
                     end
                 end
                 notificationFrame:Destroy()
-                -- Di chuyển các thông báo lên
-                for i, notif in ipairs(notifications) do
-                    local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                        Position = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
-                    })
-                    tweenUpdate:Play()
-                end
+                updateNotificationPositions()
             end)
         end
     end)
@@ -94,7 +100,7 @@ local function createNotification(message, isError)
     -- Thêm vào danh sách thông báo
     table.insert(notifications, notificationFrame)
 
-    -- Hiệu ứng di chuyển xuống
+    -- Hiệu ứng di chuyển xuống vị trí chính xác
     local tweenIn = TweenService:Create(notificationFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Position = UDim2.new(0.5, -100, 0, 10 + (#notifications - 1) * 60)
     })
@@ -121,13 +127,7 @@ local function createNotification(message, isError)
                     end
                 end
                 notificationFrame:Destroy()
-                -- Di chuyển các thông báo lên
-                for i, notif in ipairs(notifications) do
-                    local tweenUpdate = TweenService:Create(notif, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                        Position = UDim2.new(0.5, -100, 0, 10 + (i - 1) * 60)
-                    })
-                    tweenUpdate:Play()
-                end
+                updateNotificationPositions()
             end)
         end
     end)
