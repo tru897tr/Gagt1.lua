@@ -101,7 +101,7 @@ NoLagStroke.Parent = NoLagButton
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Parent = ScreenGui
 ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-ToggleButton.Position = UDim2.new(1, -45, 0, 5)
+ToggleButton.Position = UDim2.new(1, -40, 0, 5)
 ToggleButton.Size = UDim2.new(0, 35, 0, 35)
 ToggleButton.Text = "X"
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -142,31 +142,100 @@ NotificationStroke.Color = Color3.fromRGB(100, 100, 255)
 NotificationStroke.Transparency = 0.8
 NotificationStroke.Parent = NotificationFrame
 
--- Hàm hiển thị thông báo
+-- Frame loading
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Parent = ScreenGui
+LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+LoadingFrame.BackgroundTransparency = 0.3
+LoadingFrame.Position = UDim2.new(0.5, -100, 0.5, -50)
+LoadingFrame.Size = UDim2.new(0, 200, 0, 100)
+LoadingFrame.Visible = false
+local LoadingCorner = Instance.new("UICorner")
+LoadingCorner.CornerRadius = UDim.new(0, 10)
+LoadingCorner.Parent = LoadingFrame
+local LoadingStroke = Instance.new("UIStroke")
+LoadingStroke.Thickness = 1
+LoadingStroke.Color = Color3.fromRGB(100, 100, 255)
+LoadingStroke.Transparency = 0.8
+LoadingStroke.Parent = LoadingFrame
+
+-- Loading Text
+local LoadingText = Instance.new("TextLabel")
+LoadingText.Parent = LoadingFrame
+LoadingText.BackgroundTransparency = 1
+LoadingText.Position = UDim2.new(0, 0, 0, 10)
+LoadingText.Size = UDim2.new(1, 0, 0, 30)
+LoadingText.Text = "Loading Script..."
+LoadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+LoadingText.TextSize = 16
+LoadingText.Font = Enum.Font.GothamBold
+LoadingText.TextWrapped = true
+
+-- Progress Bar
+local ProgressBarFrame = Instance.new("Frame")
+ProgressBarFrame.Parent = LoadingFrame
+ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ProgressBarFrame.Position = UDim2.new(0.1, 0, 0.6, 0)
+ProgressBarFrame.Size = UDim2.new(0.8, 0, 0, 20)
+local ProgressBarCorner = Instance.new("UICorner")
+ProgressBarCorner.CornerRadius = UDim.new(0, 5)
+ProgressBarCorner.Parent = ProgressBarFrame
+local ProgressBar = Instance.new("Frame")
+ProgressBar.Parent = ProgressBarFrame
+ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+ProgressBar.Size = UDim2.new(0, 0, 1, 0)
+local ProgressBarCornerInner = Instance.new("UICorner")
+ProgressBarCornerInner.CornerRadius = UDim.new(0, 5)
+ProgressBarCornerInner.Parent = ProgressBar
+
+-- Quản lý hàng đợi thông báo
+local notificationQueue = {}
+local isShowingNotification = false
+
 local function showNotification(message, duration)
-    NotificationText.Text = message
-    NotificationFrame.Visible = true
-    local tweenIn = TweenService:Create(NotificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -100, 0.75, 0)})
-    tweenIn:Play()
-    wait(duration or 2)
-    local tweenOut = TweenService:Create(NotificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(0.5, -100, 0.85, 0)})
-    tweenOut:Play()
-    tweenOut.Completed:Connect(function()
-        NotificationFrame.Visible = false
-    end)
+    table.insert(notificationQueue, {text = message, duration = duration or 2})
+    
+    if not isShowingNotification then
+        isShowingNotification = true
+        local function processQueue()
+            while #notificationQueue > 0 do
+                local notif = notificationQueue[1]
+                NotificationText.Text = notif.text
+                NotificationFrame.Visible = true
+                local tweenIn = TweenService:Create(NotificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -100, 0.75, 0)})
+                tweenIn:Play()
+                tweenIn.Completed:Wait()
+                wait(notif.duration)
+                local tweenOut = TweenService:Create(NotificationFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {Position = UDim2.new(0.5, -100, 0.85, 0)})
+                tweenOut:Play()
+                tweenOut.Completed:Wait()
+                NotificationFrame.Visible = false
+                table.remove(notificationQueue, 1)
+            end
+            isShowingNotification = false
+        end
+        spawn(processQueue)
+    end
 end
 
 -- Hiệu ứng hover cho nút
 local function applyHoverEffect(button)
+    local hoverTween, leaveTween
     button.MouseEnter:Connect(function()
+        if hoverTween then hoverTween:Cancel() end
+        if leaveTween then leaveTween:Cancel() end
         local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-        TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0, BackgroundColor3 = Color3.fromRGB(0, 150, 255)}):Play()
+        hoverTween = TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0, BackgroundColor3 = Color3.fromRGB(0, 150, 255)})
         TweenService:Create(button:FindFirstChildOfClass("UIStroke"), tweenInfo, {Transparency = 0}):Play()
+        hoverTween:Play()
     end)
     button.MouseLeave:Connect(function()
+        if hoverTween then hoverTween:Cancel() end
+        if leaveTween then leaveTween:Cancel() end
         local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-        TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0.1, BackgroundColor3 = Color3.fromRGB(0, 120, 215)}):Play()
+        leaveTween = TweenService:Create(button, tweenInfo, {BackgroundTransparency = 0.1, BackgroundColor3 = Color3.fromRGB(0, 120, 215)})
         TweenService:Create(button:FindFirstChildOfClass("UIStroke"), tweenInfo, {Transparency = 0.8}):Play()
+        leaveTween:Play()
     end)
 end
 
@@ -175,30 +244,73 @@ applyHoverEffect(NoLagButton)
 applyHoverEffect(ToggleButton)
 
 -- Hiệu ứng bật/tắt Frame
+local currentTween = nil
+local isToggling = false
+
 local function toggleFrame()
+    if isToggling then return end
+    isToggling = true
+    if currentTween then currentTween:Cancel() end
     local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
     if Frame.Visible then
-        TweenService:Create(Frame, tweenInfo, {Position = UDim2.new(0.5, -150, 0.5, -1000)}):Play()
-        wait(0.3)
-        Frame.Visible = false
-        ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 255, 50)
-        ToggleButton.Text = "O"
-        showNotification("Hack Hub Hidden", 1.5)
+        currentTween = TweenService:Create(Frame, tweenInfo, {Position = UDim2.new(0.5, -150, 0.5, -1000)})
+        currentTween:Play()
+        currentTween.Completed:Connect(function()
+            Frame.Visible = false
+            ToggleButton.BackgroundColor3 = Color3.fromRGB(50, 255, 50)
+            ToggleButton.Text = "O"
+            showNotification("Hack Hub Hidden", 1.5)
+            isToggling = false
+        end)
     else
         Frame.Visible = true
-        TweenService:Create(Frame, tweenInfo, {Position = UDim2.new(0.5, -150, 0.5, -100)}):Play()
-        ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-        ToggleButton.Text = "X"
-        showNotification("Hack Hub Shown", 1.5)
+        currentTween = TweenService:Create(Frame, tweenInfo, {Position = UDim2.new(0.5, -150, 0.5, -100)})
+        currentTween:Play()
+        currentTween.Completed:Connect(function()
+            ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+            ToggleButton.Text = "X"
+            showNotification("Hack Hub Shown", 1.5)
+            isToggling = false
+        end)
     end
 end
 
 -- Chức năng nút Toggle
 ToggleButton.MouseButton1Click:Connect(toggleFrame)
 
--- Hàm chạy script với kiểm tra lỗi
+-- Hàm chạy progress bar
+local function runProgressBar()
+    local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
+    local tween = TweenService:Create(ProgressBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
+    tween:Play()
+    return tween
+end
+
+-- Hàm hiển thị và chạy loading
+local function showLoading()
+    LoadingFrame.Visible = true
+    ProgressBar.Size = UDim2.new(0, 0, 1, 0)
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local tweenIn = TweenService:Create(LoadingFrame, tweenInfo, {Position = UDim2.new(0.5, -100, 0.5, -50)})
+    tweenIn:Play()
+    return runProgressBar()
+end
+
+-- Hàm ẩn loading
+local function hideLoading()
+    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+    local tweenOut = TweenService:Create(LoadingFrame, tweenInfo, {Position = UDim2.new(0.5, -100, 0.5, -150)})
+    tweenOut:Play()
+    tweenOut.Completed:Connect(function()
+        LoadingFrame.Visible = false
+    end)
+end
+
+-- Hàm chạy script với loading
 local function runScript(url, scriptName)
     showNotification("Loading " .. scriptName .. "...", 2)
+    local progressTween = showLoading()
+    local startTime = tick()
     local success, result = pcall(function()
         local scriptContent = game:HttpGet(url, true)
         if scriptContent then
@@ -207,6 +319,11 @@ local function runScript(url, scriptName)
             error("Failed to fetch script content")
         end
     end)
+    local elapsedTime = tick() - startTime
+    local remainingTime = math.max(0, 5 - elapsedTime)
+    wait(remainingTime)
+    progressTween:Cancel()
+    hideLoading()
     if success then
         showNotification(scriptName .. " Loaded!", 2)
     else
