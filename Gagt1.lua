@@ -10,7 +10,7 @@ ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Tạo Frame chính
+-- Tạo Frame chính (bảng chọn hack)
 local Frame = Instance.new("Frame")
 Frame.Parent = ScreenGui
 Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
@@ -19,7 +19,7 @@ Frame.Size = UDim2.new(0, 300, 0, 200)
 Frame.BackgroundTransparency = 0.05
 Frame.Active = true
 Frame.Draggable = true
-Frame.Visible = true
+Frame.Visible = false -- Ẩn ban đầu, chờ loading xong mới hiện
 
 -- Bo góc Frame
 local FrameCorner = Instance.new("UICorner")
@@ -107,6 +107,7 @@ ToggleButton.Text = "X"
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleButton.TextSize = 14
 ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.Visible = false -- Ẩn ban đầu, chờ loading xong mới hiện
 local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.CornerRadius = UDim.new(0.5, 0)
 ToggleCorner.Parent = ToggleButton
@@ -115,6 +116,52 @@ ToggleStroke.Thickness = 1
 ToggleStroke.Color = Color3.fromRGB(255, 255, 255)
 ToggleStroke.Transparency = 0.8
 ToggleStroke.Parent = ToggleButton
+
+-- Frame loading (che toàn màn hình)
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Parent = ScreenGui
+LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+LoadingFrame.BackgroundTransparency = 0.3
+LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
+LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
+LoadingFrame.Visible = true -- Hiển thị đầu tiên
+local LoadingCorner = Instance.new("UICorner")
+LoadingCorner.CornerRadius = UDim.new(0, 0)
+LoadingCorner.Parent = LoadingFrame
+local LoadingStroke = Instance.new("UIStroke")
+LoadingStroke.Thickness = 1
+LoadingStroke.Color = Color3.fromRGB(100, 100, 255)
+LoadingStroke.Transparency = 0.8
+LoadingStroke.Parent = LoadingFrame
+
+-- Loading Text
+local LoadingText = Instance.new("TextLabel")
+LoadingText.Parent = LoadingFrame
+LoadingText.BackgroundTransparency = 1
+LoadingText.Position = UDim2.new(0.5, -100, 0.4, 0)
+LoadingText.Size = UDim2.new(0, 200, 0, 30)
+LoadingText.Text = "Loading Hack Hub..."
+LoadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+LoadingText.TextSize = 18
+LoadingText.Font = Enum.Font.GothamBold
+LoadingText.TextWrapped = true
+
+-- Progress Bar
+local ProgressBarFrame = Instance.new("Frame")
+ProgressBarFrame.Parent = LoadingFrame
+ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+ProgressBarFrame.Position = UDim2.new(0.5, -100, 0.5, 0)
+ProgressBarFrame.Size = UDim2.new(0, 200, 0, 20)
+local ProgressBarCorner = Instance.new("UICorner")
+ProgressBarCorner.CornerRadius = UDim.new(0, 5)
+ProgressBarCorner.Parent = ProgressBarFrame
+local ProgressBar = Instance.new("Frame")
+ProgressBar.Parent = ProgressBarFrame
+ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+ProgressBar.Size = UDim2.new(0, 0, 1, 0)
+local ProgressBarCornerInner = Instance.new("UICorner")
+ProgressBarCornerInner.CornerRadius = UDim.new(0, 5)
+ProgressBarCornerInner.Parent = ProgressBar
 
 -- Frame thông báo
 local NotificationFrame = Instance.new("Frame")
@@ -141,52 +188,6 @@ NotificationStroke.Thickness = 1
 NotificationStroke.Color = Color3.fromRGB(100, 100, 255)
 NotificationStroke.Transparency = 0.8
 NotificationStroke.Parent = NotificationFrame
-
--- Frame loading
-local LoadingFrame = Instance.new("Frame")
-LoadingFrame.Parent = ScreenGui
-LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-LoadingFrame.BackgroundTransparency = 0.3
-LoadingFrame.Position = UDim2.new(0.5, -100, 0.5, -50)
-LoadingFrame.Size = UDim2.new(0, 200, 0, 100)
-LoadingFrame.Visible = false
-local LoadingCorner = Instance.new("UICorner")
-LoadingCorner.CornerRadius = UDim.new(0, 10)
-LoadingCorner.Parent = LoadingFrame
-local LoadingStroke = Instance.new("UIStroke")
-LoadingStroke.Thickness = 1
-LoadingStroke.Color = Color3.fromRGB(100, 100, 255)
-LoadingStroke.Transparency = 0.8
-LoadingStroke.Parent = LoadingFrame
-
--- Loading Text
-local LoadingText = Instance.new("TextLabel")
-LoadingText.Parent = LoadingFrame
-LoadingText.BackgroundTransparency = 1
-LoadingText.Position = UDim2.new(0, 0, 0, 10)
-LoadingText.Size = UDim2.new(1, 0, 0, 30)
-LoadingText.Text = "Loading Script..."
-LoadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
-LoadingText.TextSize = 16
-LoadingText.Font = Enum.Font.GothamBold
-LoadingText.TextWrapped = true
-
--- Progress Bar
-local ProgressBarFrame = Instance.new("Frame")
-ProgressBarFrame.Parent = LoadingFrame
-ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-ProgressBarFrame.Position = UDim2.new(0.1, 0, 0.6, 0)
-ProgressBarFrame.Size = UDim2.new(0.8, 0, 0, 20)
-local ProgressBarCorner = Instance.new("UICorner")
-ProgressBarCorner.CornerRadius = UDim.new(0, 5)
-ProgressBarCorner.Parent = ProgressBarFrame
-local ProgressBar = Instance.new("Frame")
-ProgressBar.Parent = ProgressBarFrame
-ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-ProgressBar.Size = UDim2.new(0, 0, 1, 0)
-local ProgressBarCornerInner = Instance.new("UICorner")
-ProgressBarCornerInner.CornerRadius = UDim.new(0, 5)
-ProgressBarCornerInner.Parent = ProgressBar
 
 -- Quản lý hàng đợi thông báo
 local notificationQueue = {}
@@ -291,26 +292,29 @@ local function showLoading()
     LoadingFrame.Visible = true
     ProgressBar.Size = UDim2.new(0, 0, 1, 0)
     local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local tweenIn = TweenService:Create(LoadingFrame, tweenInfo, {Position = UDim2.new(0.5, -100, 0.5, -50)})
+    local tweenIn = TweenService:Create(LoadingFrame, tweenInfo, {BackgroundTransparency = 0.3})
     tweenIn:Play()
     return runProgressBar()
 end
 
--- Hàm ẩn loading
+-- Hàm ẩn loading và hiện bảng hack
 local function hideLoading()
     local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-    local tweenOut = TweenService:Create(LoadingFrame, tweenInfo, {Position = UDim2.new(0.5, -100, 0.5, -150)})
+    local tweenOut = TweenService:Create(LoadingFrame, tweenInfo, {BackgroundTransparency = 1})
     tweenOut:Play()
     tweenOut.Completed:Connect(function()
         LoadingFrame.Visible = false
+        Frame.Visible = true
+        ToggleButton.Visible = true
+        local openTween = TweenService:Create(Frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -150, 0.5, -100)})
+        openTween:Play()
+        showNotification("Welcome to Hack Hub!", 2)
     end)
 end
 
 -- Hàm chạy script với loading
 local function runScript(url, scriptName)
     showNotification("Loading " .. scriptName .. "...", 2)
-    local progressTween = showLoading()
-    local startTime = tick()
     local success, result = pcall(function()
         local scriptContent = game:HttpGet(url, true)
         if scriptContent then
@@ -319,16 +323,11 @@ local function runScript(url, scriptName)
             error("Failed to fetch script content")
         end
     end)
-    local elapsedTime = tick() - startTime
-    local remainingTime = math.max(0, 5 - elapsedTime)
-    wait(remainingTime)
-    progressTween:Cancel()
-    hideLoading()
     if success then
         showNotification(scriptName .. " Loaded!", 2)
     else
         showNotification("Error: Failed to load " .. scriptName .. ": " .. tostring(result), 3)
-    end
+    end)
 end
 
 -- Chức năng nút Speed Up
@@ -341,9 +340,9 @@ NoLagButton.MouseButton1Click:Connect(function()
     runScript("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua", "No Lag Script")
 end)
 
--- Hiệu ứng mở Frame lần đầu
-Frame.Position = UDim2.new(0.5, -150, 0.5, -1000)
-Frame.Visible = true
-local openTween = TweenService:Create(Frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -150, 0.5, -100)})
-openTween:Play()
-showNotification("Welcome to Hack Hub!", 2)
+-- Khởi động loading
+showLoading()
+local progressTween = runProgressBar()
+wait(5)
+progressTween:Cancel()
+hideLoading()
