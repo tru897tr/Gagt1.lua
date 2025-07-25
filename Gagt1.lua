@@ -1,194 +1,97 @@
--- Prevent multiple executions
-if _G.HackHubLoaded then
-    warn("Hack Hub script already loaded!")
-    return
-end
-_G.HackHubLoaded = true
-
--- Services
 local UserInputService = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui", 5)
+local TweenService = game:GetService("TweenService")
 
--- Validate PlayerGui
-if not playerGui then
-    warn("PlayerGui not found. Ensure script runs in a valid Roblox environment.")
-    return
+-- Tạo ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "HackHub"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+
+-- Tạo Frame chính
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.BorderSizePixel = 0
+mainFrame.Parent = screenGui
+
+-- Tạo tiêu đề
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0, 50)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+titleLabel.Text = "Hack Hub"
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextSize = 24
+titleLabel.Font = Enum.Font.SourceSansBold
+titleLabel.Parent = mainFrame
+
+-- Tạo nút ẩn/hiện ở góc phải
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 50, 0, 50)
+toggleButton.Position = UDim2.new(1, -60, 0, 10)
+toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+toggleButton.Text = ">"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.TextSize = 20
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.Parent = screenGui
+
+-- Biến trạng thái
+local isVisible = true
+
+-- Hàm chuyển đổi ẩn/hiện
+local function toggleUI()
+    isVisible = not isVisible
+    local targetPosition = isVisible and UDim2.new(0.5, -150, 0.5, -200) or UDim2.new(0.5, -150, -1, -200)
+    local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut)
+    local tween = TweenService:Create(mainFrame, tweenInfo, {Position = targetPosition})
+    tween:Play()
+    toggleButton.Text = isVisible and ">" or "<"
 end
 
--- Create ScreenGui
-local gui = Instance.new("ScreenGui")
-gui.Name = "HackHubGui"
-gui.ResetOnSpawn = false
-gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-gui.Enabled = true
-gui.Parent = playerGui
-
--- Create Loading Screen
-local function createLoadingScreen()
-    local loadingFrame = Instance.new("Frame")
-    loadingFrame.Size = UDim2.new(1, 0, 1, 0)
-    loadingFrame.Position = UDim2.new(0, 0, 0, 0)
-    loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    loadingFrame.ZIndex = 10
-    loadingFrame.Parent = gui
-
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 30)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 10))
-    }
-    gradient.Rotation = 90
-    gradient.Parent = loadingFrame
-
-    local loadingText = Instance.new("TextLabel")
-    loadingText.Size = UDim2.new(0.5, 0, 0.2, 0)
-    loadingText.Position = UDim2.new(0.25, 0, 0.4, 0)
-    loadingText.BackgroundTransparency = 1
-    loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    loadingText.Text = "Loading"
-    loadingText.Font = Enum.Font.GothamBold
-    loadingText.TextSize = 36
-    loadingText.TextScaled = true
-    loadingText.ZIndex = 11
-    loadingText.Parent = loadingFrame
-
-    -- Destroy after 5 seconds
-    task.spawn(function()
-        task.wait(5)
-        loadingFrame:Destroy()
-    end)
-end
-
--- Create Main Frame
-local function createFrame()
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 180, 0, 140)
-    frame.Position = UDim2.new(0.5, -90, 0.5, -70)
-    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    frame.BorderSizePixel = 0
-    frame.Active = true
-    frame.Draggable = true
-    frame.ZIndex = 2
-
-    local gradient = Instance.new("UIGradient")
-    gradient.Color = ColorSequence.new{
-        ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 60, 60)),
-        ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
-    }
-    gradient.Rotation = 45
-    gradient.Parent = frame
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 10)
-    corner.Parent = frame
-
-    return frame
-end
-
--- Create Title
-local function createTitle(parent)
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, 0, 0, 30)
-    title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.Text = "Grow a Garden Hack Hub"
-    title.Font = Enum.Font.GothamBold
-    title.TextSize = 16
-    title.ZIndex = 3
-    title.Parent = parent
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 8)
-    corner.Parent = title
-end
-
--- Create Button
-local function createButton(name, position, parent, callback)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0.9, 0, 0, 35)
-    button.Position = position
-    button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Text = name
-    button.Font = Enum.Font.Gotham
-    button.TextSize = 14
-    button.ZIndex = 3
-    button.Parent = parent
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 6)
-    corner.Parent = button
-
-    button.MouseEnter:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    end)
-    button.MouseLeave:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    end)
-
-    button.MouseButton1Click:Connect(function()
-        local success, err = pcall(callback)
-        if not success then
-            warn("Error executing " .. name .. " script: " .. tostring(err))
-        else
-            print(name .. " script executed successfully!")
-        end
-    end)
-end
-
--- Create Toggle Button
-local function createToggleButton()
-    local toggleButton = Instance.new("TextButton")
-    toggleButton.Size = UDim2.new(0, 25, 0, 25)
-    toggleButton.Position = UDim2.new(1, -35, 0, 10)
-    toggleButton.BackgroundColor3 = Color3.fromRGB(80, 255, 80)
-    toggleButton.Text = ""
-    toggleButton.ZIndex = 5
-    toggleButton.Parent = gui
-
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0.5, 0)
-    corner.Parent = toggleButton
-
-    return toggleButton
-end
-
--- Toggle GUI Visibility
-local function toggleGui()
-    frame.Visible = not frame.Visible
-    toggleButton.BackgroundColor3 = frame.Visible and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
-    print("GUI toggled: " .. (frame.Visible and "Visible" or "Hidden"))
-end
-
--- Initialize GUI
-createLoadingScreen()
-local frame = createFrame()
-frame.Parent = gui
-createTitle(frame)
-createButton("Speed Up X", UDim2.new(0.05, 0, 0.3, 0), frame, function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
-end)
-createButton("No Lag", UDim2.new(0.05, 0, 0.6, 0), frame, function()
-    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
-end)
-local toggleButton = createToggleButton()
-
--- Bind Right Shift to Toggle
+-- Xử lý phím O
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.RightShift then
-        toggleGui()
-        print("Right Shift pressed: GUI toggled")
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.O then
+        toggleUI()
     end
 end)
 
--- Bind Toggle Button Click
-toggleButton.MouseButton1Click:Connect(function()
-    toggleGui()
-    print("Toggle button clicked")
+-- Xử lý nút ẩn/hiện
+toggleButton.MouseButton1Click:Connect(toggleUI)
+
+-- Làm khung có thể kéo
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function updateInput(input)
+    local delta = input.Position - dragStart
+    mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
 end)
 
--- Debug
-print("Hack Hub GUI loaded successfully!")
+mainFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("RunService").Stepped:Connect(function()
+    if dragging and dragInput then
+        updateInput(dragInput)
+    end
+end)
