@@ -24,7 +24,7 @@ local success, errorMessage = pcall(function()
     Frame.BackgroundTransparency = 0.05
     Frame.Active = true
     Frame.Draggable = true
-    Frame.Visible = false
+    Frame.Visible = true -- Hiện ngay từ đầu
     Frame.ZIndex = 200
     print("Frame created")
 
@@ -149,11 +149,11 @@ local success, errorMessage = pcall(function()
     CloseStroke.Transparency = 0.8
     CloseStroke.Parent = CloseButton
 
-    -- Bảng xác nhận
+    -- Bảng xác nhận thoát
     local ConfirmFrame = Instance.new("Frame")
     ConfirmFrame.Parent = ScreenGui
     ConfirmFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    ConfirmFrame.Position = UDim2.new(0.5, -125, 0, 5 -90)
+    ConfirmFrame.Position = UDim2.new(0.5, -125, 0.5, -90)
     ConfirmFrame.Size = UDim2.new(0, 250, 0, 180)
     ConfirmFrame.BackgroundTransparency = 0.05
     ConfirmFrame.Visible = false
@@ -178,7 +178,7 @@ local success, errorMessage = pcall(function()
     local ConfirmTitle = Instance.new("TextLabel")
     ConfirmTitle.Parent = ConfirmFrame
     ConfirmTitle.BackgroundTransparency = 1
-    ConfirmTitle.Position = UDim2.new(0, 0, 0, 0, 10)
+    ConfirmTitle.Position = UDim2.new(0, 0, 0, 10)
     ConfirmTitle.Size = UDim2.new(1, -20, 0, 50)
     ConfirmTitle.Text = "Bạn có chắc muốn tắt script không?"
     ConfirmTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -251,7 +251,7 @@ local success, errorMessage = pcall(function()
     ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     ToggleButton.TextSize = 16
     ToggleButton.Font = Enum.Font.SourceSansPro
-    ToggleButton.Visible = false
+    ToggleButton.Visible = true -- Hiện ngay từ đầu
     ToggleButton.ZIndex = 500
     local ToggleCorner = Instance.new("UICorner")
     ToggleCorner.CornerRadius = UDim.new(0.5, 0)
@@ -262,59 +262,6 @@ local success, errorMessage = pcall(function()
     ToggleStroke.Transparency = 0.8
     ToggleStroke.Parent = ToggleButton
     print("ToggleButton created")
-
-    -- Frame loading (che toàn màn hình)
-    local LoadingFrame = Instance.new("Frame")
-    LoadingFrame.Parent = ScreenGui
-    LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    LoadingFrame.BackgroundTransparency = 0
-    LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
-    LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
-    LoadingFrame.Visible = true
-    LoadingFrame.ZIndex = 1000
-    LoadingFrame.AnchorPoint = Vector2.new(0, 0)
-    LoadingFrame.ClipsDescendants = false
-    local LoadingCorner = Instance.new("UICorner")
-    LoadingCorner.CornerRadius = UDim.new(0, 0)
-    LoadingCorner.Parent = LoadingFrame
-    local LoadingStroke = Instance.new("UIStroke")
-    LoadingStroke.Thickness = 1.5
-    LoadingStroke.Color = Color3.fromRGB(100, 100, 255)
-    LoadingStroke.Transparency = 0.8
-    LoadingStroke.Parent = LoadingFrame
-    print("LoadingFrame created")
-
-    -- Loading Text
-    local LoadingText = Instance.new("TextLabel")
-    LoadingText.Parent = LoadingFrame
-    LoadingText.BackgroundTransparency = 1
-    LoadingText.Position = UDim2.new(0.5, -125, 0.4, 0)
-    LoadingText.Size = UDim2.new(0, 250, 0, 40)
-    LoadingText.Text = "Loading Hack Hub..."
-    LoadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
-    LoadingText.TextSize = 20
-    LoadingText.Font = Enum.Font.SourceSansPro
-    LoadingText.TextWrapped = true
-    LoadingText.ZIndex = 1001
-
-    -- Progress Bar
-    local ProgressBarFrame = Instance.new("Frame")
-    ProgressBarFrame.Parent = LoadingFrame
-    ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    ProgressBarFrame.Position = UDim2.new(0.5, -125, 0.5, 0)
-    ProgressBarFrame.Size = UDim2.new(0, 250, 0, 25)
-    ProgressBarFrame.ZIndex = 1001
-    local ProgressBarCorner = Instance.new("UICorner")
-    ProgressBarCorner.CornerRadius = UDim.new(0, 6)
-    ProgressBarCorner.Parent = ProgressBarFrame
-    local ProgressBar = Instance.new("Frame")
-    ProgressBar.Parent = ProgressBarFrame
-    ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
-    ProgressBar.Size = UDim2.new(0, 0, 1, 0)
-    ProgressBar.ZIndex = 1002
-    local ProgressBarCornerInner = Instance.new("UICorner")
-    ProgressBarCornerInner.CornerRadius = UDim.new(0, 6)
-    ProgressBarCornerInner.Parent = ProgressBar
 
     -- Frame thông báo
     local NotificationFrame = Instance.new("Frame")
@@ -472,43 +419,6 @@ local success, errorMessage = pcall(function()
         print("ConfirmFrame hidden, Frame shown")
     end)
 
-    -- Hàm chạy progress bar
-    local function runProgressBar()
-        ProgressBar.Size = UDim2.new(0, 0, 1, 0)
-        local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
-        local tween = TweenService:Create(ProgressBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
-        tween:Play()
-        return tween
-    end
-
-    -- Hàm hiển thị loading
-    local function showLoading()
-        LoadingFrame.Visible = true
-        LoadingFrame.BackgroundTransparency = 0
-        ProgressBar.Size = UDim2.new(0, 0, 1, 0)
-        print("LoadingFrame shown")
-        return runProgressBar()
-    end
-
-    -- Hàm ẩn loading và hiện bảng hack
-    local function hideLoading()
-        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
-        local tweenOut = TweenService:Create(LoadingFrame, tweenInfo, {BackgroundTransparency = 1})
-        tweenOut:Play()
-        tweenOut.Completed:Connect(function()
-            LoadingFrame.Visible = false
-            Frame.Visible = true
-            ToggleButton.Visible = true
-            Frame.Position = UDim2.new(0.5, -175, 0.5, -1000)
-            local openTween = TweenService:Create(Frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -175, 0.5, -125)})
-            openTween:Play()
-            openTween.Completed:Connect(function()
-                showNotification("Welcome to Hack Hub!", 2)
-                print("LoadingFrame hidden, Frame and ToggleButton shown")
-            end)
-        end)
-    end
-
     -- Hàm chạy script với kiểm tra lỗi và thử lại
     local function runScript(url, scriptName)
         showNotification("Loading " .. scriptName .. "...", 2)
@@ -548,12 +458,9 @@ local success, errorMessage = pcall(function()
         runScript("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua", "No Lag Script")
     end)
 
-    -- Khởi động loading
-    showLoading()
-    local progressTween = runProgressBar()
-    wait(5)
-    progressTween:Cancel()
-    hideLoading()
+    -- Thông báo khởi động
+    showNotification("Welcome to Hack Hub!", 2)
+    print("Hack Hub initialized")
 end)
 
 -- Kiểm tra lỗi khởi tạo
