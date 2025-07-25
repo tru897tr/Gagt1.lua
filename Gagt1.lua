@@ -19,7 +19,8 @@ Frame.Size = UDim2.new(0, 300, 0, 200)
 Frame.BackgroundTransparency = 0.05
 Frame.Active = true
 Frame.Draggable = true
-Frame.Visible = false -- Ẩn ban đầu, chờ loading
+Frame.Visible = false -- Ẩn ban đầu
+Frame.ZIndex = 2 -- Đảm bảo hiển thị trên các phần tử khác
 
 -- Bo góc Frame
 local FrameCorner = Instance.new("UICorner")
@@ -97,17 +98,18 @@ NoLagStroke.Color = Color3.fromRGB(255, 255, 255)
 NoLagStroke.Transparency = 0.8
 NoLagStroke.Parent = NoLagButton
 
--- Nút bật/tắt (sát góc trên bên phải)
+-- Nút bật/tắt
 local ToggleButton = Instance.new("TextButton")
 ToggleButton.Parent = ScreenGui
 ToggleButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-ToggleButton.Position = UDim2.new(1, -40, 0, 5)
+ToggleButton.Position = UDim2.new(1, -40, 0, 5))
 ToggleButton.Size = UDim2.new(0, 35, 0, 35)
 ToggleButton.Text = "X"
 ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleButton.TextSize = 14
 ToggleButton.Font = Enum.Font.GothamBold
 ToggleButton.Visible = false -- Ẩn ban đầu
+ToggleButton.ZIndex = 5 -- Đảm bảo nút trên cùng
 local ToggleCorner = Instance.new("UICorner")
 ToggleCorner.CornerRadius = UDim.new(0.5, 0)
 ToggleCorner.Parent = ToggleButton
@@ -124,7 +126,8 @@ LoadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 LoadingFrame.BackgroundTransparency = 0.3
 LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
 LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
-LoadingFrame.Visible = true
+LoadingFrame.Visible = true -- Hiển thị ngay từ đầu
+LoadingFrame.ZIndex = 10 -- Đảm bảo che toàn bộ
 local LoadingCorner = Instance.new("UICorner")
 LoadingCorner.CornerRadius = UDim.new(0, 0)
 LoadingCorner.Parent = LoadingFrame
@@ -145,6 +148,7 @@ LoadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
 LoadingText.TextSize = 18
 LoadingText.Font = Enum.Font.GothamBold
 LoadingText.TextWrapped = true
+LoadingText.ZIndex = 11
 
 -- Progress Bar
 local ProgressBarFrame = Instance.new("Frame")
@@ -152,6 +156,7 @@ ProgressBarFrame.Parent = LoadingFrame
 ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 ProgressBarFrame.Position = UDim2.new(0.5, -100, 0.5, 0)
 ProgressBarFrame.Size = UDim2.new(0, 200, 0, 20)
+ProgressBarFrame.ZIndex = 11
 local ProgressBarCorner = Instance.new("UICorner")
 ProgressBarCorner.CornerRadius = UDim.new(0, 5)
 ProgressBarCorner.Parent = ProgressBarFrame
@@ -159,6 +164,7 @@ local ProgressBar = Instance.new("Frame")
 ProgressBar.Parent = ProgressBarFrame
 ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
 ProgressBar.Size = UDim2.new(0, 0, 1, 0)
+ProgressBar.ZIndex = 12
 local ProgressBarCornerInner = Instance.new("UICorner")
 ProgressBarCornerInner.CornerRadius = UDim.new(0, 5)
 ProgressBarCornerInner.Parent = ProgressBar
@@ -171,6 +177,7 @@ NotificationFrame.Position = UDim2.new(0.5, -100, 0.85, 0)
 NotificationFrame.Size = UDim2.new(0, 200, 0, 40)
 NotificationFrame.BackgroundTransparency = 0.1
 NotificationFrame.Visible = false
+NotificationFrame.ZIndex = 3
 local NotificationCorner = Instance.new("UICorner")
 NotificationCorner.CornerRadius = UDim.new(0, 8)
 NotificationCorner.Parent = NotificationFrame
@@ -183,6 +190,7 @@ NotificationText.TextSize = 12
 NotificationText.Font = Enum.Font.Gotham
 NotificationText.Text = ""
 NotificationText.TextWrapped = true
+NotificationText.ZIndex = 4
 local NotificationStroke = Instance.new("UIStroke")
 NotificationStroke.Thickness = 1
 NotificationStroke.Color = Color3.fromRGB(100, 100, 255)
@@ -280,19 +288,18 @@ ToggleButton.MouseButton1Click:Connect(toggleFrame)
 
 -- Hàm chạy progress bar
 local function runProgressBar()
+    ProgressBar.Size = UDim2.new(0, 0, 1, 0) -- Reset progress bar
     local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.In)
     local tween = TweenService:Create(ProgressBar, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
     tween:Play()
     return tween
 end
 
--- Hàm hiển thị và chạy loading
+-- Hàm hiển thị loading
 local function showLoading()
     LoadingFrame.Visible = true
+    LoadingFrame.BackgroundTransparency = 0.3
     ProgressBar.Size = UDim2.new(0, 0, 1, 0)
-    local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local tweenIn = TweenService:Create(LoadingFrame, tweenInfo, {BackgroundTransparency = 0.3})
-    tweenIn:Play()
     return runProgressBar()
 end
 
@@ -305,6 +312,7 @@ local function hideLoading()
         LoadingFrame.Visible = false
         Frame.Visible = true
         ToggleButton.Visible = true
+        Frame.Position = UDim2.new(0.5, -150, 0.5, -1000) -- Đặt vị trí ban đầu để trượt lên
         local openTween = TweenService:Create(Frame, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -150, 0.5, -100)})
         openTween:Play()
         showNotification("Welcome to Hack Hub!", 2)
