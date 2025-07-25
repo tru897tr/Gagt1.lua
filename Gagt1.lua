@@ -1,5 +1,6 @@
 -- Services
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui", 5)
@@ -18,6 +19,33 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Enabled = true
 gui.Parent = playerGui
 
+-- Create Loading Screen
+local function createLoadingScreen()
+    local loadingFrame = Instance.new("Frame")
+    loadingFrame.Size = UDim2.new(1, 0, 1, 0)
+    loadingFrame.Position = UDim2.new(0, 0, 0, 0)
+    loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    loadingFrame.BackgroundTransparency = 0
+    loadingFrame.ZIndex = 10
+    loadingFrame.Parent = gui
+
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+    }
+    gradient.Rotation = 90
+    gradient.Parent = loadingFrame
+
+    -- Fade out animation
+    local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(loadingFrame, tweenInfo, {BackgroundTransparency = 1})
+    tween:Play()
+    tween.Completed:Connect(function()
+        loadingFrame:Destroy()
+    end)
+end
+
 -- Create Main Frame
 local function createFrame()
     local frame = Instance.new("Frame")
@@ -27,8 +55,8 @@ local function createFrame()
     frame.BorderSizePixel = 0
     frame.Active = true
     frame.Draggable = true
+    frame.ZIndex = 2
 
-    -- Add Gradient
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0, Color3.fromRGB(60, 60, 60)),
@@ -37,7 +65,6 @@ local function createFrame()
     gradient.Rotation = 45
     gradient.Parent = frame
 
-    -- Add Corner
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 10)
     corner.Parent = frame
@@ -71,13 +98,13 @@ local function createButton(name, position, parent, callback)
     button.Text = name
     button.Font = Enum.Font.Gotham
     button.TextSize = 14
+    button.ZIndex = 3
     button.Parent = parent
 
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 6)
     corner.Parent = button
 
-    -- Hover Effect
     button.MouseEnter:Connect(function()
         button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     end)
@@ -98,14 +125,15 @@ end
 -- Create Toggle Button
 local function createToggleButton()
     local toggleButton = Instance.new("TextButton")
-    toggleButton.Size = UDim2.new(0, 30, 0, 30)
-    toggleButton.Position = UDim2.new(1, -40, 0, 10)
-    toggleButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+    toggleButton.Size = UDim2.new(0, 25, 0, 25)
+    toggleButton.Position = UDim2.new(1, -35, 0, 10)
+    toggleButton.BackgroundColor3 = Color3.fromRGB(80, 255, 80)
     toggleButton.Text = ""
+    toggleButton.ZIndex = 5
     toggleButton.Parent = gui
 
     local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0.5, 0) -- Circular
+    corner.CornerRadius = UDim.new(0.5, 0)
     corner.Parent = toggleButton
 
     return toggleButton
@@ -114,10 +142,11 @@ end
 -- Toggle GUI Visibility
 local function toggleGui()
     frame.Visible = not frame.Visible
-    toggleButton.BackgroundColor3 = frame.Visible and Color3.fromRGB(255, 80, 80) or Color3.fromRGB(80, 255, 80)
+    toggleButton.BackgroundColor3 = frame.Visible and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
 end
 
 -- Initialize GUI
+createLoadingScreen()
 local frame = createFrame()
 frame.Parent = gui
 createTitle(frame)
@@ -132,7 +161,7 @@ local toggleButton = createToggleButton()
 -- Bind Right Shift to Toggle
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.RightShift then
+    if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == Enum.KeyCode.RightShift then
         toggleGui()
     end
 end)
