@@ -9,9 +9,10 @@ local success, errorMessage = pcall(function()
     -- Tạo ScreenGui
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui", 5)
+    if not ScreenGui.Parent then error("Failed to parent ScreenGui to PlayerGui") end
     ScreenGui.ResetOnSpawn = false
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    ScreenGui.IgnoreGuiInset = true -- Che cả thanh công cụ Roblox
+    ScreenGui.IgnoreGuiInset = true
     print("ScreenGui created and parented to PlayerGui")
 
     -- Tạo Frame chính (bảng chọn hack)
@@ -23,8 +24,8 @@ local success, errorMessage = pcall(function()
     Frame.BackgroundTransparency = 0.05
     Frame.Active = true
     Frame.Draggable = true
-    Frame.Visible = false -- Ẩn ban đầu
-    Frame.ZIndex = 20 -- Tăng ZIndex
+    Frame.Visible = false
+    Frame.ZIndex = 200
     print("Frame created")
 
     -- Bo góc Frame
@@ -59,7 +60,7 @@ local success, errorMessage = pcall(function()
     Title.Font = Enum.Font.SourceSansPro
     Title.TextStrokeTransparency = 0.7
     Title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-    Title.ZIndex = 21
+    Title.ZIndex = 201
 
     -- Credit
     local Credit = Instance.new("TextLabel")
@@ -72,7 +73,7 @@ local success, errorMessage = pcall(function()
     Credit.TextSize = 14
     Credit.Font = Enum.Font.SourceSansPro
     Credit.TextTransparency = 0.1
-    Credit.ZIndex = 21
+    Credit.ZIndex = 201
 
     -- Container cho các nút
     local ButtonContainer = Instance.new("Frame")
@@ -86,7 +87,7 @@ local success, errorMessage = pcall(function()
     UIListLayout.Padding = UDim.new(0, 10)
     UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
     UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
-    ButtonContainer.ZIndex = 21
+    ButtonContainer.ZIndex = 201
 
     -- Nút Speed Up
     local SpeedUpButton = Instance.new("TextButton")
@@ -98,7 +99,7 @@ local success, errorMessage = pcall(function()
     SpeedUpButton.TextSize = 18
     SpeedUpButton.Font = Enum.Font.SourceSansPro
     SpeedUpButton.BackgroundTransparency = 0.1
-    SpeedUpButton.ZIndex = 21
+    SpeedUpButton.ZIndex = 201
     local SpeedUpCorner = Instance.new("UICorner")
     SpeedUpCorner.CornerRadius = UDim.new(0, 10)
     SpeedUpCorner.Parent = SpeedUpButton
@@ -118,7 +119,7 @@ local success, errorMessage = pcall(function()
     NoLagButton.TextSize = 18
     NoLagButton.Font = Enum.Font.SourceSansPro
     NoLagButton.BackgroundTransparency = 0.1
-    NoLagButton.ZIndex = 21
+    NoLagButton.ZIndex = 201
     local NoLagCorner = Instance.new("UICorner")
     NoLagCorner.CornerRadius = UDim.new(0, 10)
     NoLagCorner.Parent = NoLagButton
@@ -138,7 +139,7 @@ local success, errorMessage = pcall(function()
     CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     CloseButton.TextSize = 14
     CloseButton.Font = Enum.Font.SourceSansPro
-    CloseButton.ZIndex = 22
+    CloseButton.ZIndex = 202
     local CloseCorner = Instance.new("UICorner")
     CloseCorner.CornerRadius = UDim.new(0.5, 0)
     CloseCorner.Parent = CloseButton
@@ -148,15 +149,15 @@ local success, errorMessage = pcall(function()
     CloseStroke.Transparency = 0.8
     CloseStroke.Parent = CloseButton
 
-    -- Bảng xác nhận thoát
+    -- Bảng xác nhận
     local ConfirmFrame = Instance.new("Frame")
     ConfirmFrame.Parent = ScreenGui
     ConfirmFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    ConfirmFrame.Position = UDim2.new(0.5, -125, 0.5, -90)
+    ConfirmFrame.Position = UDim2.new(0.5, -125, 0, 5 -90)
     ConfirmFrame.Size = UDim2.new(0, 250, 0, 180)
     ConfirmFrame.BackgroundTransparency = 0.05
     ConfirmFrame.Visible = false
-    ConfirmFrame.ZIndex = 30
+    ConfirmFrame.ZIndex = 300
     local ConfirmCorner = Instance.new("UICorner")
     ConfirmCorner.CornerRadius = UDim.new(0, 12)
     ConfirmCorner.Parent = ConfirmFrame
@@ -177,14 +178,14 @@ local success, errorMessage = pcall(function()
     local ConfirmTitle = Instance.new("TextLabel")
     ConfirmTitle.Parent = ConfirmFrame
     ConfirmTitle.BackgroundTransparency = 1
-    ConfirmTitle.Position = UDim2.new(0, 0, 0, 10)
+    ConfirmTitle.Position = UDim2.new(0, 0, 0, 0, 10)
     ConfirmTitle.Size = UDim2.new(1, -20, 0, 50)
     ConfirmTitle.Text = "Bạn có chắc muốn tắt script không?"
     ConfirmTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
     ConfirmTitle.TextSize = 16
     ConfirmTitle.Font = Enum.Font.SourceSansPro
     ConfirmTitle.TextWrapped = true
-    ConfirmTitle.ZIndex = 31
+    ConfirmTitle.ZIndex = 301
 
     -- Container cho nút xác nhận
     local ConfirmButtonContainer = Instance.new("Frame")
@@ -192,7 +193,7 @@ local success, errorMessage = pcall(function()
     ConfirmButtonContainer.BackgroundTransparency = 1
     ConfirmButtonContainer.Position = UDim2.new(0, 0, 0, 70)
     ConfirmButtonContainer.Size = UDim2.new(1, -20, 0, 80)
-    ConfirmButtonContainer.ZIndex = 31
+    ConfirmButtonContainer.ZIndex = 301
     local ConfirmListLayout = Instance.new("UIListLayout")
     ConfirmListLayout.Parent = ConfirmButtonContainer
     ConfirmListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -210,7 +211,7 @@ local success, errorMessage = pcall(function()
     YesButton.TextSize = 16
     YesButton.Font = Enum.Font.SourceSansPro
     YesButton.BackgroundTransparency = 0.1
-    YesButton.ZIndex = 31
+    YesButton.ZIndex = 301
     local YesCorner = Instance.new("UICorner")
     YesCorner.CornerRadius = UDim.new(0, 8)
     YesCorner.Parent = YesButton
@@ -230,7 +231,7 @@ local success, errorMessage = pcall(function()
     NoButton.TextSize = 16
     NoButton.Font = Enum.Font.SourceSansPro
     NoButton.BackgroundTransparency = 0.1
-    NoButton.ZIndex = 31
+    NoButton.ZIndex = 301
     local NoCorner = Instance.new("UICorner")
     NoCorner.CornerRadius = UDim.new(0, 8)
     NoCorner.Parent = NoButton
@@ -251,7 +252,7 @@ local success, errorMessage = pcall(function()
     ToggleButton.TextSize = 16
     ToggleButton.Font = Enum.Font.SourceSansPro
     ToggleButton.Visible = false
-    ToggleButton.ZIndex = 50 -- Tăng ZIndex
+    ToggleButton.ZIndex = 500
     local ToggleCorner = Instance.new("UICorner")
     ToggleCorner.CornerRadius = UDim.new(0.5, 0)
     ToggleCorner.Parent = ToggleButton
@@ -270,7 +271,7 @@ local success, errorMessage = pcall(function()
     LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
     LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
     LoadingFrame.Visible = true
-    LoadingFrame.ZIndex = 100 -- Tăng ZIndex
+    LoadingFrame.ZIndex = 1000
     LoadingFrame.AnchorPoint = Vector2.new(0, 0)
     LoadingFrame.ClipsDescendants = false
     local LoadingCorner = Instance.new("UICorner")
@@ -294,7 +295,7 @@ local success, errorMessage = pcall(function()
     LoadingText.TextSize = 20
     LoadingText.Font = Enum.Font.SourceSansPro
     LoadingText.TextWrapped = true
-    LoadingText.ZIndex = 101
+    LoadingText.ZIndex = 1001
 
     -- Progress Bar
     local ProgressBarFrame = Instance.new("Frame")
@@ -302,7 +303,7 @@ local success, errorMessage = pcall(function()
     ProgressBarFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     ProgressBarFrame.Position = UDim2.new(0.5, -125, 0.5, 0)
     ProgressBarFrame.Size = UDim2.new(0, 250, 0, 25)
-    ProgressBarFrame.ZIndex = 101
+    ProgressBarFrame.ZIndex = 1001
     local ProgressBarCorner = Instance.new("UICorner")
     ProgressBarCorner.CornerRadius = UDim.new(0, 6)
     ProgressBarCorner.Parent = ProgressBarFrame
@@ -310,7 +311,7 @@ local success, errorMessage = pcall(function()
     ProgressBar.Parent = ProgressBarFrame
     ProgressBar.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
     ProgressBar.Size = UDim2.new(0, 0, 1, 0)
-    ProgressBar.ZIndex = 102
+    ProgressBar.ZIndex = 1002
     local ProgressBarCornerInner = Instance.new("UICorner")
     ProgressBarCornerInner.CornerRadius = UDim.new(0, 6)
     ProgressBarCornerInner.Parent = ProgressBar
@@ -323,7 +324,7 @@ local success, errorMessage = pcall(function()
     NotificationFrame.Size = UDim2.new(0, 250, 0, 50)
     NotificationFrame.BackgroundTransparency = 0.1
     NotificationFrame.Visible = false
-    NotificationFrame.ZIndex = 40
+    NotificationFrame.ZIndex = 400
     local NotificationCorner = Instance.new("UICorner")
     NotificationCorner.CornerRadius = UDim.new(0, 10)
     NotificationCorner.Parent = NotificationFrame
@@ -345,7 +346,7 @@ local success, errorMessage = pcall(function()
     NotificationText.Font = Enum.Font.SourceSansPro
     NotificationText.Text = ""
     NotificationText.TextWrapped = true
-    NotificationText.ZIndex = 41
+    NotificationText.ZIndex = 401
 
     -- Quản lý hàng đợi thông báo
     local notificationQueue = {}
