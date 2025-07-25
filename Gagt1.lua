@@ -9,13 +9,39 @@ screenGui.ResetOnSpawn = false
 screenGui.IgnoreGuiInset = true -- Bỏ qua thanh công cụ Roblox
 screenGui.DisplayOrder = 100 -- Đảm bảo hiển thị trên cùng
 
+-- Hàm tạo thông báo
+local function createNotification(message)
+    local notificationFrame = Instance.new("Frame")
+    notificationFrame.Size = UDim2.new(0, 200, 0, 50)
+    notificationFrame.Position = UDim2.new(0.5, -100, 0, 10)
+    notificationFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    notificationFrame.BorderSizePixel = 0
+    notificationFrame.ZIndex = 15
+    notificationFrame.Parent = screenGui
+
+    local notificationText = Instance.new("TextLabel")
+    notificationText.Size = UDim2.new(1, 0, 1, 0)
+    notificationText.BackgroundTransparency = 1
+    notificationText.Text = message
+    notificationText.TextColor3 = Color3.fromRGB(255, 255, 255)
+    notificationText.TextSize = 16
+    notificationText.Font = Enum.Font.SourceSans
+    notificationText.ZIndex = 16
+    notificationText.Parent = notificationFrame
+
+    spawn(function()
+        wait(3)
+        notificationFrame:Destroy()
+    end)
+end
+
 -- Tạo màn hình Loading
 local loadingFrame = Instance.new("Frame")
 loadingFrame.Size = UDim2.new(1, 0, 1, 0)
 loadingFrame.Position = UDim2.new(0, 0, 0, 0)
 loadingFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 loadingFrame.BackgroundTransparency = 0 -- Màu đen hoàn toàn
-loadingFrame.ZIndex = 100 -- ZIndex cao
+loadingFrame.ZIndex = 100
 loadingFrame.Parent = screenGui
 
 local loadingText = Instance.new("TextLabel")
@@ -26,13 +52,14 @@ loadingText.Text = "Loading..."
 loadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
 loadingText.TextSize = 32
 loadingText.Font = Enum.Font.SourceSansBold
-loadingText.ZIndex = 101 -- Cao hơn loadingFrame
+loadingText.ZIndex = 101
 loadingText.Parent = loadingFrame
 
--- Tắt màn hình loading sau 5 giây
+-- Tắt màn hình loading sau 5 giây và thông báo thành công
 spawn(function()
     wait(5)
     loadingFrame:Destroy()
+    createNotification("Script loaded successfully!")
 end)
 
 -- Tạo Frame chính
@@ -55,6 +82,61 @@ titleLabel.TextSize = 24
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.ZIndex = 6
 titleLabel.Parent = mainFrame
+
+-- Tạo nút đóng (X) ở góc trên bên phải
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -35, 0, 5)
+closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 16
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.ZIndex = 7
+closeButton.Parent = mainFrame
+
+-- Tạo khung xác nhận khi đóng
+local confirmFrame = Instance.new("Frame")
+confirmFrame.Size = UDim2.new(0, 250, 0, 150)
+confirmFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
+confirmFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+confirmFrame.BorderSizePixel = 0
+confirmFrame.ZIndex = 20
+confirmFrame.Visible = false
+confirmFrame.Parent = screenGui
+
+local confirmText = Instance.new("TextLabel")
+confirmText.Size = UDim2.new(1, 0, 0, 50)
+confirmText.Position = UDim2.new(0, 0, 0, 10)
+confirmText.BackgroundTransparency = 1
+confirmText.Text = "Close script completely?"
+confirmText.TextColor3 = Color3.fromRGB(255, 255, 255)
+confirmText.TextSize = 18
+confirmText.Font = Enum.Font.SourceSans
+confirmText.ZIndex = 21
+confirmText.Parent = confirmFrame
+
+local confirmOkButton = Instance.new("TextButton")
+confirmOkButton.Size = UDim2.new(0, 100, 0, 40)
+confirmOkButton.Position = UDim2.new(0.15, 0, 0.6, 0)
+confirmOkButton.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+confirmOkButton.Text = "OK"
+confirmOkButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+confirmOkButton.TextSize = 16
+confirmOkButton.Font = Enum.Font.SourceSansBold
+confirmOkButton.ZIndex = 21
+confirmOkButton.Parent = confirmFrame
+
+local confirmCancelButton = Instance.new("TextButton")
+confirmCancelButton.Size = UDim2.new(0, 100, 0, 40)
+confirmCancelButton.Position = UDim2.new(0.55, 0, 0.6, 0)
+confirmCancelButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+confirmCancelButton.Text = "Cancel"
+confirmCancelButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+confirmCancelButton.TextSize = 16
+confirmCancelButton.Font = Enum.Font.SourceSansBold
+confirmCancelButton.ZIndex = 21
+confirmCancelButton.Parent = confirmFrame
 
 -- Tạo nút Speed Up X
 local speedUpButton = Instance.new("TextButton")
@@ -112,26 +194,49 @@ local function toggleUI()
     local tween = TweenService:Create(mainFrame, tweenInfo, {Position = targetPosition})
     tween:Play()
     toggleButton.Text = isVisible and ">" or "<"
+    createNotification(isVisible and "Interface shown!" or "Interface hidden!")
 end
-
--- Xử lý phím O
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not gameProcessed and input.KeyCode == Enum.KeyCode.O then
-        toggleUI()
-    end
-end)
 
 -- Xử lý nút ẩn/hiện
 toggleButton.MouseButton1Click:Connect(toggleUI)
 
+-- Xử lý nút đóng
+closeButton.MouseButton1Click:Connect(function()
+    confirmFrame.Visible = true
+end)
+
+-- Xử lý nút OK trong xác nhận
+confirmOkButton.MouseButton1Click:Connect(function()
+    screenGui:Destroy() -- Tắt hoàn toàn script
+end)
+
+-- Xử lý nút Cancel trong xác nhận
+confirmCancelButton.MouseButton1Click:Connect(function()
+    confirmFrame.Visible = false
+end)
+
 -- Xử lý nút Speed Up X
 speedUpButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+    end)
+    if success then
+        createNotification("Speed Up X executed successfully!")
+    else
+        createNotification("Error executing Speed Up X: " .. tostring(err))
+    end
 end)
 
 -- Xử lý nút No Lag
 noLagButton.MouseButton1Click:Connect(function()
-    loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
+    local success, err = pcall(function()
+        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
+    end)
+    if success then
+        createNotification("No Lag executed successfully!")
+    else
+        createNotification("Error executing No Lag: " .. tostring(err))
+    end
 end)
 
 -- Làm khung có thể kéo (hỗ trợ cả chuột và cảm ứng)
