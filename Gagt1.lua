@@ -266,14 +266,14 @@ closeButton.Font = Enum.Font.SourceSansBold
 closeButton.ZIndex = 7
 closeButton.Parent = mainFrame
 
--- Tạo nút Discord nhỏ ở góc trên bên phải (bên trái nút đóng)
+-- Tạo nút Discord ở góc trên bên trái
 local discordButton = Instance.new("TextButton")
-discordButton.Size = UDim2.new(0, 20, 0, 20)
-discordButton.Position = UDim2.new(1, -60, 0, 10)
+discordButton.Size = UDim2.new(0, 30, 0, 30)
+discordButton.Position = UDim2.new(0, 5, 0, 5)
 discordButton.BackgroundColor3 = Color3.fromRGB(88, 101, 242) -- Màu xanh Discord
-discordButton.Text = "D"
+discordButton.Text = "🟦" -- Emoji placeholder cho logo Discord
 discordButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-discordButton.TextSize = 12
+discordButton.TextSize = 16
 discordButton.Font = Enum.Font.SourceSansBold
 discordButton.ZIndex = 7
 discordButton.Parent = mainFrame
@@ -434,53 +434,65 @@ end)
 
 -- Xử lý nút Speed Up X
 speedUpButton.MouseButton1Click:Connect(function()
+    createNotification("Attempting to execute Speed Up X...", false)
     local success, err = pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+        local scriptContent = game:HttpGetAsync("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua")
+        print("[HackHub Debug] Speed Up X script fetched, length: " .. #scriptContent)
+        loadstring(scriptContent)()
     end)
     if success then
         createNotification("Speed Up X executed successfully!", false)
     else
         createNotification("Error executing Speed Up X: " .. tostring(err), true)
+        print("[HackHub Debug] Speed Up X error details: " .. tostring(err))
     end
 end)
 
 -- Xử lý nút No Lag
 noLagButton.MouseButton1Click:Connect(function()
+    createNotification("Attempting to execute No Lag...", false)
     local success, err = pcall(function()
-        loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua"))()
+        local scriptContent = game:HttpGetAsync("https://raw.githubusercontent.com/NoLag-id/No-Lag-HUB/refs/heads/main/Loader/LoaderV1.lua")
+        print("[HackHub Debug] No Lag script fetched, length: " .. #scriptContent)
+        loadstring(scriptContent)()
     end)
     if success then
         createNotification("No Lag executed successfully!", false)
     else
         createNotification("Error executing No Lag: " .. tostring(err), true)
+        print("[HackHub Debug] No Lag error details: " .. tostring(err))
     end
 end)
 
 -- Xử lý nút Limit Hub
 limitHubButton.MouseButton1Click:Connect(function()
+    createNotification("Attempting to execute Limit Hub...", false)
     local success, err = pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Luarmor_E.lua"))()
+        local scriptContent = game:HttpGetAsync("https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Luarmor_E.lua")
+        print("[HackHub Debug] Limit Hub script fetched, length: " .. #scriptContent)
+        loadstring(scriptContent)()
     end)
     if success then
         createNotification("Limit Hub executed successfully!", false)
     else
         createNotification("Error executing Limit Hub: " .. tostring(err), true)
+        print("[HackHub Debug] Limit Hub error details: " .. tostring(err))
     end
 end)
 
--- Xử lý nút OMG Hub với debug bổ sung
+-- Xử lý nút OMG Hub
 omgHubButton.MouseButton1Click:Connect(function()
-    createNotification("Attempting to execute OMG Hub...", false) -- Thông báo bắt đầu thực thi
+    createNotification("Attempting to execute OMG Hub...", false)
     local success, err = pcall(function()
-        local scriptContent = game:HttpGet("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua")
-        print("[HackHub Debug] OMG Hub script fetched, length: " .. #scriptContent) -- Debug độ dài nội dung script
+        local scriptContent = game:HttpGetAsync("https://raw.githubusercontent.com/Omgshit/Scripts/main/MainLoader.lua")
+        print("[HackHub Debug] OMG Hub script fetched, length: " .. #scriptContent)
         loadstring(scriptContent)()
     end)
     if success then
         createNotification("OMG Hub executed successfully!", false)
     else
         createNotification("Error executing OMG Hub: " .. tostring(err), true)
-        print("[HackHub Debug] OMG Hub error details: " .. tostring(err)) -- Debug chi tiết lỗi
+        print("[HackHub Debug] OMG Hub error details: " .. tostring(err))
     end
 end)
 
