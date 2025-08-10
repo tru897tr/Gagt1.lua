@@ -198,7 +198,7 @@ progressFill.ZIndex = 10002
 progressFill.Parent = progressBar
 
 -- Animate progress bar
-local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.In) -- 5 giây, tuyến tính
+local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Linear, Enum.EasingDirection.In) -- 5 giây, tuyến tính
 local tween = TweenService:Create(progressFill, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)}) -- Fill từ 0% đến 100%
 tween:Play()
 
